@@ -4,6 +4,8 @@ import type { StatusState } from './types';
 const ENDPOINT = 'shopify:admin/api/graphql.json';
 const NAMESPACE = '$app';
 const KEY = 'cfs_status';
+// New apps are limited to 128KB per JSON metafield value (Shopify metafield limits).
+const MAX_JSON_BYTES = 128 * 1024;
 
 const LOAD_QUERY = `#graphql
   query CfsStatus($id: ID!) {
@@ -51,6 +53,14 @@ export async function saveState(
   digest: string | null,
   fetchFn: typeof fetch = fetch,
 ): Promise<SaveResult> {
+  const value = JSON.stringify(state);
+  if (new TextEncoder().encode(value).length > MAX_JSON_BYTES) {
+    return {
+      ok: false,
+      reason: 'error',
+      message: 'The status history for this order has reached the 128KB limit, so no more changes can be saved. Contact an administrator.',
+    };
+  }
   try {
     const data = await post(fetchFn, SAVE_MUTATION, {
       metafields: [
@@ -59,7 +69,7 @@ export async function saveState(
           namespace: NAMESPACE,
           key: KEY,
           type: 'json',
-          value: JSON.stringify(state),
+          value,
           compareDigest: digest,
         },
       ],

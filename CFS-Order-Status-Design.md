@@ -87,8 +87,8 @@ The tests in CFS-Order-Status-MVP.md (A1–A2, B1–B4) apply unchanged. Add che
 ## 7. Open items (for the builder)
 - Confirm the logged-in Partner account can see Urban Deco Dev, then create the app there.
 - Pin the Admin API version at scaffold time (2026-10 is current, to be verified).
-- Check the JSON metafield size limit against a long history, and decide a cap if needed.
-- Confirm an app-owned metafield is not exposed to the storefront.
+- **Size limit result:** Shopify's documentation sets 128KB per JSON metafield for new apps (2MB only for apps using JSON before 1 April 2026). One single-change history entry is about 250 bytes, so roughly 500 entries fit. `saveState` refuses an oversized save with a clear message (tested). Still to decide: an archive route for long histories and legacy imports.
+- **Storefront exposure:** per Shopify documentation, a metafield is readable by the Storefront API only if a definition grants `PUBLIC_READ`. This metafield has no definition. Documentation only; not tested against the storefront (pending).
 - **Identity test result (18 November 2026):** `shopify app dev` on Urban Deco Dev (Basic App Development) fails when the app requests `read_users`; without it the preview starts. So `currentStaffMember` is not available for this app, and the MVP uses the self-declared name (fallback 2). A verified identity needs either an Advanced or Plus store with `read_users` enabled by Shopify Support, or a backend (approach B).
 - CFS to confirm: roll-up or cascade rules, which statuses are still used, the meaning of V12, DHD and SBTS, and how much history to migrate.
 

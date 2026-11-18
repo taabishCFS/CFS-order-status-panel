@@ -2,7 +2,7 @@
 
 **Store:** Urban Deco Dev (`urban-deco-dev.myshopify.com`)  
 **Goal:** Reproduce the current CFS staff status workflow inside the Shopify order details page.  
-**Progress:** Order #1036 was verified as a paid, unfulfilled test order. The staff status panel and tests are pending.
+**Progress:** The staff status panel is built and tests A1–B4 passed on 18 November 2026 in the Admin development preview (section 6). Staff identity is typed in, not verified. Deployment and production rollout are pending.
 
 ## 1. Confirm what the current CFS screen does
 
@@ -55,3 +55,30 @@ Capture one screenshot of the staff panel showing the order and line statuses to
 Confirm the production rules for whole-order updates, selected items and status roll-up. Check which statuses are still in daily use, including the meaning of ambiguous labels such as V12, DHD, and SBTS. Map migrated order and line statuses by their original IDs and agree how much existing history to bring forward.
 
 [Shopify Admin order details extension targets](https://shopify.dev/docs/api/admin-extensions/2026-01/target-apis/core-apis/standard-api)
+
+## 6. Results on Urban Deco Dev (18 November 2026)
+
+**Setup:** Admin development preview (`shopify app dev`), nothing deployed. Order #1036 (seven lines, from the CFS configurator, paid and unfulfilled) and order #1034 (one line, paid and unfulfilled). The tester typed the staff names. Design: [CFS-Order-Status-Design.md](CFS-Order-Status-Design.md).
+
+| Step | Result | What was seen |
+|---|---|---|
+| A1 | Pass (#1034) | Whole order, then the item, each saved as **Collection/Display Stock**. History shows two entries with their scopes. |
+| A2 | Pass (#1034) | After a full reload both statuses persisted and the history showed two entries. |
+| B1 | Pass (#1036) | Both Archer bed lines **Allocated From Stock**; divan and three mattresses **Due In Stock**; order status stayed Not set. |
+| B2 | Pass (#1036) | Order status **Part Delivery Booked**; line statuses unchanged. |
+| B3 | Pass (#1036) | Only the Archer Double bed changed to **Part Order Delivered**. The other bed, the other lines and the order status were unchanged. |
+| B4 | Pass (#1036) | In two sessions, Staff A saved Delivery Booked. Staff B's save from the stale view was refused with a refresh prompt, and the stored record holds no entry from Staff B. |
+| Native badges | Pass | #1036 and #1034 still showed Paid and Unfulfilled after every save. |
+
+Screenshots: [panel with order and line statuses](docs/screenshots/1036-panel-order-and-line-statuses.jpg), [status history](docs/screenshots/1036-status-history.jpg), [stale save refused](docs/screenshots/1036-stale-save-refresh-prompt.jpg), [persisted after reload](docs/screenshots/1034-persisted-after-reload.jpg).
+
+**Findings from the build**
+- **Staff identity.** `currentStaffMember` needs the `read_users` scope. Shopify rejected that scope for this app on Urban Deco Dev, and the preview would not start until it was removed. History therefore records a typed name marked self-declared. Production needs an Advanced or Plus store with the scope enabled by Shopify Support, or a backend that verifies the session token.
+- **Layout.** Shopify clips tall blocks, and a modal does not work inside a block. The block is a compact summary. **Update status and history** opens a dialog (second extension, `cfs-order-status-update`).
+- **Removed lines.** Shopify still returns lines removed in an order edit. The panel hides lines with a current quantity of 0. Statuses saved against a line that was later removed stay in the record and show as "Removed from order". That display was not tested live.
+- **Size limit.** New apps are limited to 128KB per JSON metafield. A single-change history entry is about 250 bytes (roughly 500 entries); saves touching many lines use more. The panel refuses an oversized save with a clear message. Decide how to archive older history before importing legacy history.
+- **Privacy.** The metafield has no definition, so Shopify's documentation says the Storefront API cannot read it. This was not tested against the storefront.
+
+**Pass criteria:** exact labels saved, scopes independent, changes survived reload, native badges accurate. All met, except that staff identity is not verified.
+
+**Still open:** the rollout questions in section 5, a deployed (non-preview) install, a verified staff identity route, a staff name list, the removed-line display, and storefront non-exposure.

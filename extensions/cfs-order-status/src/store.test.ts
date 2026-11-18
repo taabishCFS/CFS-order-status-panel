@@ -63,6 +63,15 @@ describe('saveState', () => {
     expect(await saveState(ORDER, saved, 'old', f as unknown as typeof fetch)).toEqual({ ok: false, reason: 'error', message: 'Value is too long' });
   });
 
+  it('refuses a value over the 128KB JSON metafield limit and does not call Shopify', async () => {
+    const big = { ...saved, history: Array.from({ length: 1000 }, (_, i) => ({ ...saved.history[0], id: `e${i}` })) };
+    const f = reply({});
+    const result = await saveState(ORDER, big, 'old', f as unknown as typeof fetch);
+    expect(result).toMatchObject({ ok: false, reason: 'error' });
+    expect((result as { message: string }).message).toMatch(/128KB/);
+    expect(f).not.toHaveBeenCalled();
+  });
+
   it('reports a thrown fetch as an error without throwing', async () => {
     const f = vi.fn(async () => { throw new Error('offline'); });
     expect(await saveState(ORDER, saved, 'old', f as unknown as typeof fetch)).toEqual({ ok: false, reason: 'error', message: 'offline' });
