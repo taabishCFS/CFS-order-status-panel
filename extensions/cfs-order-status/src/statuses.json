@@ -1,0 +1,338 @@
+[
+  {
+    "id": 1,
+    "label": "Payment Process"
+  },
+  {
+    "id": 2,
+    "label": "Part Order Coming IN"
+  },
+  {
+    "id": 3,
+    "label": "Order in Progress"
+  },
+  {
+    "id": 4,
+    "label": "In Stock"
+  },
+  {
+    "id": 5,
+    "label": "Part Order In Stock"
+  },
+  {
+    "id": 6,
+    "label": "Completed"
+  },
+  {
+    "id": 7,
+    "label": "Cancelled"
+  },
+  {
+    "id": 8,
+    "label": "On Hold"
+  },
+  {
+    "id": 9,
+    "label": "Deleted"
+  },
+  {
+    "id": 10,
+    "label": "Delayed"
+  },
+  {
+    "id": 11,
+    "label": "Part Order Out of Stock"
+  },
+  {
+    "id": 12,
+    "label": "Invoice Received"
+  },
+  {
+    "id": 13,
+    "label": "Invoice Paid"
+  },
+  {
+    "id": 14,
+    "label": "Coming IN"
+  },
+  {
+    "id": 15,
+    "label": "Service Issue"
+  },
+  {
+    "id": 16,
+    "label": "Part Order Delivered"
+  },
+  {
+    "id": 17,
+    "label": "Send Back to Supplier"
+  },
+  {
+    "id": 18,
+    "label": "Delivery Booked"
+  },
+  {
+    "id": 19,
+    "label": "Part Delivery Booked"
+  },
+  {
+    "id": 20,
+    "label": "Order Delivered"
+  },
+  {
+    "id": 21,
+    "label": "Awaiting Credit Note"
+  },
+  {
+    "id": 22,
+    "label": "Credit Note Received"
+  },
+  {
+    "id": 23,
+    "label": "Part Refunded"
+  },
+  {
+    "id": 24,
+    "label": "Refund Processed"
+  },
+  {
+    "id": 25,
+    "label": "Repl. Coming In"
+  },
+  {
+    "id": 26,
+    "label": "Repl. Delivery Booked"
+  },
+  {
+    "id": 27,
+    "label": "Replacement In Stock"
+  },
+  {
+    "id": 28,
+    "label": "Repl. Invoice Paid"
+  },
+  {
+    "id": 29,
+    "label": "Repl. Invoice Received"
+  },
+  {
+    "id": 30,
+    "label": "Repl. Order In Progress"
+  },
+  {
+    "id": 31,
+    "label": "Collection"
+  },
+  {
+    "id": 32,
+    "label": "Order Failed"
+  },
+  {
+    "id": 33,
+    "label": "Exchange"
+  },
+  {
+    "id": 34,
+    "label": "Discontinued"
+  },
+  {
+    "id": 35,
+    "label": "In Stock with Supplier"
+  },
+  {
+    "id": 36,
+    "label": "DHD with Supplier"
+  },
+  {
+    "id": 37,
+    "label": "Replacement"
+  },
+  {
+    "id": 38,
+    "label": "TNT"
+  },
+  {
+    "id": 39,
+    "label": "Check Stock"
+  },
+  {
+    "id": 40,
+    "label": "Container Stock"
+  },
+  {
+    "id": 41,
+    "label": "On Water"
+  },
+  {
+    "id": 42,
+    "label": "Store Collect"
+  },
+  {
+    "id": 43,
+    "label": "Allocated From Stock"
+  },
+  {
+    "id": 44,
+    "label": "Collection/SBTS"
+  },
+  {
+    "id": 45,
+    "label": "Collection/Free Stock"
+  },
+  {
+    "id": 46,
+    "label": "Collection/Display Stock"
+  },
+  {
+    "id": 47,
+    "label": "Exchange/Display Stock"
+  },
+  {
+    "id": 48,
+    "label": "Exchange/Free Stock"
+  },
+  {
+    "id": 49,
+    "label": "Exchange/SBTS"
+  },
+  {
+    "id": 50,
+    "label": "Awaiting Payment"
+  },
+  {
+    "id": 51,
+    "label": "Free Stock"
+  },
+  {
+    "id": 52,
+    "label": "Collected"
+  },
+  {
+    "id": 53,
+    "label": "Failed Delivery"
+  },
+  {
+    "id": 54,
+    "label": "Failed Collection"
+  },
+  {
+    "id": 55,
+    "label": "Exchange/Wrong Item Delivered"
+  },
+  {
+    "id": 56,
+    "label": "Payment Not Confirmed"
+  },
+  {
+    "id": 57,
+    "label": "Due In Stock"
+  },
+  {
+    "id": 58,
+    "label": "Awaiting V12 Approval"
+  },
+  {
+    "id": 59,
+    "label": "Missing On Supplier Delivery"
+  },
+  {
+    "id": 60,
+    "label": "Reorder In Progress"
+  },
+  {
+    "id": 61,
+    "label": "Agreed For Part Delivery"
+  },
+  {
+    "id": 62,
+    "label": "On Hold Delivery"
+  },
+  {
+    "id": 63,
+    "label": "Allocated From Container Stock"
+  },
+  {
+    "id": 64,
+    "label": "Partial Order Delivered"
+  },
+  {
+    "id": 65,
+    "label": "Part Refund"
+  },
+  {
+    "id": 66,
+    "label": "Cancel-Removed"
+  },
+  {
+    "id": 67,
+    "label": "Transit Damage"
+  },
+  {
+    "id": 68,
+    "label": "Manufacturing Defect"
+  },
+  {
+    "id": 69,
+    "label": "In Stock From Display"
+  },
+  {
+    "id": 70,
+    "label": "X Display Shop Soiled"
+  },
+  {
+    "id": 71,
+    "label": "No Guarantee OR Warranty"
+  },
+  {
+    "id": 72,
+    "label": "Credit Agreed"
+  },
+  {
+    "id": 73,
+    "label": "In Stock From Shop"
+  },
+  {
+    "id": 74,
+    "label": "Fitter Visit"
+  },
+  {
+    "id": 75,
+    "label": "Part Exchange"
+  },
+  {
+    "id": 76,
+    "label": "In Transit"
+  },
+  {
+    "id": 77,
+    "label": "Payment Not Come"
+  },
+  {
+    "id": 78,
+    "label": "EXTRA SBTS"
+  },
+  {
+    "id": 79,
+    "label": "Policy Saved"
+  },
+  {
+    "id": 80,
+    "label": "Warehouse Collect"
+  },
+  {
+    "id": 81,
+    "label": "Policy Purchased"
+  },
+  {
+    "id": 82,
+    "label": "Collection/Wrong Item Delivered"
+  },
+  {
+    "id": 83,
+    "label": "Deposit Paid"
+  },
+  {
+    "id": 84,
+    "label": "Courier Claims"
+  }
+]
