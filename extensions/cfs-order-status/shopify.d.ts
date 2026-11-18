@@ -31,7 +31,7 @@ declare module './src/useOrderStatus.js' {
 }
 
 //@ts-ignore
-declare module './src/state.ts' {
+declare module './src/canSave.ts' {
   const shopify: import('@shopify/ui-extensions/admin.order-details.action.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
@@ -43,7 +43,7 @@ declare module './src/statuses.json' {
 }
 
 //@ts-ignore
-declare module './src/statuses.ts' {
+declare module './src/state.ts' {
   const shopify: import('@shopify/ui-extensions/admin.order-details.action.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
@@ -55,7 +55,7 @@ declare module './src/lines.ts' {
 }
 
 //@ts-ignore
-declare module './src/store.ts' {
+declare module './src/statuses.ts' {
   const shopify: import('@shopify/ui-extensions/admin.order-details.action.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
@@ -67,7 +67,7 @@ declare module './src/state.ts' {
 }
 
 //@ts-ignore
-declare module './src/useOrderStatus.js' {
+declare module './src/store.ts' {
   const shopify: import('@shopify/ui-extensions/admin.order-details.action.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
@@ -75,6 +75,12 @@ declare module './src/useOrderStatus.js' {
 //@ts-ignore
 declare module './src/store.ts' {
   const shopify: import('@shopify/ui-extensions/admin.order-details.block.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/useOrderStatus.js' {
+  const shopify: import('@shopify/ui-extensions/admin.order-details.action.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
 

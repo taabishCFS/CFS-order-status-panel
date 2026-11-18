@@ -79,6 +79,23 @@ Screenshots: [panel with order and line statuses](docs/screenshots/1036-panel-or
 - **Size limit.** New apps are limited to 128KB per JSON metafield. A single-change history entry is about 250 bytes (roughly 500 entries); saves touching many lines use more. The panel refuses an oversized save with a clear message. Decide how to archive older history before importing legacy history.
 - **Privacy.** The metafield has no definition, so Shopify's documentation says the Storefront API cannot read it. This was not tested against the storefront.
 
+### Deployed install on Urban Deco Dev (18 November 2026)
+
+`shopify app deploy` released version `cfs-order-status-panel-2` to the app. A leftover dev preview was overriding it, so it was cleaned in the Dev Console. The "CFS Order Status" block is then added from **+ Block** on the order page and pinned. That is a per-user layout step, so each staff member does it once.
+
+| Check | Result |
+|---|---|
+| Deployed block loads on #1034 | Pass. It showed the saved order and item statuses. |
+| Deployed build is the latest code | Pass. The dialog heading now reads "CFS Order Status", the wording from the review fixes. |
+| Earlier history loads | Pass. The two earlier entries appeared. |
+| Save from the deployed build | Pass. Whole order set to **Delivery Booked** as "Deploy Check". The button then showed (3) history entries. |
+| Stale save between two sessions (B4) | Pending on the deployed build. |
+| Review fixes (blocked save after a failed load, malformed stored data, removed-line titles) | Pending live. Unit tests pass (38). |
+
+Screenshots: [deployed block after the save](docs/screenshots/1034-deployed-block.png), [orders list with no CFS status column](docs/screenshots/orders-list-no-status-column.png).
+
+**Orders list column:** the main Orders list has no CFS status column. The Shopify documentation lists only a More actions target on that page, so a custom column is not available to an extension (see the design doc).
+
 **Pass criteria:** exact labels saved, scopes independent, changes survived reload, native badges accurate. All met, except that staff identity is not verified.
 
 **Still open:** the rollout questions in section 5, a deployed (non-preview) install, a verified staff identity route, a staff name list, the removed-line display, and storefront non-exposure.
