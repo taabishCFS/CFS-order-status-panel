@@ -89,7 +89,7 @@ The tests in CFS-Order-Status-MVP.md (A1–A2, B1–B4) apply unchanged. Add che
 - Pin the Admin API version at scaffold time (2026-10 is current, to be verified).
 - Check the JSON metafield size limit against a long history, and decide a cap if needed.
 - Confirm an app-owned metafield is not exposed to the storefront.
-- Outcome of the `currentStaffMember` test on a dev store.
+- **Identity test result (18 November 2026):** `shopify app dev` on Urban Deco Dev (Basic App Development) fails when the app requests `read_users`; without it the preview starts. So `currentStaffMember` is not available for this app, and the MVP uses the self-declared name (fallback 2). A verified identity needs either an Advanced or Plus store with `read_users` enabled by Shopify Support, or a backend (approach B).
 - CFS to confirm: roll-up or cascade rules, which statuses are still used, the meaning of V12, DHD and SBTS, and how much history to migrate.
 
 ## 8. Calls I made (not agreed with the user)
