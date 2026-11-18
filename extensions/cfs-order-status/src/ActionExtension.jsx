@@ -6,6 +6,7 @@ import { canSave as canSaveNow } from './canSave';
 import { applyChange } from './state';
 import { STATUSES, labelFor, statusById } from './statuses';
 import { saveState } from './store';
+import { syncStatusTag } from './tags';
 import { lineText, useOrderStatus } from './useOrderStatus';
 
 export default async () => {
@@ -52,9 +53,13 @@ function Extension() {
     });
     const result = await saveState(orderId, next, digest);
     if (result.ok) {
+      const savedScope = scope;
+      const savedLabel = statusById(Number(statusId)).label;
       setStatusId('');
       setPicked([]);
+      const tag = savedScope === 'order' ? await syncStatusTag(orderId, savedLabel) : { ok: true };
       await refresh();
+      if (!tag.ok) setNotice({ tone: 'warning', text: `Status saved, but the order tag for the Orders list could not be updated: ${tag.message}` });
     } else if (result.reason === 'stale') {
       setNotice({ tone: 'warning', text: 'Someone else changed this order’s status. Refresh to see the latest before saving again.', refresh: true });
     } else {
