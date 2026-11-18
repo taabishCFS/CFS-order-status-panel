@@ -94,7 +94,17 @@ Screenshots: [panel with order and line statuses](docs/screenshots/1036-panel-or
 
 Screenshots: [deployed block after the save](docs/screenshots/1034-deployed-block.png), [orders list with no CFS status column](docs/screenshots/orders-list-no-status-column.png).
 
-**Orders list column:** the main Orders list has no CFS status column. The Shopify documentation lists only a More actions target on that page, so a custom column is not available to an extension (see the design doc).
+**Orders list status (tag workaround, deployed as version 3):** the main Orders list has no custom column for extensions (Shopify documents only a More actions target there). Instead, saving a **Whole order** status also sets an order tag `CFS status: <label>`, which shows in the Tags column and can be filtered.
+
+| Check | Result |
+|---|---|
+| Whole-order save sets the tag | Pass. #1034 saved as Part Delivery Booked and gained `CFS status: Part Delivery Booked`. The Orders list showed it in Tags. |
+| Filter by tag | Pass. Searching `tag:'CFS status: Part Delivery Booked'` returned #1034 only. |
+| Changing the status replaces the old tag | Unit-tested (add new, then remove old). Not seen live, because #1034 had no tag before this save. Pending. |
+| Item-level saves leave tags alone | By design (tags mirror the order status only). Not seen live. Pending. |
+| Existing orders | Orders with a status saved before this version have no tag until their status is saved again. |
+
+Limitations: the Tags column is wide and truncates, so on orders with long `cfs-attempt-…` tags the status tag may be cut off. Filtering by tag is the dependable view. Tags are plain text on the order, so anyone who edits tags can change or delete it. The metafield stays the source of truth. Screenshot: [orders list with status tag](docs/screenshots/orders-list-status-tag.jpg).
 
 **Pass criteria:** exact labels saved, scopes independent, changes survived reload, native badges accurate. All met, except that staff identity is not verified.
 
