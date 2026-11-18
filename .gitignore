@@ -1,5 +1,10 @@
 node_modules/
 .superpowers/
 .shopify/
+.shopify.lock
 dist/
 .env
+.env.*
+*.log
+.DS_Store
+shared/types/graphql
