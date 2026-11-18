@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { currentLines } from './lines';
+import { currentLines, removedLineInfo } from './lines';
 
 const node = (id: string, quantity: number, currentQuantity: number, title = id) => ({
   id,
@@ -7,6 +7,13 @@ const node = (id: string, quantity: number, currentQuantity: number, title = id)
   variantTitle: null,
   quantity,
   currentQuantity,
+});
+
+describe('removedLineInfo', () => {
+  it('keeps the title of lines removed in an order edit so their statuses stay readable', () => {
+    const info = removedLineInfo([{ ...node('a', 1, 1), title: 'Bed' }, { ...node('gone', 1, 0), title: 'Mattress', variantTitle: 'Single' }]);
+    expect(info).toEqual({ gone: { title: 'Mattress', variantTitle: 'Single' } });
+  });
 });
 
 describe('currentLines', () => {

@@ -2,6 +2,7 @@ import '@shopify/ui-extensions/preact';
 import { render } from 'preact';
 import { useState } from 'preact/hooks';
 import { selfDeclaredActor } from './identity';
+import { canSave as canSaveNow } from './canSave';
 import { applyChange } from './state';
 import { STATUSES, labelFor, statusById } from './statuses';
 import { saveState } from './store';
@@ -16,7 +17,7 @@ const when = (iso) => new Date(iso).toLocaleString('en-GB');
 
 function Extension() {
   const orderId = shopify.data.selected[0].id;
-  const { lines, state, digest, loading, notice, setNotice, refresh } = useOrderStatus(orderId);
+  const { lines, state, digest, loading, loadFailed, notice, setNotice, refresh, removed, removedInfo } = useOrderStatus(orderId);
   const [saving, setSaving] = useState(false);
   const [scope, setScope] = useState('order');
   const [picked, setPicked] = useState([]);
@@ -25,9 +26,10 @@ function Extension() {
 
   const lineTitle = (id) => {
     const l = lines.find((x) => x.id === id);
-    return l ? `${l.title}${l.variantTitle ? ` (${l.variantTitle})` : ''}` : 'Removed line';
+    const r = l || removedInfo[id];
+    return r ? `${r.title}${r.variantTitle ? ` (${r.variantTitle})` : ''}${l ? '' : ' (removed from order)'}` : 'Removed line';
   };
-  const canSave = !saving && !loading && statusId !== '' && (scope === 'order' || picked.length > 0);
+  const canSave = canSaveNow({ saving, loading, loadFailed, statusId, scope, pickedCount: picked.length });
   const toggle = (id, on) => setPicked((p) => (on ? [...p, id] : p.filter((x) => x !== id)));
 
   async function onSave() {
@@ -62,7 +64,7 @@ function Extension() {
   }
 
   return (
-    <s-admin-action heading="CFS order status">
+    <s-admin-action heading="CFS Order Status">
       <s-stack direction="block" gap="base">
         {notice && (
           <s-banner tone={notice.tone}>
@@ -88,6 +90,10 @@ function Extension() {
               </s-stack>
             ))}
           </s-stack>
+        )}
+        {scope === 'lines' && picked.length === 0 && <s-text>Tick at least one item to save.</s-text>}
+        {scope === 'lines' && removed.length > 0 && (
+          <s-text>Removed from order: {removed.map((id) => `${lineTitle(id)} - ${labelFor(state.lines[id].statusId)}`).join('; ')}</s-text>
         )}
         <s-select label="Status" value={statusId} onChange={(e) => setStatusId(e.currentTarget.value)}>
           <s-option value="">Choose a status</s-option>

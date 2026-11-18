@@ -41,7 +41,12 @@ export async function loadState(
   const metafield = data?.order?.metafield;
   if (!metafield) return { state: emptyState(), digest: null };
   try {
-    return { state: JSON.parse(metafield.value) as StatusState, digest: metafield.compareDigest };
+    const parsed = JSON.parse(metafield.value);
+    const valid =
+      parsed && typeof parsed === 'object' && Array.isArray(parsed.history) &&
+      parsed.lines && typeof parsed.lines === 'object' && !Array.isArray(parsed.lines);
+    if (!valid) throw new Error('bad shape');
+    return { state: parsed as StatusState, digest: metafield.compareDigest };
   } catch {
     throw new Error('The saved CFS status could not be read. Do not save; contact an administrator.');
   }

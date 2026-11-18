@@ -31,6 +31,13 @@ describe('loadState', () => {
     await expect(loadState(ORDER, f as unknown as typeof fetch)).rejects.toThrow(/could not be read/i);
   });
 
+  it('throws when the stored JSON parses but is not a status record', async () => {
+    for (const value of ['{}', '[]', 'null', JSON.stringify({ ...saved, history: 'x' }), JSON.stringify({ ...saved, lines: null })]) {
+      const f = reply({ data: { order: { metafield: { value, compareDigest: 'abc' } } } });
+      await expect(loadState(ORDER, f as unknown as typeof fetch)).rejects.toThrow(/could not be read/i);
+    }
+  });
+
   it('throws when Shopify returns GraphQL errors', async () => {
     const f = reply({ errors: [{ message: 'Access denied' }] });
     await expect(loadState(ORDER, f as unknown as typeof fetch)).rejects.toThrow('Access denied');

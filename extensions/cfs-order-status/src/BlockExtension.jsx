@@ -11,7 +11,7 @@ export default async () => {
 // Shopify clips tall blocks.
 function Extension() {
   const orderId = shopify.data.selected[0].id;
-  const { lines, state, loading, notice, refresh, removed } = useOrderStatus(orderId);
+  const { lines, state, loading, notice, refresh, removed, removedInfo } = useOrderStatus(orderId);
 
   return (
     <s-admin-block heading="CFS Order Status">
@@ -37,7 +37,7 @@ function Extension() {
               ))}
               {removed.map((id) => (
                 <s-stack key={id} direction="inline" gap="small" alignItems="center">
-                  <s-text>Removed from order</s-text>
+                  <s-text>{removedInfo[id] ? `${removedInfo[id].title}${removedInfo[id].variantTitle ? ` (${removedInfo[id].variantTitle})` : ''} - removed from order` : 'Removed from order'}</s-text>
                   <s-badge>{labelFor(state.lines[id].statusId)}</s-badge>
                 </s-stack>
               ))}
