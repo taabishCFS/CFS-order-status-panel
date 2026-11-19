@@ -70,6 +70,22 @@ export async function archiveEntries(
   }
 }
 
+// Archived items are data written by this app, but anything else stored under the type (or a
+// corrupt payload) must never break the history list: skip what is not a real entry.
+function parseEntry(raw: string | undefined): HistoryEntry | null {
+  if (!raw) return null;
+  try {
+    const e = JSON.parse(raw);
+    const ok =
+      e && typeof e.id === 'string' && typeof e.at === 'string' &&
+      e.by && typeof e.by.name === 'string' &&
+      (e.scope === 'order' || e.scope === 'lines') && Array.isArray(e.changes);
+    return ok ? (e as HistoryEntry) : null;
+  } catch {
+    return null;
+  }
+}
+
 const OLDER = `#graphql
   query CfsOlderHistory($q: String!, $first: Int!, $after: String) {
     metaobjects(type: "${TYPE}", first: $first, after: $after, query: $q, sortKey: "updated_at", reverse: true) {
@@ -91,8 +107,10 @@ export async function loadOlderHistory(
     after: opts.after ?? null,
   });
   const conn = data.metaobjects;
-  const entries = (conn.nodes as { fields: { key: string; value: string }[] }[]).map((n) =>
-    JSON.parse(n.fields.find((f) => f.key === 'payload')!.value) as HistoryEntry,
-  );
+  const entries: HistoryEntry[] = [];
+  for (const n of conn.nodes as { fields: { key: string; value: string }[] }[]) {
+    const entry = parseEntry(n.fields.find((f) => f.key === 'payload')?.value);
+    if (entry) entries.push(entry);
+  }
   return { entries, endCursor: conn.pageInfo.endCursor, hasNextPage: conn.pageInfo.hasNextPage };
 }

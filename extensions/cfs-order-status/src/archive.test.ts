@@ -113,6 +113,17 @@ describe('loadOlderHistory', () => {
     expect(b.variables.first).toBe(5);
   });
 
+  it('skips archived items whose payload is not a valid history entry instead of breaking the list', async () => {
+    const good = entry('e9');
+    const body = page([good]);
+    const nodes = body.data.metaobjects.nodes as { fields: { key: string; value: string }[] }[];
+    nodes.unshift({ fields: [{ key: 'payload', value: '{"n":"e2"}' }] });
+    nodes.unshift({ fields: [{ key: 'payload', value: 'not json' }] });
+    nodes.unshift({ fields: [{ key: 'entry_id', value: 'no-payload' }] });
+    const f = reply(body);
+    expect((await loadOlderHistory(ORDER, {}, asFetch(f))).entries).toEqual([good]);
+  });
+
   it('throws the GraphQL error message', async () => {
     const f = reply({ errors: [{ message: 'Boom' }] });
     await expect(loadOlderHistory(ORDER, {}, asFetch(f))).rejects.toThrow('Boom');
