@@ -28,5 +28,8 @@ export interface StatusState {
   schemaVersion: 1;
   order: Stamp | null;
   lines: Record<string, Stamp>;
+  // Latest entries only (see RECENT_LIMIT); older ones are archived as metaobjects.
   history: HistoryEntry[];
+  // Every change ever saved. Absent on orders saved before history archiving.
+  totalEntries?: number;
 }
