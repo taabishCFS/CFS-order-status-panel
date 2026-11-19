@@ -1,6 +1,7 @@
 import type { Actor } from './identity';
 
-export type Scope = 'order' | 'lines';
+export type StatusScope = 'order' | 'lines';
+export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions';
 
 export interface Stamp {
   statusId: number;
@@ -16,20 +17,51 @@ export interface Change {
   toLabel: string;
 }
 
+// A change to a value other than a status (expected date, delivery outcome, instructions).
+export interface ValueChange {
+  target: 'order' | string;
+  from: string | null;
+  to: string | null;
+}
+
 export interface HistoryEntry {
   id: string;
   at: string;
   by: Actor;
   scope: Scope;
   changes: Change[];
+  values?: ValueChange[];
+  note?: string;
+}
+
+export interface DatedStamp {
+  date: string | null;
+  at: string;
+  by: Actor;
+}
+
+export interface DeliveryStamp {
+  outcome: 'confirmed' | 'declined';
+  at: string;
+  by: Actor;
+}
+
+export interface Instructions {
+  text: string;
+  at: string;
+  by: Actor;
 }
 
 export interface StatusState {
-  schemaVersion: 1;
+  // 1 = statuses and history only. 2 adds the optional fields below; version 1 records still load.
+  schemaVersion: 1 | 2;
   order: Stamp | null;
   lines: Record<string, Stamp>;
   // Latest entries only (see RECENT_LIMIT); older ones are archived as metaobjects.
   history: HistoryEntry[];
   // Every change ever saved. Absent on orders saved before history archiving.
   totalEntries?: number;
+  expected?: Record<string, DatedStamp>;
+  delivery?: Record<string, DeliveryStamp>;
+  instructions?: Instructions | null;
 }

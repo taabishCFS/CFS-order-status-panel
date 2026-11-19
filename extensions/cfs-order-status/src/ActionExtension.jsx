@@ -5,6 +5,7 @@ import { loadOlderHistory } from './archive';
 import { fetchStaffActor, resolveActor } from './identity';
 import { canSave as canSaveNow } from './canSave';
 import { commitChange } from './save';
+import { describeEntry, scopeLabel } from './historyText';
 import { applyChange } from './state';
 import { STATUSES, labelFor, statusById } from './statuses';
 import { syncStatusTag } from './tags';
@@ -147,12 +148,8 @@ function Extension() {
         {[...[...state.history].reverse(), ...older.entries].map((h) => (
           <s-box key={h.id} padding="small" border="base" borderRadius="base">
             <s-stack direction="block" gap="small-300">
-              <s-text type="strong">{when(h.at)} · {h.by.name}{h.by.source === 'self-declared' ? ' (unverified)' : ''} · {h.scope === 'order' ? 'Whole order' : 'Selected items'}</s-text>
-              {h.changes.map((c) => (
-                <s-text key={c.target}>
-                  {c.target === 'order' ? 'Order' : lineTitle(c.target)}: {c.fromId == null ? 'Not set' : labelFor(c.fromId)} → {c.toLabel}
-                </s-text>
-              ))}
+              <s-text type="strong">{when(h.at)} · {h.by.name}{h.by.source === 'self-declared' ? ' (unverified)' : ''} · {scopeLabel(h.scope)}</s-text>
+              {describeEntry(h, lineTitle).map((text, i) => <s-text key={i}>{text}</s-text>)}
             </s-stack>
           </s-box>
         ))}

@@ -1,0 +1,13 @@
+api_version = "2026-07"
+
+[[extensions]]
+# Change the merchant-facing name of the extension in locales/en.default.json
+name = "t:name"
+handle = "cfs-orders-dashboard"
+type = "ui_extension"
+uid = "ff878cd5-431e-e827-bbd2-7b309ba82545cc0beb4a"
+
+# Only 1 target can be specified for each app-home extension
+[[extensions.targeting]]
+module = "./src/AppHome.jsx"
+target = "admin.app.home.render"

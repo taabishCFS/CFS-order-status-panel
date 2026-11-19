@@ -1,7 +1,7 @@
 import type { HistoryEntry } from './types';
 
 const ENDPOINT = 'shopify:admin/api/graphql.json';
-const TYPE = '$app:cfs_status_entry';
+const TYPE = '$app:cfs_status_history';
 
 // History entries kept in the order metafield. Older ones live as metaobjects.
 export const RECENT_LIMIT = 20;
@@ -70,6 +70,8 @@ export async function archiveEntries(
   }
 }
 
+const ENTRY_SCOPES = ['order', 'lines', 'expected-date', 'delivery', 'note', 'instructions'];
+
 // Archived items are data written by this app, but anything else stored under the type (or a
 // corrupt payload) must never break the history list: skip what is not a real entry.
 function parseEntry(raw: string | undefined): HistoryEntry | null {
@@ -79,7 +81,7 @@ function parseEntry(raw: string | undefined): HistoryEntry | null {
     const ok =
       e && typeof e.id === 'string' && typeof e.at === 'string' &&
       e.by && typeof e.by.name === 'string' &&
-      (e.scope === 'order' || e.scope === 'lines') && Array.isArray(e.changes);
+      ENTRY_SCOPES.includes(e.scope) && Array.isArray(e.changes);
     return ok ? (e as HistoryEntry) : null;
   } catch {
     return null;

@@ -7,19 +7,48 @@
   ],
   "scripts": {
     "shopify": "shopify",
-    "build": "shopify app build",
+    "build": "react-router build --config react-router.vite.config.js",
     "dev": "shopify app dev",
     "info": "shopify app info",
     "generate": "shopify app generate",
     "deploy": "shopify app deploy",
-    "test": "npm test --workspace=cfs-order-status"
+    "test": "npm run test:backend && npm test --workspace=cfs-order-status --workspace=cfs-orders-dashboard",
+    "build:app": "shopify app build",
+    "start": "react-router-serve ./build/server/index.js",
+    "setup": "prisma generate && prisma migrate deploy",
+    "docker-start": "npm run setup && npm run start",
+    "prisma": "prisma",
+    "test:backend": "vitest run --config vitest.backend.config.js"
   },
   "dependencies": {
-    "@shopify/cli": "4.9.3"
+    "@shopify/cli": "4.9.3",
+    "@prisma/client": "^6.16.3",
+    "@react-router/fs-routes": "7.18.2",
+    "@react-router/node": "7.18.2",
+    "@react-router/serve": "7.18.2",
+    "@shopify/app-bridge-react": "^4.2.4",
+    "@shopify/shopify-app-react-router": "^4.0.0",
+    "@shopify/shopify-app-session-storage-prisma": "^11.0.0",
+    "isbot": "^5.1.31",
+    "prisma": "^6.16.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "7.18.2",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "trustedDependencies": [
     "@shopify/plugin-cloudflare"
   ],
   "author": "Admin",
-  "private": true
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "devDependencies": {
+    "@react-router/dev": "7.18.2",
+    "vite": "^6.3.6",
+    "vitest": "^3.2.4",
+    "@types/node": "^22.18.8"
+  }
 }

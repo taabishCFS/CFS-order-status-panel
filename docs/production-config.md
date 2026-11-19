@@ -12,7 +12,7 @@ scopes = "read_orders,write_orders,read_users"
 ```
 
 - Shopify Support must **enable `read_users` for the app** on the Advanced store (Shopify's documentation: the scope needs a Plus or Advanced store and must be enabled on request). Declaring it on a store without that approval makes `shopify app dev` fail, which is what happened on Urban Deco Dev (Basic App Development).
-- `shopify app deploy` applies the metaobject definition `$app:cfs_status_entry` (with `order_id` filterable) already declared in `shopify.app.toml`.
+- `shopify app deploy` applies the metaobject definition `$app:cfs_status_history` (with `order_id` filterable) already declared in `shopify.app.toml`.
 
 ## Behaviour until the scope is enabled
 The dialog cannot read the staff member, so it asks for a typed name and labels those history entries "(unverified)". Do not describe those names as verified.

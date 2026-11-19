@@ -60,7 +60,7 @@ describe('archiveEntries', () => {
     expect(await archiveEntries(ORDER, es, asFetch(f))).toEqual({ ok: true });
     expect(f).toHaveBeenCalledTimes(2);
     const v = sent(f, 0).variables;
-    expect(v.h).toEqual({ type: '$app:cfs_status_entry', handle: entryHandle(ORDER, 'e1') });
+    expect(v.h).toEqual({ type: '$app:cfs_status_history', handle: entryHandle(ORDER, 'e1') });
     const fields = Object.fromEntries(v.m.fields.map((x: { key: string; value: string }) => [x.key, x.value]));
     expect(fields).toMatchObject({ order_id: ORDER, entry_id: 'e1', actor_name: 'Sam Patel' });
     expect(JSON.parse(fields.payload)).toEqual(es[0]);
@@ -106,7 +106,7 @@ describe('loadOlderHistory', () => {
     const f = reply(page([]));
     await loadOlderHistory(ORDER, { after: 'CUR0', first: 5 }, asFetch(f));
     const b = sent(f);
-    expect(b.query).toContain('$app:cfs_status_entry');
+    expect(b.query).toContain('$app:cfs_status_history');
     // Creation order equals history order; re-archiving an entry must not move it in the list.
     expect(b.query).toContain('sortKey: "id"');
     expect(b.query).not.toMatch(/updated_at/);
@@ -125,6 +125,19 @@ describe('loadOlderHistory', () => {
     nodes.unshift({ fields: [{ key: 'entry_id', value: 'no-payload' }] });
     const f = reply(body);
     expect((await loadOlderHistory(ORDER, {}, asFetch(f))).entries).toEqual([good]);
+  });
+
+  it('returns archived entries of the newer types (note, delivery) and still skips an unknown scope', async () => {
+    const note: HistoryEntry = { ...entry('n1'), scope: 'note', changes: [], note: 'Called customer' };
+    const delivery: HistoryEntry = {
+      ...entry('d1'),
+      scope: 'delivery',
+      changes: [],
+      values: [{ target: 'gid://shopify/LineItem/1', from: null, to: 'confirmed' }],
+    };
+    const bogus = { ...entry('b1'), scope: 'bogus' } as unknown as HistoryEntry;
+    const f = reply(page([note, bogus, delivery]));
+    expect((await loadOlderHistory(ORDER, {}, asFetch(f))).entries).toEqual([note, delivery]);
   });
 
   it('throws the GraphQL error message', async () => {

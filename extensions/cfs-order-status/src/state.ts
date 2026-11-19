@@ -1,13 +1,13 @@
 import type { Actor } from './identity';
 import type { CfsStatus } from './statuses';
-import type { Change, Scope, StatusState } from './types';
+import type { Change, StatusScope, StatusState, ValueChange } from './types';
 
 export function emptyState(): StatusState {
   return { schemaVersion: 1, order: null, lines: {}, history: [] };
 }
 
 export interface ChangeInput {
-  scope: Scope;
+  scope: StatusScope;
   lineIds: string[];
   status: CfsStatus;
   actor: Actor;
@@ -23,6 +23,8 @@ export function applyChange(state: StatusState, input: ChangeInput): StatusState
   const changes: Change[] = [];
   let order = state.order;
   const lines = { ...state.lines };
+  let expected = state.expected;
+  const values: ValueChange[] = [];
 
   if (scope === 'order') {
     changes.push({ target: 'order', fromId: state.order?.statusId ?? null, toId: status.id, toLabel: status.label });
@@ -31,14 +33,22 @@ export function applyChange(state: StatusState, input: ChangeInput): StatusState
     for (const lineId of lineIds) {
       changes.push({ target: lineId, fromId: state.lines[lineId]?.statusId ?? null, toId: status.id, toLabel: status.label });
       lines[lineId] = stamp;
+      // In Stock means the goods are here, so any expected arrival date no longer applies.
+      const previous = state.expected?.[lineId]?.date;
+      if (status.id === 4 && previous) {
+        expected = { ...expected, [lineId]: { date: null, at: now, by: actor } };
+        values.push({ target: lineId, from: previous, to: null });
+      }
     }
   }
 
+  const entry = { id: entryId, at: now, by: actor, scope, changes, ...(values.length ? { values } : {}) };
   return {
     ...state,
+    ...(values.length ? { schemaVersion: 2 as const, expected } : {}),
     order,
     lines,
-    history: [...state.history, { id: entryId, at: now, by: actor, scope, changes }],
+    history: [...state.history, entry],
   };
 }
 

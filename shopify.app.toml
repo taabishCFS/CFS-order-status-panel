@@ -2,7 +2,7 @@
 
 client_id = "cc5a6db0aaacb62a9604019b7e02b338"
 name = "cfs-order-status-panel"
-application_url = "https://shopify.dev/apps/default-app-home"
+application_url = "https://cfs-order-status-panel.onrender.com"
 embedded = true
 
 [build]
@@ -19,35 +19,35 @@ embedded_app_direct_api_access = true
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_orders,write_orders"
 
-[metaobjects.app.cfs_status_entry]
+[metaobjects.app.cfs_status_history]
 name = "CFS status entry"
 description = "One history entry per CFS order status change"
 display_name_field = "entry_id"
 access.admin = "merchant_read"
 access.storefront = "none"
 
-[metaobjects.app.cfs_status_entry.fields.order_id]
+[metaobjects.app.cfs_status_history.fields.order_id]
 name = "Order ID"
 type = "single_line_text_field"
 required = true
 capabilities.admin_filterable = true
 
-[metaobjects.app.cfs_status_entry.fields.entry_id]
+[metaobjects.app.cfs_status_history.fields.entry_id]
 name = "Entry ID"
 type = "single_line_text_field"
 required = true
 
-[metaobjects.app.cfs_status_entry.fields.at]
+[metaobjects.app.cfs_status_history.fields.at]
 name = "Saved at"
 type = "date_time"
 
-[metaobjects.app.cfs_status_entry.fields.actor_name]
+[metaobjects.app.cfs_status_history.fields.actor_name]
 name = "Actor name"
 type = "single_line_text_field"
 
-[metaobjects.app.cfs_status_entry.fields.payload]
+[metaobjects.app.cfs_status_history.fields.payload]
 name = "Entry JSON"
 type = "json"
 
 [auth]
-redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+redirect_urls = [ "https://cfs-order-status-panel.onrender.com/api/auth" ]

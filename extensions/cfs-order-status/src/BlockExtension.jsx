@@ -1,5 +1,6 @@
 import '@shopify/ui-extensions/preact';
 import { render } from 'preact';
+import { deliveryOf, expectedOf } from './lineInfo';
 import { labelFor } from './statuses';
 import { lineText, useOrderStatus } from './useOrderStatus';
 
@@ -33,6 +34,8 @@ function Extension() {
                 <s-stack key={l.id} direction="inline" gap="small" alignItems="center">
                   <s-text>{lineText(l)}</s-text>
                   <s-badge>{state.lines[l.id] ? labelFor(state.lines[l.id].statusId) : 'Not set'}</s-badge>
+                  {expectedOf(state, l.id) && <s-text>Expected {expectedOf(state, l.id).split('-').reverse().join('/')}</s-text>}
+                  {deliveryOf(state, l.id) && <s-text>Delivery {deliveryOf(state, l.id)}</s-text>}
                 </s-stack>
               ))}
               {removed.map((id) => (
