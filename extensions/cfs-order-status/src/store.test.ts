@@ -84,3 +84,23 @@ describe('saveState', () => {
     expect(await saveState(ORDER, saved, 'old', f as unknown as typeof fetch)).toEqual({ ok: false, reason: 'error', message: 'offline' });
   });
 });
+
+describe('totalEntries (history archive counter)', () => {
+  it('loads a stored state that has totalEntries', async () => {
+    const withTotal = { ...saved, totalEntries: 57 };
+    const f = reply({ data: { order: { metafield: { value: JSON.stringify(withTotal), compareDigest: 'abc' } } } });
+    expect(await loadState(ORDER, f as unknown as typeof fetch)).toEqual({ state: withTotal, digest: 'abc' });
+  });
+
+  it('still loads a stored state without totalEntries (every MVP order)', async () => {
+    const f = reply({ data: { order: { metafield: { value: JSON.stringify(saved), compareDigest: 'abc' } } } });
+    const { state } = await loadState(ORDER, f as unknown as typeof fetch);
+    expect(state.totalEntries).toBeUndefined();
+  });
+
+  it('writes totalEntries through to the metafield unchanged', async () => {
+    const f = reply({ data: { metafieldsSet: { metafields: [{ compareDigest: 'n' }], userErrors: [] } } });
+    await saveState(ORDER, { ...saved, totalEntries: 57 }, 'old', f as unknown as typeof fetch);
+    expect(JSON.parse(sentBody(f).variables.metafields[0].value).totalEntries).toBe(57);
+  });
+});
