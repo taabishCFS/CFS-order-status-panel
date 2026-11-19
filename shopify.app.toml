@@ -19,5 +19,35 @@ embedded_app_direct_api_access = true
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_orders,write_orders"
 
+[metaobjects.app.cfs_status_entry]
+name = "CFS status entry"
+description = "One history entry per CFS order status change"
+display_name_field = "entry_id"
+access.admin = "merchant_read"
+access.storefront = "none"
+
+[metaobjects.app.cfs_status_entry.fields.order_id]
+name = "Order ID"
+type = "single_line_text_field"
+required = true
+capabilities.admin_filterable = true
+
+[metaobjects.app.cfs_status_entry.fields.entry_id]
+name = "Entry ID"
+type = "single_line_text_field"
+required = true
+
+[metaobjects.app.cfs_status_entry.fields.at]
+name = "Saved at"
+type = "date_time"
+
+[metaobjects.app.cfs_status_entry.fields.actor_name]
+name = "Actor name"
+type = "single_line_text_field"
+
+[metaobjects.app.cfs_status_entry.fields.payload]
+name = "Entry JSON"
+type = "json"
+
 [auth]
 redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]

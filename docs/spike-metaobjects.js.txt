@@ -1,0 +1,59 @@
+// TEMPORARY SPIKE - delete after the metaobject test. Not part of the product.
+const EP = 'shopify:admin/api/graphql.json';
+const TYPE = '$app:cfs_status_entry';
+const gql = async (query, variables) => {
+  const r = await fetch(EP, { method: 'POST', body: JSON.stringify({ query, variables }) });
+  return r.json();
+};
+
+const UPSERT = `mutation($h: MetaobjectHandleInput!, $m: MetaobjectUpsertInput!) {
+  metaobjectUpsert(handle: $h, metaobject: $m) { metaobject { id handle } userErrors { code message field } }
+}`;
+
+export async function runSpike(orderId) {
+  const out = [];
+  const oid = orderId.split('/').pop();
+  const upsert = (handle, entryId, name) =>
+    gql(UPSERT, {
+      h: { type: TYPE, handle },
+      m: { fields: [
+        { key: 'order_id', value: orderId },
+        { key: 'entry_id', value: entryId },
+        { key: 'at', value: new Date().toISOString() },
+        { key: 'actor_name', value: name },
+        { key: 'payload', value: JSON.stringify({ n: entryId }) },
+      ] },
+    });
+  try {
+    const a = await upsert(`o${oid}-e1`, 'e1', 'first');
+    out.push('create e1: ' + JSON.stringify(a.errors || a.data.metaobjectUpsert));
+    const b = await upsert(`o${oid}-e1`, 'e1', 'second');
+    out.push('re-upsert same handle: ' + JSON.stringify(b.errors || b.data.metaobjectUpsert));
+    const c = await upsert(`o${oid}-e2`, 'e2', 'other');
+    out.push('create e2: ' + JSON.stringify(c.errors || c.data.metaobjectUpsert.userErrors));
+
+    const other = await gql(UPSERT, { h: { type: TYPE, handle: 'o999-e1' }, m: { fields: [
+      { key: 'order_id', value: 'gid://shopify/Order/999' }, { key: 'entry_id', value: 'x1' },
+      { key: 'actor_name', value: 'otherorder' }, { key: 'payload', value: '{}' } ] } });
+    out.push('create other-order entry: ' + JSON.stringify(other.errors || other.data.metaobjectUpsert.userErrors));
+    const excl = await gql(`query { metaobjects(type: "${TYPE}", first: 1, query: "fields.order_id:'${orderId}'") { nodes { handle } pageInfo { hasNextPage endCursor } } }`);
+    out.push('filter first:1 (expect 1 node, hasNext true): ' + JSON.stringify(excl.errors || excl.data.metaobjects));
+    const all = await gql(`query { metaobjects(type: "${TYPE}", first: 50, query: "fields.order_id:'${orderId}'") { nodes { handle } } }`);
+    out.push('filter again, must not contain o999-e1: ' + JSON.stringify(all.errors || all.data.metaobjects.nodes.map((n) => n.handle)));
+
+    const def = await gql(`query { metaobjectDefinitionByType(type: "${TYPE}") { fieldDefinitions { key capabilities { adminFilterable { enabled } } } } }`);
+    out.push('definition filterable: ' + JSON.stringify(def.errors || def.data.metaobjectDefinitionByType.fieldDefinitions.map((f) => f.key + ':' + f.capabilities.adminFilterable.enabled)));
+
+    const list = await gql(`query { metaobjects(type: "${TYPE}", first: 10, sortKey: "updated_at", reverse: true) { nodes { handle displayName fields { key value } } } }`);
+    out.push('list: ' + JSON.stringify(list.errors || list.data.metaobjects.nodes.map((n) => n.handle + '=' + n.fields.find((f) => f.key === 'actor_name')?.value)));
+
+    const byField = await gql(`query { metaobjects(type: "${TYPE}", first: 10, query: "fields.order_id:'${orderId}'") { nodes { handle } } }`);
+    out.push('filter by order_id field: ' + JSON.stringify(byField.errors || byField.data.metaobjects.nodes.map((n) => n.handle)));
+
+    const byHandle = await gql(`query { metaobjects(type: "${TYPE}", first: 10, query: "handle:o${oid}-*") { nodes { handle } } }`);
+    out.push('filter by handle prefix: ' + JSON.stringify(byHandle.errors || byHandle.data.metaobjects.nodes.map((n) => n.handle)));
+  } catch (e) {
+    out.push('THREW: ' + (e && e.message));
+  }
+  return out;
+}

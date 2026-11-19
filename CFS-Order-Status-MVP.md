@@ -100,7 +100,7 @@ Screenshots: [deployed block after the save](docs/screenshots/1034-deployed-bloc
 |---|---|
 | Whole-order save sets the tag | Pass. #1034 saved as Part Delivery Booked and gained `CFS status: Part Delivery Booked`. The Orders list showed it in Tags. |
 | Filter by tag | Pass. Searching `tag:'CFS status: Part Delivery Booked'` returned #1034 only. |
-| Changing the status replaces the old tag | Unit-tested (add new, then remove old). Not seen live, because #1034 had no tag before this save. Pending. |
+| Changing the status replaces the old tag | Passed live on the deployed build (version 3). Staff changed the whole-order status on #1036 and the old tag was replaced, leaving a single `CFS status: Order Delivered` tag (screenshot 2026-11-19, confirmed by the user). Also unit-tested (add new, then remove old). |
 | Item-level saves leave tags alone | By design (tags mirror the order status only). Not seen live. Pending. |
 | Existing orders | Orders with a status saved before this version have no tag until their status is saved again. |
 
