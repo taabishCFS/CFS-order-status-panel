@@ -68,7 +68,7 @@ Throwaway script kept as `docs/spike-metaobjects.js.txt`. Tested from the order-
 
 Other findings:
 - Adding or changing the metaobject definition in `shopify.app.toml` needed a **restart** of `shopify app dev` to apply.
-- Cleaning the dev preview deleted the spike's definition and 3 test entries. The definition now lives only in the working `shopify.app.toml` and reaches the store on the next `shopify app deploy`.
+- **Correction (19 November 2026):** cleaning the dev preview did **not** delete the spike's test entries. They were still in the dev store and later made "Show older history" hang (their payload is not a history entry). I deleted them through the dev API and made the loader skip invalid payloads. The definition lives in the working `shopify.app.toml` and reaches the store on the next `shopify app deploy`.
 - **Not tested:** per-entry size limit (entries are about 250 bytes, so unlikely to matter), behaviour at hundreds of entries per order, and the real two-step save.
 
 The design stands: no scope change is needed, and `order_id` must be marked filterable.
@@ -86,4 +86,4 @@ The design stands: no scope change is needed, and `order_id` must be marked filt
 
 ## 8. Build status (19 November 2026)
 
-Implemented and unit-tested (76 tests passing): the staff lookup and typed-name fallback, the metaobject archive module, trimming to 20 entries with archive-first saving, and the stored-state checks. The dialog and block are wired and both extensions compile. **Not yet run live:** see the phase 2 table in CFS-Order-Status-MVP.md. The verified-name display cannot be tested until `read_users` is enabled (see docs/production-config.md).
+Implemented and unit-tested (76 tests passing): the staff lookup and typed-name fallback, the metaobject archive module, trimming to 20 entries with archive-first saving, and the stored-state checks. The dialog and block are wired and both extensions compile. Live checks on Urban Deco Dev (dev preview, 19 November 2026) passed except the verified-name display: see the phase 2 table in CFS-Order-Status-MVP.md. The verified-name display cannot be tested until `read_users` is enabled (see docs/production-config.md).

@@ -117,8 +117,9 @@ Built and unit-tested (76 tests passing). **No live result below has been run ye
 | Check | Status |
 |---|---|
 | Metaobject write, retry, order filter and paging from the extension (spike, dev preview, 19 November 2026) | Passed. See Design Phase 2 section 5.3. |
-| With the entry limit temporarily set to 3, five saves keep the latest 3 in the panel, the button shows the total, and "Show older history" lists the rest with nothing shown twice | Pending |
-| Dev store shows the "Your name" box and new entries read "(unverified)" | Pending |
-| Stale save (B4) still shows the refresh prompt and loses or duplicates nothing | Pending |
-| Whole-order save replaces the order tag; an item-only save leaves tags alone | Whole-order replacement passed live on #1036 (18 to 19 November 2026). Item-only save pending. |
+| With the entry limit temporarily set to 3, five saves keep the latest 3 in the panel, the button shows the total, and "Show older history" lists the rest with nothing shown twice | **Passed live** on #1034 (dev preview, 19 November 2026). The block count and "Status history" total matched; the panel showed the latest 3; "Show older history" paged 3 then 2 entries newest first with no repeats; the dev API listed 6 archived entries for 9 total (9 minus the latest 3). Entries were saved by a typed name, so this is unit-tested plus dev-store evidence only. |
+| Dev store shows the "Your name" box and new entries read "(unverified)" | **Passed live** (19 November 2026): the box appeared and typed-name entries read "(unverified)". |
+| Stale save (B4) still shows the refresh prompt and loses or duplicates nothing | **Passed live** (19 November 2026): a second browser tab saved first; the stale tab showed the refresh prompt and saved nothing; after Refresh the other tab's entry was on top and the total was 9. |
+| Whole-order save replaces the order tag; an item-only save leaves tags alone | **Passed live** on #1034 (19 November 2026): successive whole-order saves replaced the tag each time, and an item-only save left it unchanged. |
+| Older history ignores a malformed item stored under the metaobject type | Found live: leftover spike entries (payload not a history entry) made the dialog hang on "Show older history". Fixed test-first (the loader skips invalid payloads); the live list then worked. |
 | Verified staff name on a history entry | **Cannot be tested** until Shopify Support enables `read_users` on the Advanced CFS store. Pending. |
