@@ -1,11 +1,12 @@
 import '@shopify/ui-extensions/preact';
 import { render } from 'preact';
-import { useState } from 'preact/hooks';
-import { selfDeclaredActor } from './identity';
+import { useEffect, useState } from 'preact/hooks';
+import { loadOlderHistory } from './archive';
+import { fetchStaffActor, resolveActor } from './identity';
 import { canSave as canSaveNow } from './canSave';
+import { commitChange } from './save';
 import { applyChange } from './state';
 import { STATUSES, labelFor, statusById } from './statuses';
-import { saveState } from './store';
 import { syncStatusTag } from './tags';
 import { lineText, useOrderStatus } from './useOrderStatus';
 
@@ -24,20 +25,45 @@ function Extension() {
   const [picked, setPicked] = useState([]);
   const [statusId, setStatusId] = useState('');
   const [name, setName] = useState('');
+  // undefined while checking, null when Shopify will not say who is signed in
+  const [staff, setStaff] = useState(undefined);
+  const [older, setOlder] = useState({ entries: [], cursor: null, hasNext: true, loading: false });
+
+  useEffect(() => { fetchStaffActor().then(setStaff); }, []);
+
+  const total = state.totalEntries ?? state.history.length;
+  const shownIds = new Set([...state.history, ...older.entries].map((h) => h.id));
+  const canShowOlder = total > state.history.length && older.hasNext;
+
+  async function showOlder() {
+    setOlder((o) => ({ ...o, loading: true }));
+    try {
+      const page = await loadOlderHistory(orderId, { after: older.cursor });
+      setOlder((o) => ({
+        entries: [...o.entries, ...page.entries.filter((e) => !shownIds.has(e.id))],
+        cursor: page.endCursor,
+        hasNext: page.hasNextPage,
+        loading: false,
+      }));
+    } catch (e) {
+      setOlder((o) => ({ ...o, loading: false }));
+      setNotice({ tone: 'warning', text: `Older history could not be loaded: ${e.message}` });
+    }
+  }
 
   const lineTitle = (id) => {
     const l = lines.find((x) => x.id === id);
     const r = l || removedInfo[id];
     return r ? `${r.title}${r.variantTitle ? ` (${r.variantTitle})` : ''}${l ? '' : ' (removed from order)'}` : 'Removed line';
   };
-  const canSave = canSaveNow({ saving, loading, loadFailed, statusId, scope, pickedCount: picked.length });
+  const canSave = staff !== undefined && canSaveNow({ saving, loading, loadFailed, statusId, scope, pickedCount: picked.length });
   const toggle = (id, on) => setPicked((p) => (on ? [...p, id] : p.filter((x) => x !== id)));
 
   async function onSave() {
     setNotice(null);
     let actor;
     try {
-      actor = selfDeclaredActor(name);
+      actor = resolveActor(staff ?? null, name);
     } catch (e) {
       setNotice({ tone: 'warning', text: e.message });
       return;
@@ -51,12 +77,13 @@ function Extension() {
       now: new Date().toISOString(),
       entryId: newId(),
     });
-    const result = await saveState(orderId, next, digest);
+    const result = await commitChange(orderId, state, next, digest);
     if (result.ok) {
       const savedScope = scope;
       const savedLabel = statusById(Number(statusId)).label;
       setStatusId('');
       setPicked([]);
+      setOlder({ entries: [], cursor: null, hasNext: true, loading: false });
       const tag = savedScope === 'order' ? await syncStatusTag(orderId, savedLabel) : { ok: true };
       await refresh();
       if (!tag.ok) setNotice({ tone: 'warning', text: `Status saved, but the order tag for the Orders list could not be updated: ${tag.message}` });
@@ -104,15 +131,17 @@ function Extension() {
           <s-option value="">Choose a status</s-option>
           {STATUSES.map((s) => <s-option key={s.id} value={String(s.id)}>{s.label}</s-option>)}
         </s-select>
-        <s-text-field label="Your name" value={name} onInput={(e) => setName(e.currentTarget.value)} />
+        {staff
+          ? <s-text>Saving as {staff.name}</s-text>
+          : staff === null && <s-text-field label="Your name" value={name} onInput={(e) => setName(e.currentTarget.value)} />}
 
         <s-divider />
-        <s-text type="strong">Status history</s-text>
+        <s-text type="strong">Status history ({total})</s-text>
         {state.history.length === 0 && <s-text>No status changes yet.</s-text>}
-        {[...state.history].reverse().map((h) => (
+        {[...[...state.history].reverse(), ...older.entries].map((h) => (
           <s-box key={h.id} padding="small" border="base" borderRadius="base">
             <s-stack direction="block" gap="small-300">
-              <s-text type="strong">{when(h.at)} · {h.by.name} · {h.scope === 'order' ? 'Whole order' : 'Selected items'}</s-text>
+              <s-text type="strong">{when(h.at)} · {h.by.name}{h.by.source === 'self-declared' ? ' (unverified)' : ''} · {h.scope === 'order' ? 'Whole order' : 'Selected items'}</s-text>
               {h.changes.map((c) => (
                 <s-text key={c.target}>
                   {c.target === 'order' ? 'Order' : lineTitle(c.target)}: {c.fromId == null ? 'Not set' : labelFor(c.fromId)} → {c.toLabel}
@@ -121,6 +150,7 @@ function Extension() {
             </s-stack>
           </s-box>
         ))}
+        {canShowOlder && <s-button loading={older.loading} onClick={showOlder}>Show older history</s-button>}
       </s-stack>
       <s-button slot="primary-action" variant="primary" disabled={!canSave} loading={saving} onClick={onSave}>Save</s-button>
       <s-button slot="secondary-actions" onClick={() => shopify.close()}>Close</s-button>

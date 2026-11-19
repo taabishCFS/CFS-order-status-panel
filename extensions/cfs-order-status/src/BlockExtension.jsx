@@ -43,7 +43,7 @@ function Extension() {
               ))}
             </s-stack>
             <s-button variant="primary" href="extension:cfs-order-status-update">
-              Update status and history ({state.history.length})
+              Update status and history ({state.totalEntries ?? state.history.length})
             </s-button>
           </>
         )}
