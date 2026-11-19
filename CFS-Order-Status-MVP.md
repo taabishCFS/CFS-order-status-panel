@@ -109,3 +109,16 @@ Limitations: the Tags column is wide and truncates, so on orders with long `cfs-
 **Pass criteria:** exact labels saved, scopes independent, changes survived reload, native badges accurate. All met, except that staff identity is not verified.
 
 **Still open:** the rollout questions in section 5, a deployed (non-preview) install, a verified staff identity route, a staff name list, the removed-line display, and storefront non-exposure.
+
+## 7. Phase 2: verified identity and history archive (19 November 2026)
+
+Built and unit-tested (76 tests passing). **No live result below has been run yet.** Design: CFS-Order-Status-Design-Phase2.md. Production notes: docs/production-config.md.
+
+| Check | Status |
+|---|---|
+| Metaobject write, retry, order filter and paging from the extension (spike, dev preview, 19 November 2026) | Passed. See Design Phase 2 section 5.3. |
+| With the entry limit temporarily set to 3, five saves keep the latest 3 in the panel, the button shows the total, and "Show older history" lists the rest with nothing shown twice | Pending |
+| Dev store shows the "Your name" box and new entries read "(unverified)" | Pending |
+| Stale save (B4) still shows the refresh prompt and loses or duplicates nothing | Pending |
+| Whole-order save replaces the order tag; an item-only save leaves tags alone | Whole-order replacement passed live on #1036 (18 to 19 November 2026). Item-only save pending. |
+| Verified staff name on a history entry | **Cannot be tested** until Shopify Support enables `read_users` on the Advanced CFS store. Pending. |

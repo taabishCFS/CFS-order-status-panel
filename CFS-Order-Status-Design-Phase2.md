@@ -50,7 +50,7 @@ The user chose A on 19 November 2026.
 ### 5.2 History storage
 - App-owned metaobject type `$app:cfs_status_entry`, declared in `shopify.app.toml`, storefront access none. Fields: order ID, entry ID, timestamp, actor ID, actor name, actor source, scope, and the changes (JSON text).
 - Order metafield `cfs_status` keeps `order`, `lines` and `history` (the latest 20 entries only, plus `totalEntries`).
-- Save order of operations: (1) create the metaobject entry, with its handle set from the entry ID so a retry cannot duplicate it; (2) `metafieldsSet` with `compareDigest`. If step 2 fails or is stale, the orphan entry is harmless and is ignored or reused on retry.
+- Save order of operations (**changed at plan time, 19 November 2026**): an entry is archived only when it falls out of the latest 20, not on every save. (1) Archive the entries that are about to be trimmed (idempotent: handle from order and entry ID); stop and report if that fails. (2) `metafieldsSet` with `compareDigest` for the state holding the latest 20 entries and `totalEntries`. Writing a metaobject for every change first left a phantom history entry if the metafield write then failed or was stale, because a retry uses a new entry ID. Archive-on-trim cannot do that, usually needs one write per save, and every entry still ends up as its own metaobject. The newest 20 entries exist only in the metafield until they age out.
 - "Show older history" in the dialog pages through metaobject entries for the order, newest first.
 - Migration: orders whose metafield holds more than 20 entries are trimmed on their next save, after their older entries are written as metaobjects. Existing dev-store orders have under 20, so nothing moves.
 
@@ -83,3 +83,7 @@ The design stands: no scope change is needed, and `order_id` must be marked filt
 - Email not stored in history.
 - Handle-based idempotency for the metaobject write.
 - "(unverified)" label rather than blocking saves, until go-live.
+
+## 8. Build status (19 November 2026)
+
+Implemented and unit-tested (76 tests passing): the staff lookup and typed-name fallback, the metaobject archive module, trimming to 20 entries with archive-first saving, and the stored-state checks. The dialog and block are wired and both extensions compile. **Not yet run live:** see the phase 2 table in CFS-Order-Status-MVP.md. The verified-name display cannot be tested until `read_users` is enabled (see docs/production-config.md).
