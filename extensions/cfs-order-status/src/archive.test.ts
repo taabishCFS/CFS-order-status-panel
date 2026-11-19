@@ -107,7 +107,10 @@ describe('loadOlderHistory', () => {
     await loadOlderHistory(ORDER, { after: 'CUR0', first: 5 }, asFetch(f));
     const b = sent(f);
     expect(b.query).toContain('$app:cfs_status_entry');
-    expect(b.query).toMatch(/updated_at/);
+    // Creation order equals history order; re-archiving an entry must not move it in the list.
+    expect(b.query).toContain('sortKey: "id"');
+    expect(b.query).not.toMatch(/updated_at/);
+    expect(b.query).toContain('reverse: true');
     expect(JSON.stringify(b.variables)).toContain(ORDER);
     expect(b.variables.after).toBe('CUR0');
     expect(b.variables.first).toBe(5);

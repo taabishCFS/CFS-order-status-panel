@@ -86,4 +86,4 @@ The design stands: no scope change is needed, and `order_id` must be marked filt
 
 ## 8. Build status (19 November 2026)
 
-Implemented and unit-tested (76 tests passing): the staff lookup and typed-name fallback, the metaobject archive module, trimming to 20 entries with archive-first saving, and the stored-state checks. The dialog and block are wired and both extensions compile. Live checks on Urban Deco Dev (dev preview, 19 November 2026) passed except the verified-name display: see the phase 2 table in CFS-Order-Status-MVP.md. The verified-name display cannot be tested until `read_users` is enabled (see docs/production-config.md).
+Implemented and unit-tested (77 tests passing): the staff lookup and typed-name fallback, the metaobject archive module, trimming to 20 entries with archive-first saving, and the stored-state checks. The dialog and block are wired and both extensions compile. Live checks on Urban Deco Dev (dev preview, 19 November 2026) passed except the verified-name display: see the phase 2 table in CFS-Order-Status-MVP.md. The verified-name display cannot be tested until `read_users` is enabled (see docs/production-config.md).

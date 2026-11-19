@@ -31,6 +31,12 @@ function Extension() {
 
   useEffect(() => { fetchStaffActor().then(setStaff); }, []);
 
+  // Refreshing moves the latest-20 window, so any older entries already loaded are out of date.
+  const refreshAll = () => {
+    setOlder({ entries: [], cursor: null, hasNext: true, loading: false });
+    return refresh();
+  };
+
   const total = state.totalEntries ?? state.history.length;
   const shownIds = new Set([...state.history, ...older.entries].map((h) => h.id));
   const canShowOlder = total > state.history.length && older.hasNext;
@@ -101,7 +107,7 @@ function Extension() {
         {notice && (
           <s-banner tone={notice.tone}>
             {notice.text}
-            {notice.refresh && <s-button slot="secondary-actions" onClick={refresh}>Refresh</s-button>}
+            {notice.refresh && <s-button slot="secondary-actions" onClick={refreshAll}>Refresh</s-button>}
           </s-banner>
         )}
         <s-stack direction="inline" gap="small" alignItems="center">

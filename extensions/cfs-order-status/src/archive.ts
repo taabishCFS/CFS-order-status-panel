@@ -88,13 +88,15 @@ function parseEntry(raw: string | undefined): HistoryEntry | null {
 
 const OLDER = `#graphql
   query CfsOlderHistory($q: String!, $first: Int!, $after: String) {
-    metaobjects(type: "${TYPE}", first: $first, after: $after, query: $q, sortKey: "updated_at", reverse: true) {
+    metaobjects(type: "${TYPE}", first: $first, after: $after, query: $q, sortKey: "id", reverse: true) {
       nodes { fields { key value } }
       pageInfo { hasNextPage endCursor }
     }
   }`;
 
-// Archived entries for one order, newest first. Search is not instant, so the newest entries
+// Archived entries for one order, newest first. Sorted by id (creation order = history order),
+// not updated_at, because re-archiving an entry must not move it in the list.
+// Search is not instant, so the newest entries
 // must come from the order metafield, never from here.
 export async function loadOlderHistory(
   orderId: string,

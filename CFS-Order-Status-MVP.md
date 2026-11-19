@@ -112,7 +112,7 @@ Limitations: the Tags column is wide and truncates, so on orders with long `cfs-
 
 ## 7. Phase 2: verified identity and history archive (19 November 2026)
 
-Built and unit-tested (76 tests passing). **No live result below has been run yet.** Design: CFS-Order-Status-Design-Phase2.md. Production notes: docs/production-config.md.
+Built and unit-tested (77 tests passing). Live results (Urban Deco Dev dev preview, 19 November 2026) are marked in the table; anything marked Pending has not been run. Design: CFS-Order-Status-Design-Phase2.md. Production notes: docs/production-config.md.
 
 | Check | Status |
 |---|---|
