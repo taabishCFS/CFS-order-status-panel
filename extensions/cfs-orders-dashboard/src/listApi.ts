@@ -126,3 +126,22 @@ export const archiveOrders = (orderIds: string[], archived: boolean, fetchFn: ty
     fetchFn,
     { staff_not_verified: 'Only a verified staff member can archive or restore orders.' },
   );
+
+export interface LineExport {
+  csv: string;
+  count: number;
+  capped: boolean;
+  costLookup: 'ok' | 'unavailable' | 'not_needed';
+  filename: string;
+}
+
+// Export 2 (supplier chase-up sheet) or 3 (per-brand ordering sheet) for every line the filters match.
+export async function loadLineExport(kind: 2 | 3, f: Filters, fetchFn: typeof fetch = fetch): Promise<{ ok: true; data: LineExport } | { ok: false; message: string }> {
+  const filters = buildQuery({ ...f, page: undefined, all: false });
+  const res = await call<LineExport>(`/api/line-export?kind=${kind}${filters ? `&${filters.slice(1)}` : ''}`, undefined, fetchFn, {
+    staff_not_verified: 'Only a verified staff member can download exports.',
+  });
+  if (!res.ok) return res;
+  const { ok: _ok, ...data } = res;
+  return { ok: true, data: data as LineExport };
+}

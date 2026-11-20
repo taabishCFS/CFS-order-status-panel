@@ -7,6 +7,8 @@ export const gqlLine = (n = 1, over = {}) => ({
   sku: `SKU-${n}`,
   vendor: "Duke Beds",
   variantTitle: "2ft 6in",
+  product: { id: "gid://shopify/Product/500" },
+  variant: { id: "gid://shopify/ProductVariant/600" },
   quantity: 1,
   originalUnitPriceSet: set("279.0"),
   totalDiscountSet: set("0.0"),

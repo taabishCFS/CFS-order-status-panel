@@ -44,6 +44,8 @@ const lineColumns = (l, archived) => ({
   sku: l.sku,
   vendor: l.vendor,
   variantTitle: l.variantTitle,
+  productId: l.productId,
+  variantId: l.variantId,
   title: l.title,
   quantity: l.quantity,
   currency: l.price.currency,

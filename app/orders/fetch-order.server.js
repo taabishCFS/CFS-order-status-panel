@@ -3,6 +3,8 @@ const MONEY = "shopMoney { amount currencyCode }";
 const LINES = `lineItems(first: 100, after: $after) {
   nodes {
     id title variantTitle sku vendor quantity
+    product { id }
+    variant { id }
     originalUnitPriceSet { ${MONEY} }
     totalDiscountSet { ${MONEY} }
     customAttributes { key value }

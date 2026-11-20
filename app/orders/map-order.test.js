@@ -29,6 +29,12 @@ describe("mapOrder", () => {
     expect(lines[0]).toMatchObject({ vendor: "Duke Beds", variantTitle: "2ft 6in" });
   });
 
+  it("keeps the product and variant ids, and null for a custom item with neither", () => {
+    const { lines } = mapOrder("s", gqlOrder({ lineItems: { nodes: [gqlLine(1), gqlLine(2, { product: null, variant: null })], pageInfo: { hasNextPage: false, endCursor: null } } }));
+    expect(lines[0]).toMatchObject({ productId: "gid://shopify/Product/500", variantId: "gid://shopify/ProductVariant/600" });
+    expect(lines[1]).toMatchObject({ productId: null, variantId: null });
+  });
+
   it("takes the customer name from the shipping address, or the billing address when there is none", () => {
     expect(mapOrder("s", gqlOrder()).order.customerName).toBe("Alex Customer");
     const billingOnly = gqlOrder({ shippingAddress: null, billingAddress: { name: "Bill Payer" } });

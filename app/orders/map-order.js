@@ -69,6 +69,8 @@ export function mapOrder(shop, o) {
     sku: l.sku ?? null,
     vendor: l.vendor ?? null,
     variantTitle: l.variantTitle ?? null,
+    productId: l.product?.id ?? null,
+    variantId: l.variant?.id ?? null,
     title: l.title,
     quantity: l.quantity,
     price: money(l.originalUnitPriceSet),

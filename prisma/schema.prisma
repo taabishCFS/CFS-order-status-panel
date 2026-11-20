@@ -76,6 +76,8 @@ model OrderLine {
   sku           String?
   vendor        String?
   variantTitle  String?
+  productId     String?
+  variantId     String?
   title         String
   quantity      Int
   currency      String

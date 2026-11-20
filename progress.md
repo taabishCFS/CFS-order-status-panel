@@ -159,3 +159,11 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Orders by Brand table cut from 12 to 8 columns: Order (link, site badge, date), Product (variant and code underneath), Brand, Qty, Sold Price, Exp. Delivery, Status (with supplier invoice line).
 - Site logo image replaced by a site badge (the logo did not load inside the app screen).
 - Order Detail and the By Order list show the `#` order number as the order id.
+
+## Orders by Brand exports 2 and 3 (2026-11-20)
+- New: Export 2 (supplier chase-up sheet) and Export 3 (per-brand ordering sheet) as CSV downloads from Orders by Brand. Same columns and dd/mm/yyyy dates as the legacy samples. They honour the current filters, ignore the page, and cap at 5,000 lines.
+- Backend: `app/orders/export-rules.js` (CSV rules, formula-safe cells), `export-query.server.js` (reads lines, looks up cost and collections in Shopify for Export 3), `routes/api.line-export.jsx` (staff only, returns the CSV inside JSON). Extension: `loadLineExport`, `download.ts`, two buttons.
+- Cost per item comes from the Shopify variant (`inventoryItem.unitCost`); Range Name is the product's collection names joined with " / ". Both are blank when Shopify has none (the dev store has no costs). If Shopify cannot be read, the file still downloads with those columns blank and a warning.
+- OrderLine now stores `productId` and `variantId` (migration `20261122100000_order_line_product_ids`). Existing lines get them after "Refresh order data".
+- New scope `read_products` (shopify.app.toml, .env.example). Render's SCOPES env var must include it; the merchant approves the new permission after `shopify app deploy`.
+- Assumptions to confirm with staff: Final Sale Price = unit price after the line discount; "Variant & Access COST" = the variant cost (no accessory split yet); PO Number blank until a PO module exists. Export 1 not built (needs production cost data).
