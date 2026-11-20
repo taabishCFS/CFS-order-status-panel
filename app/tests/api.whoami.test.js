@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 let admin;
 vi.mock("../shopify.server", () => ({ authenticate: { admin: (...a) => admin(...a) } }));
 
-const { loader } = await import("./api.whoami.jsx");
+const { loader } = await import("../routes/api.whoami.jsx");
 const req = new Request("https://app.test/api/whoami");
 
 describe("GET /api/whoami", () => {

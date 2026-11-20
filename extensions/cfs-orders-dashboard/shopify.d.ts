@@ -19,6 +19,12 @@ declare module './src/OrdersByBrand.jsx' {
 }
 
 //@ts-ignore
+declare module './src/backend.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/DeliverySection.jsx' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
