@@ -24,10 +24,20 @@ function orderColumns(o) {
     tags: o.tags,
     sourceName: o.sourceName,
     site: o.site,
+    orderStatusId: o.orderStatusId,
+    gateway: o.gateway,
+    outstandingMinor: o.outstanding.minor,
+    refundedMinor: o.refunded.minor,
+    phone: o.phone,
+    postcode: o.postcode,
+    orderTakenBy: o.orderTakenBy,
+    orderSource: o.orderSource,
+    brands: o.brands,
+    lineStatusIds: o.lineStatusIds,
   };
 }
 
-const lineColumns = (l) => ({
+const lineColumns = (l, archived) => ({
   shop: l.shop,
   orderId: l.orderId,
   lineId: l.lineId,
@@ -40,6 +50,11 @@ const lineColumns = (l) => ({
   priceMinor: l.price.minor,
   discountMinor: l.discount.minor,
   properties: l.properties,
+  lineStatusId: l.lineStatusId,
+  expectedDate: l.expectedDate,
+  deliveryOutcome: l.deliveryOutcome,
+  orderCreatedAt: l.orderCreatedAt,
+  orderArchived: archived,
 });
 
 /** Returns { outcome: "saved" | "stale" }. Throws when the database fails, so the caller can retry. */
@@ -51,7 +66,7 @@ export async function upsertOrder(db, { order, lines }) {
     const data = orderColumns(order);
     await tx.order.upsert({ where, create: data, update: data });
     await tx.orderLine.deleteMany({ where: { shop: order.shop, orderId: order.orderId } });
-    if (lines.length) await tx.orderLine.createMany({ data: lines.map(lineColumns) });
+    if (lines.length) await tx.orderLine.createMany({ data: lines.map((l) => lineColumns(l, existing?.archivedAt != null)) });
     return { outcome: "saved" };
   }, LIMITS);
 }

@@ -80,7 +80,7 @@ export default function EmailTemplatesPage() {
 
   return (
     <s-page heading="Email templates">
-      <s-link href="/">← Orders by Brand</s-link>
+      <s-link href="/">← Orders</s-link>
 
       {loadError && <s-banner tone="critical" heading="Could not load the templates">{loadError}</s-banner>}
       {!list && !loadError && <s-spinner accessibilityLabel="Loading templates" />}

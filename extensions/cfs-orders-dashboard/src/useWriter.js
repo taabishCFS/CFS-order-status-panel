@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { fetchStaffActor, resolveActor } from '../../cfs-order-status/src/identity';
+import { syncOrder } from './mirrorSync';
 import { saveChange } from './writes';
 
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -28,6 +29,7 @@ export function useWriter({ orderId, detail, refresh, setNotice, afterSave }) {
     let ok = false;
     if (result.ok) {
       ok = true;
+      void syncOrder(orderId);
       if (afterSave) await afterSave();
       await refresh();
     } else if (result.reason === 'stale') {

@@ -50,10 +50,22 @@ model Order {
   tags             String[]
   sourceName       String?
   site             String?
+  orderStatusId    Int?
+  gateway          String?
+  outstandingMinor Int       @default(0)
+  refundedMinor    Int       @default(0)
+  phone            String?
+  postcode         String?
+  orderTakenBy     String?
+  orderSource      String?
+  archivedAt       DateTime?
+  brands           String[]
+  lineStatusIds    Int[]
   syncedAt         DateTime  @default(now()) @updatedAt
 
   @@unique([shop, orderId])
   @@index([shop, createdAt])
+  @@index([shop, archivedAt, createdAt])
 }
 
 model OrderLine {
@@ -70,9 +82,16 @@ model OrderLine {
   priceMinor    Int
   discountMinor Int
   properties    Json
+  lineStatusId    Int?
+  expectedDate    String?
+  deliveryOutcome String?
+  orderCreatedAt  DateTime @default(now())
+  orderArchived   Boolean  @default(false)
 
   @@index([shop, orderId])
   @@index([shop, sku])
+  @@index([shop, vendor, orderCreatedAt])
+  @@index([shop, lineStatusId])
 }
 
 // One saved configuration of one configured order line. Version 1 is the original from the

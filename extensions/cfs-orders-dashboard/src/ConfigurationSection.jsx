@@ -17,7 +17,9 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
   const [sel, setSel] = useState(null);
   const [quote, setQuote] = useState(null);
   const [reason, setReason] = useState('');
-  const [busy, setBusy] = useState(false);
+  // Which request is running: 'check' (pricing) or 'apply' (saving). Only that button spins; both stay disabled meanwhile.
+  const [working, setWorking] = useState(null);
+  const busy = working !== null;
   const [message, setMessage] = useState(null); // { tone, text }
 
   async function load() {
@@ -56,7 +58,7 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
   const body = () => ({ orderId: id, lineItemId: editing.lineItemId, ...selectionToRequest(sel, groupNames) });
 
   async function check() {
-    setBusy(true);
+    setWorking('check');
     setMessage(null);
     try {
       const r = await post('api/lines/quote', body());
@@ -65,11 +67,11 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
     } catch (e) {
       setMessage({ tone: 'critical', text: `Could not price this change: ${e.message}` });
     }
-    setBusy(false);
+    setWorking(null);
   }
 
   async function apply() {
-    setBusy(true);
+    setWorking('apply');
     setMessage(null);
     let result;
     try {
@@ -80,7 +82,7 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
     }
     if (result.outcome !== 'applied') {
       setMessage({ tone: result.outcome === 'failed' ? 'critical' : 'warning', text: outcomeText(result.outcome, result.message) });
-      setBusy(false);
+      setWorking(null);
       return;
     }
 
@@ -101,7 +103,7 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
     });
     await load();
     await reload();
-    setBusy(false);
+    setWorking(null);
   }
 
   if (!data) return <s-section heading="Configuration"><s-text>Loading…</s-text></s-section>;
@@ -157,7 +159,7 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
 
                   {catalog?.groups && (
                     <>
-                      <s-button disabled={!ready || !canQuote(sel, catalog.groups) || undefined} loading={busy || undefined} onClick={check}>Check price</s-button>
+                      <s-button disabled={!ready || !canQuote(sel, catalog.groups) || undefined} loading={working === 'check' || undefined} onClick={check}>Check price</s-button>
                       {quote && (
                         <s-stack direction="block" gap="small-300">
                           <s-text>
@@ -171,7 +173,7 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
                     </>
                   )}
                   <s-stack direction="inline" gap="small">
-                    <s-button variant="primary" disabled={!ready || !quote || quote.same || !reason.trim() || undefined} loading={busy || undefined} onClick={apply}>Apply change</s-button>
+                    <s-button variant="primary" disabled={!ready || !quote || quote.same || !reason.trim() || undefined} loading={working === 'apply' || undefined} onClick={apply}>Apply change</s-button>
                     <s-button disabled={busy || undefined} onClick={stop}>Cancel</s-button>
                   </s-stack>
                 </s-stack>

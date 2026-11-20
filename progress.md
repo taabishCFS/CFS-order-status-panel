@@ -144,3 +144,11 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - **Screens**: the Email the customer ticks (Status, Expected date, Delivery Not Confirm) now work; an Emails list with Retry on each order; an Email templates screen (link on Orders by Brand) with edit, preview (words only), Send test (allow-list only), history and restore.
 - **Rules for staff to confirm** (`docs/email-template-differences.md`): status 10, 18, 19 one email per line; 14 only for lines not previously 4; 34 and 36 one email from the first line; 31 lists collection lines. Supplier order form, supplier chase-up and the expected-date email are minimal and need staff wording; the invoice is text only; the delivery-confirmed email is not wired because the app holds no delivery dates yet.
 - **Tests**: backend 335, dashboard 73, status extension 104; build passes. Not yet run live: the acceptance steps in `docs/resend-setup.md` need the Render variables, a push and redeploy, and `shopify app deploy`.
+
+## Order lists built (2026-11-21)
+
+- **Backend:** new columns on `Order` and `OrderLine` (payment gateway, balance, refunds, phone, postcode, taken-by, source, archive flag, header and line status, expected date, delivery outcome, brands) in migration `20261121120000_order_list_columns`. The mirror reads the saved status record with each order, so the lists can filter by line status. New routes: `api/order-list`, `api/line-list`, `api/brands`, `api/orders/archive` (staff only), `api/orders/:id/sync` (called after each staff save).
+- **Screens:** **Orders** (`/`) is the By Order list: 50 per page, brand, date range, search, select, Archive and Restore. **Orders by Brand** (`/orders-by-brand`) is the line list with filters, summary, find and bulk change status / expected date. The old client-side list code was removed.
+- **Existing orders need a one-off refresh:** press **Refresh order data** on the Orders screen after deploying (it drives the existing backfill route).
+- **Not built (later slices):** exports, bulk email, Process Order, By Order expand row, Store Orders filter. Supp. Invoice Paid shows "No".
+- **Tests:** backend 390, status extension 104, dashboard 90; build passes. Not yet checked live; see `docs/order-lists.md`.

@@ -63,3 +63,44 @@ describe("siteOf", () => {
     expect(siteOf({ sourceName: "web", tags: ["site:XYZ"] })).toBeNull();
   });
 });
+
+describe("mapOrder list fields", () => {
+  const status = JSON.stringify({ order: { statusId: 3 }, lines: { "gid://shopify/LineItem/1": { statusId: 4 } }, expected: { "gid://shopify/LineItem/1": { date: "2026-12-10" } }, history: [] });
+  const base = (over = {}) => gqlOrder({
+    paymentGatewayNames: ["kody", "shopify"],
+    phone: "0777",
+    shippingAddress: { name: "Alex", zip: "LE1 3LR", phone: "0116" },
+    totalOutstandingSet: money("50.0"),
+    totalRefundedSet: money("5.0"),
+    tags: ["site:CFS", "taken-by: ABEER ", "source:Leicester"],
+    metafield: { value: status },
+    ...over,
+  });
+
+  it("maps gateway, balance, refunds, phone, postcode, taker and source", () => {
+    const { order } = mapOrder("s", base());
+    expect(order).toMatchObject({ gateway: "kody", outstanding: { minor: 5000 }, refunded: { minor: 500 }, phone: "0116", postcode: "LE1 3LR", orderTakenBy: "ABEER", orderSource: "Leicester", orderStatusId: 3 });
+  });
+
+  it("falls back to the order phone and leaves absent fields null", () => {
+    const { order } = mapOrder("s", base({ shippingAddress: { name: "A" }, paymentGatewayNames: [], tags: [] }));
+    expect(order).toMatchObject({ phone: "0777", postcode: null, gateway: null, orderTakenBy: null, orderSource: null });
+  });
+
+  it("lists distinct brands (blank as Unmapped) and distinct line statuses", () => {
+    const { order } = mapOrder("s", base({ lineItems: { nodes: [gqlLine(1), gqlLine(2, { vendor: null }), gqlLine(3)], pageInfo: {} } }));
+    expect(order.brands).toEqual(["Duke Beds", "Unmapped"]);
+    expect(order.lineStatusIds).toEqual([4]);
+  });
+
+  it("puts each line's status, expected date and the order date on the line", () => {
+    const { lines } = mapOrder("s", base());
+    expect(lines[0]).toMatchObject({ lineStatusId: 4, expectedDate: "2026-12-10", deliveryOutcome: null, orderCreatedAt: new Date("2026-11-18T15:14:12Z") });
+  });
+
+  it("leaves statuses null when the record is unreadable", () => {
+    const { order, lines } = mapOrder("s", base({ metafield: { value: "{bad" } }));
+    expect(order.orderStatusId).toBeNull();
+    expect(lines[0].lineStatusId).toBeNull();
+  });
+});

@@ -14,7 +14,10 @@ const ADDRESS = "name address1 address2 city province zip countryCodeV2 phone";
 const ORDER_QUERY = `#graphql
   query CfsMirrorOrder($id: ID!, $after: String) {
     order(id: $id) {
-      id name createdAt updatedAt cancelledAt displayFinancialStatus sourceName tags email
+      id name createdAt updatedAt cancelledAt displayFinancialStatus sourceName tags email phone paymentGatewayNames
+      totalOutstandingSet { ${MONEY} }
+      totalRefundedSet { ${MONEY} }
+      metafield(namespace: "$app", key: "cfs_status") { value }
       shippingAddress { ${ADDRESS} }
       billingAddress { ${ADDRESS} }
       subtotalPriceSet { ${MONEY} }

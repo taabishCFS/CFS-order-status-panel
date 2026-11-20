@@ -30,6 +30,11 @@ export const gqlOrder = (over = {}) => ({
   totalDiscountsSet: set("0.0"),
   totalShippingPriceSet: set("20.0"),
   totalPriceSet: set("299.0"),
+  paymentGatewayNames: ["shopify_payments"],
+  phone: null,
+  totalOutstandingSet: set("0.0"),
+  totalRefundedSet: set("0.0"),
+  metafield: null,
   lineItems: { nodes: [gqlLine(1)], pageInfo: { hasNextPage: false, endCursor: null } },
   ...over,
 });

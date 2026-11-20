@@ -1,4 +1,6 @@
 // Turns a Shopify GraphQL order into plain rows. Money is kept in minor units (pence) with its currency.
+import { readStatusState } from "./status-state.js";
+
 const SITES = ["CFS", "TFS", "FURN", "UD", "MM", "eBay"];
 
 export const toMinor = (amount) => Math.round(Number(amount) * 100);
@@ -15,13 +17,26 @@ export function siteOf({ sourceName, tags }) {
   return /ebay/i.test(sourceName ?? "") ? "eBay" : null;
 }
 
+// A `<prefix>:<value>` tag, for fields Shopify has no column for (placeholder rule, like siteOf).
+const tagValue = (tags, prefix) => {
+  for (const tag of tags) {
+    const m = new RegExp(`^${prefix}:(.+)$`, "i").exec(tag.trim());
+    if (m && m[1].trim()) return m[1].trim();
+  }
+  return null;
+};
+
 export function mapOrder(shop, o) {
   const tags = o.tags ?? [];
+  const status = readStatusState(o.metafield?.value ?? null);
+  const createdAt = new Date(o.createdAt);
+  const lineNodes = o.lineItems?.nodes ?? [];
+  const brandOf = (l) => l.vendor?.trim() || "Unmapped";
   const order = {
     shop,
     orderId: o.id,
     name: o.name,
-    createdAt: new Date(o.createdAt),
+    createdAt,
     cancelledAt: o.cancelledAt ? new Date(o.cancelledAt) : null,
     shopifyUpdatedAt: new Date(o.updatedAt),
     customerName: o.shippingAddress?.name ?? o.billingAddress?.name ?? null,
@@ -36,8 +51,18 @@ export function mapOrder(shop, o) {
     tags,
     sourceName: o.sourceName ?? null,
     site: siteOf({ sourceName: o.sourceName, tags }),
+    orderStatusId: status.orderStatusId,
+    gateway: o.paymentGatewayNames?.[0] ?? null,
+    outstanding: money(o.totalOutstandingSet),
+    refunded: money(o.totalRefundedSet),
+    phone: o.shippingAddress?.phone ?? o.phone ?? null,
+    postcode: o.shippingAddress?.zip ?? null,
+    orderTakenBy: tagValue(tags, "taken-by"),
+    orderSource: tagValue(tags, "source"),
+    brands: [...new Set(lineNodes.map(brandOf))],
+    lineStatusIds: [...new Set(lineNodes.map((l) => status.lines[l.id]?.statusId).filter((id) => id != null))],
   };
-  const lines = (o.lineItems?.nodes ?? []).map((l) => ({
+  const lines = lineNodes.map((l) => ({
     shop,
     orderId: o.id,
     lineId: l.id,
@@ -49,6 +74,10 @@ export function mapOrder(shop, o) {
     price: money(l.originalUnitPriceSet),
     discount: money(l.totalDiscountSet),
     properties: (l.customAttributes ?? []).map(({ key, value }) => ({ key, value })),
+    lineStatusId: status.lines[l.id]?.statusId ?? null,
+    expectedDate: status.lines[l.id]?.expectedDate ?? null,
+    deliveryOutcome: status.lines[l.id]?.delivery ?? null,
+    orderCreatedAt: createdAt,
   }));
   return { order, lines };
 }

@@ -41,3 +41,28 @@ describe("upsertOrder", () => {
     expect(db.lines).toHaveLength(1);
   });
 });
+
+describe("upsertOrder archive flag", () => {
+  it("keeps archivedAt on a repeat save and marks the rebuilt lines archived", async () => {
+    const db = fakeDb();
+    await upsertOrder(db, rows());
+    const key = "s|gid://shopify/Order/1";
+    const archivedAt = new Date("2026-11-20T00:00:00Z");
+    db.orders.set(key, { ...db.orders.get(key), archivedAt });
+    const newer = rows();
+    newer.order.shopifyUpdatedAt = new Date("2027-01-01T00:00:00Z");
+    await upsertOrder(db, newer);
+    expect(db.orders.get(key).archivedAt).toEqual(archivedAt);
+    expect(db.lines[0].orderArchived).toBe(true);
+  });
+
+  it("writes the list fields", async () => {
+    const db = fakeDb();
+    const r = rows();
+    Object.assign(r.order, { gateway: "kody", outstanding: { minor: 500, currency: "GBP" }, refunded: { minor: 0, currency: "GBP" }, brands: ["A"], lineStatusIds: [3], orderStatusId: 3, phone: "1", postcode: "P", orderTakenBy: "X", orderSource: "Y" });
+    Object.assign(r.lines[0], { lineStatusId: 3, expectedDate: "2026-12-10", deliveryOutcome: null, orderCreatedAt: new Date("2026-11-18T00:00:00Z") });
+    await upsertOrder(db, r);
+    expect(db.orders.get("s|gid://shopify/Order/1")).toMatchObject({ gateway: "kody", outstandingMinor: 500, refundedMinor: 0, brands: ["A"], lineStatusIds: [3], orderStatusId: 3, phone: "1", postcode: "P", orderTakenBy: "X", orderSource: "Y" });
+    expect(db.lines[0]).toMatchObject({ lineStatusId: 3, expectedDate: "2026-12-10", orderArchived: false });
+  });
+});
