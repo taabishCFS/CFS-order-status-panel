@@ -41,7 +41,7 @@ describe('queueEmail', () => {
 
   it('posts the body as JSON and reports success', async () => {
     const fn = call({ ok: true, status: 200, body: { ok: true, rows: [] } });
-    expect(await queueEmail({ a: 1 }, fn)).toEqual({ ok: true });
+    expect(await queueEmail({ a: 1 }, fn)).toEqual({ ok: true, recipients: [] });
     expect(fn).toHaveBeenCalledWith('api/emails', expect.objectContaining({ method: 'POST', body: JSON.stringify({ a: 1 }) }));
   });
 
@@ -52,7 +52,12 @@ describe('queueEmail', () => {
   });
 
   it('a send with nothing to send counts as ok', async () => {
-    expect(await queueEmail({}, call({ ok: true, status: 200, body: { ok: true, rows: [], code: 'nothing_to_send' } }))).toEqual({ ok: true });
+    expect(await queueEmail({}, call({ ok: true, status: 200, body: { ok: true, rows: [], code: 'nothing_to_send' } }))).toEqual({ ok: true, recipients: [] });
+  });
+
+  it('reports who the customer emails were queued for, not internal copies', async () => {
+    const rows = [{ kind: 'customer', recipient: 'a@x.com' }, { kind: 'internal_copy', recipient: 'ops@x.com' }, { kind: 'customer', recipient: null }];
+    expect(await queueEmail({}, call({ ok: true, status: 200, body: { ok: true, rows } }))).toEqual({ ok: true, recipients: ['a@x.com'] });
   });
 });
 
@@ -79,6 +84,13 @@ describe('describeEmail and templateLabel', () => {
     expect(text).toContain('jane@example.com');
     expect(text).toContain('Sent');
     expect(text).toContain('2026');
+  });
+
+  it('says a log-mode email was only logged, never sent', () => {
+    expect(describeEmail({ ...row, mode: 'log' })).toContain('Logged only (not sent)');
+    expect(describeEmail({ ...row, mode: 'log' })).not.toContain('· Sent');
+    expect(describeEmail({ ...row, mode: 'test' })).toContain('Sent (test mode)');
+    expect(describeEmail({ ...row, mode: 'live' })).toContain('· Sent');
   });
 
   it('shows the error for a failed email and marks an internal copy', () => {

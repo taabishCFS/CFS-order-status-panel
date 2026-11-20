@@ -30,5 +30,9 @@ export default function EmailTick({ emails, checked, onChange }) {
 export async function sendAfterSave({ body, setNotice, emails }) {
   const result = await queueEmail(body);
   if (!result.ok) setNotice({ tone: 'warning', text: `Saved, but the email could not be queued: ${result.message}` });
+  else if (result.recipients.length) setNotice({ tone: 'success', text: `Saved. Email to ${result.recipients.join(', ')} is on its way: see the Emails list at the bottom of the page for its status.` });
+  else setNotice({ tone: 'warning', text: 'Saved, but no email was sent: this order has no customer email address.' });
   await emails.reload();
+  // The worker sends within seconds; look again so the list shows the final status.
+  setTimeout(() => emails.reload(), 4000);
 }

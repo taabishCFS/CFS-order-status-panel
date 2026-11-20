@@ -103,14 +103,17 @@ export function emailOutcomeText(problem: { code?: string; error?: string | null
 export async function queueEmail(
   body: Record<string, unknown>,
   call: typeof callBackendResult = callBackendResult,
-): Promise<{ ok: boolean; message?: string }> {
+): Promise<{ ok: boolean; message?: string; recipients?: string[] }> {
   let result;
   try {
     result = await call('api/emails', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   } catch {
     return { ok: false, message: emailOutcomeText({ network: true }) };
   }
-  if (result.ok) return { ok: true };
+  if (result.ok) {
+    const rows = (result.body as { rows?: { kind: string; recipient: string | null }[] } | null)?.rows ?? [];
+    return { ok: true, recipients: rows.filter((r) => r.kind === 'customer' && r.recipient).map((r) => r.recipient as string) };
+  }
   const code = (result.body as { code?: string; error?: string } | null)?.code ?? (result.body as { error?: string } | null)?.error;
   return { ok: false, message: emailOutcomeText({ code }) };
 }
@@ -134,7 +137,9 @@ export function describeEmail(row: EmailRow): string {
   const when = new Date(row.createdAt).toLocaleString('en-GB');
   const copy = row.kind === 'internal_copy' ? ' (internal copy)' : '';
   const to = row.recipient ?? 'no email address';
-  const status = STATUS_WORDS[row.status] ?? row.status;
+  const word = STATUS_WORDS[row.status] ?? row.status;
+  // Log mode records the email but sends nothing; test mode really sends, but only to allowed addresses.
+  const status = row.status === 'sent' && row.mode === 'log' ? 'Logged only (not sent)' : row.status === 'sent' && row.mode === 'test' ? 'Sent (test mode)' : word;
   const detail =
     row.status === 'skipped' && row.error
       ? ` — ${SKIP_REASON[row.error] ?? row.error}`
