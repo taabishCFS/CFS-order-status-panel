@@ -42,3 +42,11 @@ Created by `cfs-configurator` through a draft order: an ordinary variant, a `pri
 ## Cleanup and follow-ups
 - Test orders #1037 and #1038 remain on the dev store (tags `mirror-test`, `spike-phase4`).
 - The edit does not change `_cfs_attempt` or the configurator's snapshot; the new version table in this app must reference the configurator's snapshot for the original configuration.
+
+## Live checks during Task 3 (20 November, order #1038)
+- **A fixed line discount is per unit.** `orderEditAddLineItemDiscount` with `fixedValue` 1.00 on a quantity-2 line took **2.00** off the order. The app therefore sends (whole-line difference) / (line quantity) and refuses a decrease that does not divide evenly.
+- **Custom item works:** `orderEditAddCustomItem` £1.00 raised the total by £1.00; the title carries the marker `[cfg:<lineId>:v<n>]`.
+- **Markers are findable:** a custom item's marker is in the line title; a discount's marker is in `ManualDiscountApplication.title` and `.description` (via `discountAllocations`).
+- `Order.currencyCode` and `LineItem.unfulfilledQuantity` exist and are used to check an edit is allowed.
+- The order edit's `CalculatedLineItem` id for an existing line has the same number as its `LineItem` id.
+- **Left on #1038 by these checks:** a £1.00 item (v9) and a £2.00 discount (v10); total now £2,258.98. Dev store only.
