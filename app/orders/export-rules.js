@@ -37,3 +37,8 @@ export function exportRow(kind, line, ctx) {
     "", ctx.statusLabel ?? "", dmy(line.expectedDate),
   ];
 }
+
+const slug = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/** e.g. orders-export-3-actona-2026-11-20.csv */
+export const exportFilename = (kind, brand, today = new Date()) => `orders-export-${kind}${brand ? `-${slug(brand)}` : ""}-${today.toISOString().slice(0, 10)}.csv`;

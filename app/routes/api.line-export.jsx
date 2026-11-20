@@ -1,24 +1,24 @@
-import db from "../db.server";
-import { buildExport } from "../orders/export-query.server";
+import { signExportLink } from "../orders/export-link.server";
+import { exportFilename } from "../orders/export-rules";
 import { parseListParams } from "../orders/list-rules";
 import { authenticate } from "../shopify.server";
 import { staffFromSession } from "../staff/staff.server";
 
-const slug = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-
-// GET ?kind=2|3 plus the Orders by Brand filters: the matching lines as a CSV, inside JSON for the extension to save.
+// GET ?kind=2|3 plus the Orders by Brand filters: a signed, five-minute download link for that export.
+// The file itself is served by /exports/line, which a plain browser tab can open.
 export const loader = async ({ request }) => {
-  const { session, admin, cors } = await authenticate.admin(request);
+  const { session, cors } = await authenticate.admin(request);
   const json = (body, status = 200) => cors(Response.json(body, { status }));
   if (!staffFromSession(session)) return json({ error: "staff_not_verified" }, 403);
 
-  const url = new URL(request.url);
-  const kind = Number(url.searchParams.get("kind"));
+  const search = new URL(request.url).searchParams;
+  const kind = Number(search.get("kind"));
   if (kind !== 2 && kind !== 3) return json({ error: "bad_request" }, 400);
 
-  const params = parseListParams(url.searchParams);
-  const result = await buildExport({ db, graphql: admin.graphql, shop: session.shop, params, kind });
-  const brand = params.brand ? `-${slug(params.brand)}` : "";
-  const filename = `orders-export-${kind}${brand}-${new Date().toISOString().slice(0, 10)}.csv`;
-  return json({ ...result, filename });
+  const filters = new URLSearchParams(search);
+  for (const key of ["kind", "page", "all"]) filters.delete(key);
+  const query = filters.toString();
+  const token = signExportLink({ shop: session.shop, kind, query }, process.env.SHOPIFY_API_SECRET);
+  const base = (process.env.SHOPIFY_APP_URL ?? "").replace(/\/$/, "");
+  return json({ url: `${base}/exports/line?t=${encodeURIComponent(token)}`, filename: exportFilename(kind, parseListParams(filters).brand) });
 };

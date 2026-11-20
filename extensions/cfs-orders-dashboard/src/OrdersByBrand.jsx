@@ -2,8 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 import { fetchStaffActor, resolveActor } from '../../cfs-order-status/src/identity';
 import { STATUSES, labelFor, statusById } from '../../cfs-order-status/src/statuses';
 import { bulkChangeStatus, bulkExpectedDate, groupByOrder } from './bulk';
-import { saveCsv } from './download';
-import { loadBrands, loadLineExport, loadLineList } from './listApi';
+import { loadBrands, loadExportLink, loadLineList } from './listApi';
 import Pager from './Pager.jsx';
 import { formatDate, formatMoney, lineTitle, matchesFind, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
 
@@ -27,8 +26,8 @@ export default function OrdersByBrand() {
   const [bulkDate, setBulkDate] = useState('');
   const [working, setWorking] = useState(false);
   const [report, setReport] = useState(null);
-  const [exporting, setExporting] = useState(null); // 2 or 3 while a download is being prepared
-  const [exportNote, setExportNote] = useState(null);
+  const [exporting, setExporting] = useState(null); // 2 or 3 while a download link is being prepared
+  const [exportNote, setExportNote] = useState(null); // { tone, text, link? }
 
   useEffect(() => { fetchStaffActor().then(setStaff); }, []);
 
@@ -73,18 +72,14 @@ export default function OrdersByBrand() {
     await load();
   }
 
-  // Downloads every line the filters match (not just this page).
+  // Asks for a download link covering every line the filters match (not just this page). The link opens in a new tab.
   async function download(kind) {
     setExporting(kind);
     setExportNote(null);
-    const res = await loadLineExport(kind, applied);
+    const res = await loadExportLink(kind, applied);
     setExporting(null);
     if (!res.ok) { setExportNote({ tone: 'critical', text: res.message }); return; }
-    saveCsv(res.data.filename, res.data.csv);
-    const notes = [`Downloaded ${res.data.count} line${res.data.count === 1 ? '' : 's'} as ${res.data.filename}.`];
-    if (res.data.capped) notes.push('The file holds the newest 5,000 lines. Narrow the filters to get the rest.');
-    if (res.data.costLookup === 'unavailable') notes.push('Cost and range could not be read from Shopify, so those columns are blank.');
-    setExportNote({ tone: res.data.capped || res.data.costLookup === 'unavailable' ? 'warning' : 'success', text: notes.join(' ') });
+    setExportNote({ tone: 'success', text: `Export ${kind} is ready (up to 5,000 lines, the link works for 5 minutes).`, link: res.data });
   }
 
   const noneTicked = picked.size === 0;
@@ -128,7 +123,12 @@ export default function OrdersByBrand() {
           <s-button disabled={exporting !== null || undefined} loading={exporting === 2 || undefined} onClick={() => download(2)}>Export 2 (chase-up sheet)</s-button>
           <s-button disabled={exporting !== null || undefined} loading={exporting === 3 || undefined} onClick={() => download(3)}>Export 3 (ordering sheet)</s-button>
         </s-stack>
-        {exportNote && <s-banner tone={exportNote.tone} dismissible onDismiss={() => setExportNote(null)}>{exportNote.text}</s-banner>}
+        {exportNote && (
+          <s-banner tone={exportNote.tone} dismissible onDismiss={() => setExportNote(null)}>
+            {exportNote.text}
+            {exportNote.link && <s-link href={exportNote.link.url} target="_blank">Download {exportNote.link.filename}</s-link>}
+          </s-banner>
+        )}
       </s-section>
 
       <s-section>

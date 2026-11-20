@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { archiveOrders, buildQuery, loadBrands, loadLineExport, loadLineList, loadOrderList } from './listApi';
+import { archiveOrders, buildQuery, loadBrands, loadExportLink, loadLineList, loadOrderList } from './listApi';
 
 const asFetch = (f: unknown) => f as unknown as typeof fetch;
 const reply = (status: number, body: unknown) => vi.fn(async () => ({ ok: status < 300, status, json: async () => body }) as Response);
@@ -53,17 +53,17 @@ describe('archiveOrders', () => {
   });
 });
 
-describe('loadLineExport', () => {
-  it('asks for the export kind with the list filters, without the page', async () => {
-    const body = { csv: 'A\r\n', count: 1, capped: false, costLookup: 'ok', filename: 'x.csv' };
+describe('loadExportLink', () => {
+  it('asks for the export kind with the list filters, without the page, and returns the link', async () => {
+    const body = { url: 'https://app.test/exports/line?t=abc', filename: 'x.csv' };
     const f = reply(200, body);
-    const res = await loadLineExport(3, { brand: 'Actona', page: 4, all: true, insurance: true }, asFetch(f));
+    const res = await loadExportLink(3, { brand: 'Actona', page: 4, all: true, insurance: true }, asFetch(f));
     expect(f).toHaveBeenCalledWith('/api/line-export?kind=3&brand=Actona&insurance=1', undefined);
     expect(res).toEqual({ ok: true, data: body });
   });
 
   it('explains an unverified staff member in plain words', async () => {
-    const res = await loadLineExport(2, {}, asFetch(reply(403, { error: 'staff_not_verified' })));
+    const res = await loadExportLink(2, {}, asFetch(reply(403, { error: 'staff_not_verified' })));
     expect(res).toEqual({ ok: false, message: 'Only a verified staff member can download exports.' });
   });
 });
