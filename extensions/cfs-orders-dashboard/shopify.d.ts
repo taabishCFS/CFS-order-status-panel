@@ -25,6 +25,12 @@ declare module './src/OrdersByBrand.jsx' {
 }
 
 //@ts-ignore
+declare module './src/OrdersByOrder.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/backend.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
@@ -115,19 +121,31 @@ declare module './src/orderDetail.ts' {
 }
 
 //@ts-ignore
+declare module './src/mirrorSync.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/writes.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
 
 //@ts-ignore
-declare module './src/load.ts' {
+declare module './src/bulk.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
 
 //@ts-ignore
-declare module './src/rows.ts' {
+declare module './src/listApi.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/orderList.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }

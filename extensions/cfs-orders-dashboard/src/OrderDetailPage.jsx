@@ -100,7 +100,7 @@ export default function OrderDetailPage({ id }) {
 
       <s-section heading="Order">
         <s-stack direction="block" gap="small">
-          <s-text>Order ID: {id}</s-text>
+          <s-text>Order ID: {detail.name}</s-text>
           <s-text>Placed {when(detail.createdAt)}</s-text>
           <s-stack direction="inline" gap="small" alignItems="center">
             <s-text type="strong">Order status:</s-text>

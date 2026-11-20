@@ -137,7 +137,7 @@ export default function OrdersByOrder() {
                   <s-table-cell>
                     <s-stack direction="block">
                       <s-text tone={tone}>{formatDate(r.createdAt)}</s-text>
-                      <s-text color="subdued">{r.orderId.split('/').pop()}</s-text>
+                      <s-text color="subdued">{r.name}</s-text>
                     </s-stack>
                   </s-table-cell>
                   <s-table-cell>{logo ? <s-image src={logo} alt={r.site} inlineSize="fill" /> : <s-text>{r.site ?? ''}</s-text>}</s-table-cell>
