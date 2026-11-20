@@ -50,3 +50,13 @@ Created by `cfs-configurator` through a draft order: an ordinary variant, a `pri
 - `Order.currencyCode` and `LineItem.unfulfilledQuantity` exist and are used to check an edit is allowed.
 - The order edit's `CalculatedLineItem` id for an existing line has the same number as its `LineItem` id.
 - **Left on #1038 by these checks:** a £1.00 item (v9) and a £2.00 discount (v10); total now £2,258.98. Dev store only.
+
+## Live acceptance on the dev store (Task 5, order #1035)
+
+- Price check through the extension matches the charged price (£1,089.98 for line 1's current options).
+- Price-neutral change (fabric swap, same price): saved as version 2 with actor and reason, no Shopify call, survives a reload.
+- Increase (+£89.99): custom item with the `[cfg:<line>:v4]` marker; order total £2,089.97 -> £2,179.96, balance due £89.99.
+- Decrease (-£89.99): line discount with the v5 marker; total back to £2,089.97, balance £0.00.
+- Failed attempts are kept as `failed` versions (audit trail) and do not block the next attempt.
+- Findings: (1) the app needs the `write_order_edits` scope, not only `write_orders`; the connector used in the spike has wider access, so this only showed in the app. (2) The extension's browser POSTs need a loader for the CORS preflight. (3) The panel's history entry uses the backend-verified staff member, because Shopify does not name the staff member to the extension. (4) The configurator's first call after sleeping can exceed the 10 s limit.
+- Not run live: invalid combination, configurator stopped (both unit tested). VAT: handed to the accounts module (see progress.md).

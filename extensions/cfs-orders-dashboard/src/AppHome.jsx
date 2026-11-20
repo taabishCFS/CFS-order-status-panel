@@ -1,5 +1,6 @@
 import { render } from 'preact';
 import { ErrorBoundary, LocationProvider, Route, Router } from 'preact-iso';
+import EmailTemplatesPage from './EmailTemplatesPage.jsx';
 import OrderDetailPage from './OrderDetailPage.jsx';
 import OrdersByBrand from './OrdersByBrand.jsx';
 
@@ -24,6 +25,7 @@ function App() {
         <Router>
           <Route path="/" component={OrdersByBrand} />
           <Route path="/orders/:id" component={OrderDetailPage} />
+          <Route path="/email-templates" component={EmailTemplatesPage} />
           <Route default component={NotFound} />
         </Router>
       </ErrorBoundary>

@@ -30,7 +30,7 @@ model Session {
 
 // Read-only copy of Shopify orders, kept current by webhooks and the backfill. Money is in minor units (pence).
 model Order {
-  id               String   @id @default(cuid())
+  id               String    @id @default(cuid())
   shop             String
   orderId          String
   name             String
@@ -50,7 +50,7 @@ model Order {
   tags             String[]
   sourceName       String?
   site             String?
-  syncedAt         DateTime @default(now()) @updatedAt
+  syncedAt         DateTime  @default(now()) @updatedAt
 
   @@unique([shop, orderId])
   @@index([shop, createdAt])
@@ -96,4 +96,84 @@ model LineConfiguration {
 
   @@unique([shop, lineItemId, version])
   @@index([shop, orderId])
+}
+
+// One email: queued, sent or failed. This table is both the queue and the send log.
+model EmailOutbox {
+  id              String    @id @default(cuid())
+  shop            String
+  orderId         String
+  orderName       String
+  templateKey     String
+  templateVersion Int
+  kind            String // customer | internal_copy | test
+  recipient       String?
+  from            String
+  replyTo         String?
+  subject         String
+  html            String
+  status          String // queued | sending | sent | failed | skipped
+  attempts        Int       @default(0)
+  nextAttemptAt   DateTime  @default(now())
+  claimedAt       DateTime?
+  mode            String? // log | test | live, as at send time
+  providerId      String?
+  error           String?
+  actorId         String?
+  actorName       String?
+  dedupeKey       String
+  createdAt       DateTime  @default(now())
+  sentAt          DateTime?
+
+  @@unique([shop, dedupeKey])
+  @@index([shop, orderId])
+  @@index([status, nextAttemptAt])
+}
+
+// An email template staff can edit. `version` is the current one; every save also writes an EmailTemplateVersion row.
+model EmailTemplate {
+  id            String   @id @default(cuid())
+  shop          String
+  key           String
+  subject       String
+  body          String
+  version       Int      @default(1)
+  updatedAt     DateTime @default(now()) @updatedAt
+  updatedById   String?
+  updatedByName String?
+
+  @@unique([shop, key])
+}
+
+model EmailTemplateVersion {
+  id        String   @id @default(cuid())
+  shop      String
+  key       String
+  version   Int
+  subject   String
+  body      String
+  reason    String?
+  actorId   String?
+  actorName String?
+  createdAt DateTime @default(now())
+
+  @@unique([shop, key, version])
+}
+
+// One brand: its name, links, addresses and phone, used to fill templates for orders of that site.
+model EmailSite {
+  id                 String @id @default(cuid())
+  shop               String
+  code               String
+  name               String
+  url                String
+  serviceEmail       String
+  deliveriesEmail    String
+  accountsEmail      String
+  phone              String
+  fromName           String
+  deliveriesFromName String
+  logoUrl            String
+
+  @@unique([shop, code])
 }

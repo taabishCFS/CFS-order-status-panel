@@ -101,3 +101,46 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - **Fix:** `write_order_edits` added to `shopify.app.toml` and `.env.example`. Failure messages now carry the HTTP status when Shopify refuses a call (`Shopify edit failed (HTTP 403)`), with a test; 126 backend tests pass.
 - **To do before retesting:** `shopify app deploy`, approve the new permission for the app in the dev store admin (Shopify asks the staff user to accept the updated access), set `SCOPES` on the Render service to match, redeploy Render.
 - Also this session: the history entry now uses the backend-verified staff member (deployed); the version list and the saved price-neutral change on #1035 line 1 are confirmed after a reload.
+
+### Phase 4 acceptance results on #1035 (after the write_order_edits scope was added)
+
+- **Increase:** line 2 "without Drawer" -> "with 2 Drawer", quoted +£89.99. Shopify order: total £2,089.97 -> £2,179.96, outstanding £0.00 -> £89.99, new custom item "Configuration change v4 ... [cfg:20254508450131:v4]" at £89.99. Version 4 saved as applied (actor, reason), panel "Change applied and added to the history."
+- **Decrease:** back to "without Drawer", quoted -£89.99. Shopify order: total back to £2,089.97, outstanding £0.00, a line discount of £89.99 on line 2 with marker v5. Version 5 applied.
+- Line 2 history shows v1 original, v2 and v3 failed (the scope refusal, kept as the audit trail), v4 and v5 applied.
+- The earlier price-neutral change (line 1, Carlton Black -> Comet Silver, v2) saved with no Shopify call, and survives a reload.
+- Not yet run live: invalid combination, configurator stopped. Both are unit tested. VAT on the custom item is still unverified (parked, flagged above). Dev order #1035 now carries the v4 item and the v5 discount (net zero).
+
+## Phase 4 closed; VAT work started (2026-11-20)
+
+- Phase 4 Task 5 recorded done in the ledger; acceptance addendum added to `docs/phase4-spike-report.md`.
+- **VAT, what is established:** the live store sells at VAT-inclusive prices (user, 20 Nov). The dev store has `taxesIncluded: true`, so Shopify already treats prices as gross; the configurator's quote equals the price the customer was charged, so the difference we post is a gross (VAT-inclusive) amount, which is the right input for a tax-inclusive order edit.
+- **What is not known:** the dev store collects no VAT (order #1035 has zero tax on every line, no tax lines), so the custom item (taxable: true) and the line discount were never seen with VAT. Shopify's docs only say a custom item is taxable by default; they do not describe tax-inclusive handling.
+- **Test plan:** switch on UK VAT (20%) collection on the dev store, make one change up and one down on a fresh configured order, and check on the Shopify order that (a) the custom item shows VAT extracted from its gross price (£89.99 gross -> £15.00 VAT), (b) the discount reduces the line's gross and its VAT by the matching share, (c) order total and VAT total equal what a fresh order with the new options would show.
+
+### VAT decision (user, 2026-11-20): handed to the accounts module
+
+- VAT and tax are handled by the accounts team, and the CFS legacy accounts module will be added in a later phase. The orders module does not test or decide VAT, so the VAT test on the dev store is dropped (no store tax settings were changed). The "must settle before live" flag is replaced by this hand-off.
+- **Facts the accounts module / accounts team need:** (1) live prices are VAT-inclusive; (2) every price difference we post is a gross amount, equal to the price the customer sees; (3) an increase is posted as a custom order item titled `Configuration change vN: <options> [cfg:<line>:vN]`, created taxable (Shopify's default), so Shopify will apply the store's tax rules to it if tax collection is on; (4) a decrease is a line discount with the same marker in its description; (5) both carry the marker, and the app keeps the matching version row (actor, reason, delta) in the LineConfiguration table; (6) no tax figures are stored by this app. If accounting needs the item zero-rated or split differently, it is a one-line change in `app/orders/order-edit.server.js`.
+
+## Customer email: design approved and plan written (2026-11-21)
+
+- Decided with the user: build the email module now with **editable templates** (staff change the wording), legacy wording ported as is, all legacy customer templates, Resend region stays Tokyo for development.
+- Design: `docs/superpowers/specs/2026-11-20-customer-email-design.md`. Plan (10 tasks): `docs/superpowers/plans/2026-11-21-customer-email.md`. Footer and per-site values (CFS, TFS, FURN, UD, MM) were read from the legacy source (`ordersByBrnd_add.php`).
+- One refinement of the design: a repeating `{{#lines}}…{{/lines}}` block replaces a fixed items-table placeholder, so every legacy table layout can be edited.
+- Found while planning: the Order Detail script (`orderdetailadd_a.php`) has its own status-email block with more statuses than the Orders by Brand script; Order Detail is the main source and differences go in `docs/email-template-differences.md`. The legacy rule text says status 10 is both "once per line" and "first line"; the plan uses first line and flags it for staff. Legacy title ("Mr John") is not in Shopify data, so greetings use the first name only.
+- Approved; built natively in one session (see the next section).
+
+## Knowledge graph and commit hook (2026-11-21)
+
+- Built a graphify knowledge graph of the code (157 files, AST only: 771 nodes, 1667 edges, 35 communities) in `graphify-out/` (`graph.html`, `graph.json`, `GRAPH_REPORT.md`). The 26 docs and 7 images were not semantically extracted (that costs LLM tokens); run `/graphify . --update` if wanted. `.sql` files are skipped until `pip install "graphifyy[sql]"`.
+- Installed graphify git hooks (post-commit, post-checkout, post-merge, post-rewrite): each commit re-extracts changed code files and rebuilds the graph. A merge driver for `graph.json` is registered via `.gitattributes`.
+- `.npmrc` was skipped by graphify as sensitive.
+
+## Customer email module built (2026-11-21)
+
+- **Backend** (`app/email/`): `EmailOutbox` table is the queue and send log; a worker in the server process sends every 30 s (and right after a request). Modes `log | test | live` (live only when `APP_ENV=production`; test only to `MAIL_TEST_ALLOWLIST`); providers `log` and `resend` (SMTP not built). Retry with backoff, 3 attempts, hourly cap, stuck-row recovery, duplicate protection by idempotency key.
+- **Templates are editable**: layout, 16 status emails and 11 other legacy emails are stored in Postgres, seeded from the legacy PHP wording, with versions and restore. Five sites (CFS, TFS, FURN/eBay, UD, MM) pick the wording and sender. Placeholders `{{...}}` and a repeating `{{#lines}}...{{/lines}}` block; values are HTML-escaped. New tables: `EmailOutbox`, `EmailTemplate`, `EmailTemplateVersion`, `EmailSite` (migrations `20261121100000`, `20261121110000`, both with row-level security).
+- **Routes**: `api/emails`, `api/orders/:id/emails`, `api/emails/:id/retry`, `api/email-templates`, `api/email-templates/:key` (save, restore, preview, test). Writes need a verified staff member.
+- **Screens**: the Email the customer ticks (Status, Expected date, Delivery Not Confirm) now work; an Emails list with Retry on each order; an Email templates screen (link on Orders by Brand) with edit, preview (words only), Send test (allow-list only), history and restore.
+- **Rules for staff to confirm** (`docs/email-template-differences.md`): status 10, 18, 19 one email per line; 14 only for lines not previously 4; 34 and 36 one email from the first line; 31 lists collection lines. Supplier order form, supplier chase-up and the expected-date email are minimal and need staff wording; the invoice is text only; the delivery-confirmed email is not wired because the app holds no delivery dates yet.
+- **Tests**: backend 335, dashboard 73, status extension 104; build passes. Not yet run live: the acceptance steps in `docs/resend-setup.md` need the Render variables, a push and redeploy, and `shopify app deploy`.

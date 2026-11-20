@@ -6,9 +6,11 @@ import { labelFor } from '../../cfs-order-status/src/statuses';
 import { callBackend } from './backend';
 import ConfigurationSection from './ConfigurationSection.jsx';
 import DeliverySection from './DeliverySection.jsx';
+import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
 import StatusSection from './StatusSection.jsx';
+import { useEmails } from './useEmails';
 import { useOrderDetail } from './useOrderDetail';
 import { useWriter } from './useWriter';
 
@@ -20,6 +22,7 @@ const DELIVERY = { confirmed: 'Confirmed', declined: 'Declined' };
 export default function OrderDetailPage({ id }) {
   const orderId = `gid://shopify/Order/${id}`;
   const { detail, customer, loading, loadFailed, notice, setNotice, refresh } = useOrderDetail(orderId);
+  const emails = useEmails(id);
   const [older, setOlder] = useState({ entries: [], cursor: null, hasNext: true, loading: false, error: null });
   const [picked, setPicked] = useState([]);
   const [showHistory, setShowHistory] = useState(true);
@@ -133,7 +136,7 @@ export default function OrderDetailPage({ id }) {
           )}
       </s-section>
 
-      <StatusSection orderId={orderId} detail={detail} picked={picked} loading={loading} loadFailed={loadFailed} writer={writer} setNotice={setNotice} />
+      <StatusSection orderId={orderId} detail={detail} picked={picked} loading={loading} loadFailed={loadFailed} writer={writer} setNotice={setNotice} emails={emails} />
 
       <s-section heading="Items" padding="none">
         <s-table>
@@ -172,8 +175,9 @@ export default function OrderDetailPage({ id }) {
 
       <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
 
-      <ExpectedDateSection picked={picked} writer={writer} />
-      <DeliverySection picked={picked} writer={writer} />
+      <ExpectedDateSection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <EmailsSection emails={emails} canRetry={Boolean(verified)} />
       <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />
 
       <s-section heading="Totals">

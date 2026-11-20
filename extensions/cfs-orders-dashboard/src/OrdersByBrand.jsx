@@ -51,6 +51,7 @@ export default function OrdersByBrand() {
 
   return (
     <s-page heading="Orders by Brand">
+      <s-button slot="secondary-actions" href="/email-templates">Email templates</s-button>
       <s-button slot="primary-action" onClick={() => loadMore(null, true)} loading={loading || undefined}>
         Refresh
       </s-button>

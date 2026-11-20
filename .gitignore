@@ -10,3 +10,6 @@ dist/
 shared/types/graphql
 /build
 /app/build
+
+# graphify output
+graphify-out/

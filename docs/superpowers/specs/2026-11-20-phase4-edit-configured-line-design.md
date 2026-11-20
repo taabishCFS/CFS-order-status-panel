@@ -63,7 +63,7 @@ Items table gains a "Configuration" action on editable lines. A panel shows the 
 - Money in minor units; currency from the order.
 
 ## Needs from you
-- **VAT (PARKED by the user on 20 November, not designed):** whether the added custom item should be taxable, and how a price difference splits into net and VAT. For now the custom item uses Shopify's default (`taxable: true`) and the discount follows the order's tax settings; nothing here has been checked against UK VAT-inclusive pricing. **Must be settled and tested before the live store.**
+- **VAT (PARKED by the user on 20 November, not designed):** whether the added custom item should be taxable, and how a price difference splits into net and VAT. For now the custom item uses Shopify's default (`taxable: true`) and the discount follows the order's tax settings; nothing here has been checked against UK VAT-inclusive pricing. **Decision (20 Nov): VAT is out of scope for the orders module. The accounts team handles tax, and the legacy accounts module will be brought in a later phase. See the VAT hand-off note in progress.md.**
 - `STAFF_API_SECRET` set in both Render services (and a paid, non-sleeping configurator instance in production).
 
 ## Risks
