@@ -1,4 +1,42 @@
-# CFS Order Status panel: progress (to 19 November 2026)
+# CFS Order Status panel: progress (to 20 November 2026)
+
+> Newest first for the Orders module: see section 0. Sections 1 to 6 are the earlier order-status panel work (18 to 19 November) and are unchanged except where section 0 supersedes them.
+
+## 0. Orders module (19 to 20 November 2026)
+Goal: mirror the legacy CFS PHP admin inside Shopify Admin. Plan: `C:\Users\Admin\Documents\CFS2030\Migration\Orders-and-My-Account\Orders-module\phased-plan.md` (Phases 0 to 8); legacy inventory in `legacy-feature-inventory.md` in the same folder. Working on `main`; the user commits.
+
+### Done
+- **Order Detail page** (App Home extension `cfs-orders-dashboard`): status, expected date, delivery record, notes, instructions, history, archive. Orders by Brand list opens it.
+- **Phase 1, Task 1: backend scaffold.** React Router 7, Prisma 6, Postgres on Supabase, Docker on Render at `https://cfs-order-status-panel.onrender.com`. `/healthz` returns `{"ok":true}`. `application_url` now points at Render. Verified live.
+- **Phase 1, Task 2: verified staff identity.** `GET /api/whoami` reads the staff member from the online session (`onlineAccessInfo.associated_user`). The Order Detail page shows "Verified as Taabish Shaikh". Verified live. (The first version read the wrong session fields and showed nothing; fixed with tests on the real shape.)
+- **Phase 1, Task 3: order mirror.** Tables `Order` and `OrderLine` (Supabase, RLS on). Webhooks `orders/create|updated|cancelled`, `refunds/create`, `app/uninstalled`; backfill route `/api/backfill`. Verified live: test order #1037 mirrored in about 4 seconds (site CFS, 2500 pence, 1 line); saving a status fires `orders/updated`; backfill saved 14 of the store's 16 orders (the other two, #1021 and #1022, are older than 60 days, so `read_all_orders` is needed).
+- **History list:** shows the latest 5 entries with "Show 10 more" and a Hide/Show history button. A scroll box was tried and dropped because the extension sandbox ignores inline scroll styles (it only clipped the list).
+- Backend test count: 43 backend, 100 status, 34 dashboard, all passing.
+
+### Phase 4 spike (20 November): done, report in `docs/phase4-spike-report.md`
+- Shopify cannot edit a configured line's options in place, and `orderEditAddVariant` re-adds the variant with no notes and the base price (tested on dev order #1038). A quantity-only edit keeps notes and the override price.
+- Recommended design: the app stores the configuration as versions and carries the price difference on the Shopify order as a custom item or discount. Waiting for the user's decisions: accept this design, and where the new price comes from (quote endpoint in `cfs-configurator`, copied option data, or manual price).
+- Test orders #1037 and #1038 are left on the dev store.
+- **User decisions (20 November):** go with option A, and use a **quote endpoint in `cfs-configurator`** (the option data lives in Shopify metafields and metaobjects, but the pricing logic and each order's original configuration live in the configurator, so one pricing engine is kept). Design written: `docs/superpowers/specs/2026-11-20-phase4-edit-configured-line-design.md`, approved by the user to proceed. **Flag: VAT on the price-difference custom item/discount is parked (not designed or tested); settle before the live store.**
+- **Phase 4 Task 1 (configurator, code done 20 November):** signed `/staff/*` API in `cfs-configurator` (`app/staff-api/*`, routes `staff.order-lines`, `staff.choices`, `staff.quote`; HMAC with `STAFF_API_SECRET`, 5-minute window). `readChoices` extracted from `choices-request.server.js` (storefront behaviour unchanged). 390 configurator tests and the build pass. **Live check passed 20 November:** signed requests give 200 on all three routes, unsigned and tampered give 401 (fixed a query-encoding mismatch on the way: both sides now sign a canonical query string via `canonicalPath`). Task 1 done.
+- **Phase 4 Task 2 (this app, code done 20 November):** `LineConfiguration` table + migration `20261120150000_create_line_configuration` (applied by `prisma migrate deploy` on the next Render start), signed client `app/configurator/client.server.js` (same signature as the configurator, shared test vector), `versions.server.js` (version 1 created on first read, race-safe), route `GET /api/orders/:id/configuration`. 66 backend tests and the build pass. Render env `STAFF_API_SECRET` and `CONFIGURATOR_URL` set by the user. **Still to do:** live check of the route after deploy.
+
+### Decisions and rulings (details in `.superpowers/sdd/2026-11-19-phase1-backend/progress.md`)
+- The mirror reads no customer, product or variant fields (current scopes are `read_orders,write_orders`); it keeps `vendor` (expected to be the legacy Brand) and `variantTitle`. Product and variant ids wait for Phase 4.
+- Webhook API version set to `2026-10`. Route logic lives in `app/orders/webhook.server.js`; tests never go in `app/routes/` (a test there broke the Render build).
+- `app/uninstalled` deletes sessions only; mirrored orders are kept until a redact flow exists.
+
+### On hold
+- **Phase 1, Task 4 (email module) skipped by the user on 20 November.** Setup steps for Resend are in `docs/resend-setup.md` (the domain team cannot use the `send` DNS name; use a subdomain or a custom return path). Task 5 (acceptance run and docs) is also pending.
+
+### Open items
+- Request the `read_all_orders` scope before the live store.
+- Phase 0: CFS mail-server details (limits, DKIM, outside login); mapping of brand, supplier, site and status ids; rotate the exposed Klaviyo key later.
+- Dev store still has test order #1037 and a "Mirror Check" history entry.
+- Cosmetic: Items table clipping; `tsc` shows old errors in `save.ts` and `dist/`.
+
+### Next
+Phase 4 spike (what Shopify's order-edit API can change on a configured line), then Phase 2 order lists on the mirror. See the reply of 20 November for the proposed order.
 
 Store: Urban Deco Dev (`urban-deco-dev.myshopify.com`). App: `cfs-order-status-panel`. Live CFS store will be on Shopify Advanced (not yet bought).
 Dev-store results are non-production evidence.

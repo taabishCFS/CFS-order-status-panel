@@ -1,0 +1,44 @@
+# Phase 4 spike: editing a configured product on an existing order
+
+Date: 20 November 2026. Store: `urban-deco-dev` (Admin API 2026-10). Test orders created for this spike: #1038 (and #1037 from the Phase 1 check). Nothing was sent to a customer.
+
+## Question
+A customer orders a configurable product (collection `cfstest`) and later changes an option (fabric, base, accessories). Can the merchant change it on the order, and what happens to the line, the price and the record?
+
+## What a configured line is
+Created by `cfs-configurator` through a draft order: an ordinary variant, a `priceOverride` for the unit price, and line `customAttributes` such as `Fabric: Carlton Caramel`. The order also carries the order attribute `_cfs_attempt`; the configurator keeps its own never-changed snapshot of the configuration.
+
+## What I tested (order #1038: variant 55773143433555, override £1,129.99, notes Fabric and Base)
+| Try | Result |
+|---|---|
+| Open an order edit session | The calculated line shows the notes and £1,129.99. |
+| Set the line to quantity 0 and add the same variant with `orderEditAddVariant` | The new line has **no notes** (`customAttributes: []`) and the **base price £999.99**, not £1,129.99. |
+| Restore the line, set quantity 2, commit | Notes and £1,129.99 are **kept**; total £2,259.98. |
+
+## What the API allows (checked in the 2026-10 schema)
+- `orderEditAddVariant(id, variantId, quantity, locationId, allowDuplicates)`: no price and no properties.
+- `orderEditAddCustomItem(id, title, price, quantity, taxable, requiresShipping)`: no variant link, no properties.
+- `orderEditSetQuantity`: quantity and restock only.
+- `orderEditAddLineItemDiscount`: can lower a line's price, never raise it.
+- `orderUpdate` (`OrderInput`): order-level attributes, tags, note, email, address, metafields. No line items.
+- `CalculatedLineItem.customAttributes` is read-only. **No mutation edits a line's properties.**
+
+## Conclusion
+**Shopify cannot change a configured line's options in place, and it cannot recreate the line with its options and override price.** Shopify's own order editor has the same limit. Any option change therefore has to be recorded by this app, and Shopify can only carry the price difference.
+
+## Design options
+| Option | What it does | Verdict |
+|---|---|---|
+| **A. App-owned specification plus a price adjustment (recommended)** | The app stores the order line's configuration as versions (old and new, who, when, why) and shows the current one on Order Detail. The Shopify line stays as the customer bought it. The price difference goes on the Shopify order as a custom item (increase) or a line discount (decrease), committed with a staff note, so the balance due or refundable is right. | Keeps SKU, inventory link and payment. The Shopify receipt shows the old notes. |
+| B. Replace the line with a custom item whose title lists the options | Full text on the receipt. | Loses variant, SKU and stock link. Rejected. |
+| C. Cancel the line and create a new draft order for it | Receipt and properties are exact. | New order number, payment must move between orders, harder refunds. Only for big changes. |
+| D. Replace with `orderEditAddVariant` | Loses notes and override price. | Rejected (tested). |
+
+## Open decisions for the user
+1. Accept option A (Shopify line keeps the old notes; the app is the source of truth for CFS staff, suppliers and delivery)?
+2. **Where does the new price come from?** The quote engine and the product option data live in `cfs-configurator` (its own app and database). This app cannot read them. Choose: (a) add a staff-authenticated quote endpoint in `cfs-configurator` that this app calls, (b) copy the product option data into this backend, or (c) staff type the new price by hand for now.
+3. Should the customer be emailed about a change? (Needs the email module, currently on hold.)
+
+## Cleanup and follow-ups
+- Test orders #1037 and #1038 remain on the dev store (tags `mirror-test`, `spike-phase4`).
+- The edit does not change `_cfs_attempt` or the configurator's snapshot; the new version table in this app must reference the configurator's snapshot for the original configuration.

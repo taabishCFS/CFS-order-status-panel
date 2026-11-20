@@ -74,3 +74,26 @@ model OrderLine {
   @@index([shop, orderId])
   @@index([shop, sku])
 }
+
+// One saved configuration of one configured order line. Version 1 is the original from the
+// configurator; later versions are staff changes. The newest applied version is the current one.
+model LineConfiguration {
+  id            String   @id @default(cuid())
+  shop          String
+  orderId       String
+  lineItemId    String
+  version       Int
+  source        String // original | staff
+  configuration Json
+  unitMinor     Int
+  deltaMinor    Int      @default(0)
+  status        String // pending | applied | failed
+  reason        String?
+  actorId       String?
+  actorName     String?
+  adjustment    Json?
+  createdAt     DateTime @default(now())
+
+  @@unique([shop, lineItemId, version])
+  @@index([shop, orderId])
+}
