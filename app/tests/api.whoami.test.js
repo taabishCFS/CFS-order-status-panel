@@ -11,7 +11,7 @@ describe("GET /api/whoami", () => {
 
   it("returns the shop and the verified staff member", async () => {
     admin = async () => ({
-      session: { shop: "s.myshopify.com", isOnline: true, userId: 9n, firstName: "Sam", lastName: "Patel", email: "s@x.com" },
+      session: { shop: "s.myshopify.com", isOnline: true, onlineAccessInfo: { associated_user: { id: 9, first_name: "Sam", last_name: "Patel", email: "s@x.com" } } },
       cors: (r) => r,
     });
     const res = await loader({ request: req });

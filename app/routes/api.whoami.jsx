@@ -5,6 +5,6 @@ import { staffFromSession } from "../staff/staff.server";
 export const loader = async ({ request }) => {
   const { session, cors } = await authenticate.admin(request);
   // TEMP diagnostic (flags only, no personal data); remove once verified identity is confirmed live.
-  console.log("[whoami]", { isOnline: session.isOnline, hasUserId: session.userId != null, hasName: Boolean(session.firstName || session.lastName), hasEmail: Boolean(session.email) });
+  console.log("[whoami]", { isOnline: session.isOnline, hasUser: session.onlineAccessInfo?.associated_user?.id != null });
   return cors(Response.json({ shop: session.shop, staff: staffFromSession(session) }));
 };

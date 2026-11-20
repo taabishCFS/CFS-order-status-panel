@@ -1,8 +1,10 @@
 // The verified staff member behind an online Shopify session, or null (offline session, no user).
+// The library keeps the user in session.onlineAccessInfo.associated_user.
 export function staffFromSession(session) {
-  if (!session?.isOnline || session.userId == null) return null;
-  const full = [session.firstName, session.lastName].filter((p) => p && p.trim()).join(" ").trim();
-  const name = full || session.email || "";
+  const user = session?.isOnline ? session.onlineAccessInfo?.associated_user : null;
+  if (user?.id == null) return null;
+  const full = [user.first_name, user.last_name].filter((p) => p && p.trim()).join(" ").trim();
+  const name = full || user.email || "";
   if (!name) return null;
-  return { id: String(session.userId), name, source: "verified" };
+  return { id: String(user.id), name, source: "verified" };
 }
