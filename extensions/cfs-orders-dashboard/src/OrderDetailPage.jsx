@@ -1,8 +1,9 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { loadOlderHistory } from '../../cfs-order-status/src/archive';
 import { describeEntry, scopeLabel } from '../../cfs-order-status/src/historyText';
 import { deliveryOf, expectedOf } from '../../cfs-order-status/src/lineInfo';
 import { labelFor } from '../../cfs-order-status/src/statuses';
+import { callBackend } from './backend';
 import DeliverySection from './DeliverySection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
@@ -20,6 +21,11 @@ export default function OrderDetailPage({ id }) {
   const { detail, customer, loading, loadFailed, notice, setNotice, refresh } = useOrderDetail(orderId);
   const [older, setOlder] = useState({ entries: [], cursor: null, hasNext: true, loading: false, error: null });
   const [picked, setPicked] = useState([]);
+  // Staff member verified by the backend from the session token; null when unavailable.
+  const [verified, setVerified] = useState(null);
+  useEffect(() => {
+    callBackend('api/whoami').then((r) => setVerified(r?.staff?.name ? r.staff : null)).catch(() => setVerified(null));
+  }, []);
   const resetOlder = () => setOlder({ entries: [], cursor: null, hasNext: true, loading: false, error: null });
   const writer = useWriter({
     orderId,
@@ -116,6 +122,7 @@ export default function OrderDetailPage({ id }) {
       </s-section>
 
       <s-section heading="Saving as">
+        {verified && <s-text>Verified as {verified.name}</s-text>}
         {writer.staff
           ? <s-text>{writer.staff.name}</s-text>
           : writer.staff === null && (
