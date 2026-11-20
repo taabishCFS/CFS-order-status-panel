@@ -133,11 +133,9 @@ export default function OrdersByBrand() {
             <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allPicked} onChange={() => setPicked(toggleAll(picked, rows))} /></s-table-header>
             <s-table-header listSlot="primary">Order</s-table-header>
             <s-table-header>Product</s-table-header>
-            <s-table-header>Brand</s-table-header>
             <s-table-header format="numeric">Qty</s-table-header>
             <s-table-header format="numeric">Sold Price</s-table-header>
-            <s-table-header>Exp. Delivery</s-table-header>
-            <s-table-header>Status</s-table-header>
+            <s-table-header>Status / Delivery</s-table-header>
           </s-table-header-row>
           <s-table-body>
             {rows.map((r) => (
@@ -155,16 +153,18 @@ export default function OrdersByBrand() {
                 <s-table-cell>
                   <s-stack direction="block" gap="small-500">
                     <s-text>{r.product}</s-text>
+                    <s-stack direction="inline" gap="small-300" alignItems="center">
+                      {r.brand === 'Unmapped' ? <s-badge tone="warning">No vendor</s-badge> : <s-text type="strong">{r.brand}</s-text>}
+                    </s-stack>
                     {(r.variantTitle || r.sku) && <s-text color="subdued">{[r.variantTitle, r.sku].filter(Boolean).join(' · ')}</s-text>}
                   </s-stack>
                 </s-table-cell>
-                <s-table-cell>{r.brand === 'Unmapped' ? <s-badge tone="warning">No vendor</s-badge> : r.brand}</s-table-cell>
                 <s-table-cell>{r.quantity}</s-table-cell>
                 <s-table-cell>{formatMoney(r.priceMinor, r.currency)}</s-table-cell>
-                <s-table-cell>{dmy(r.expectedDate) || <s-text color="subdued">Not set</s-text>}</s-table-cell>
                 <s-table-cell>
                   <s-stack direction="block" gap="small-500">
                     {r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : <s-text color="subdued">Not set</s-text>}
+                    <s-text color="subdued">Delivery: {dmy(r.expectedDate) || 'Not set'}</s-text>
                     <s-text tone={r.supplierInvoicePaid ? 'success' : 'critical'}>Supp. invoice: {r.supplierInvoicePaid ? 'Paid' : 'Not paid'}</s-text>
                   </s-stack>
                 </s-table-cell>

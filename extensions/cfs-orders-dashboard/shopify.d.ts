@@ -145,6 +145,12 @@ declare module './src/listApi.ts' {
 }
 
 //@ts-ignore
+declare module './src/Pager.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/orderList.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
