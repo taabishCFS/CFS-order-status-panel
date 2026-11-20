@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fetchStaffActor, resolveActor, selfDeclaredActor } from './identity';
+import { fetchStaffActor, resolveActor, selfDeclaredActor, verifiedActor } from './identity';
 
 const reply = (body: unknown) => vi.fn(async () => ({ json: async () => body }) as Response);
 const asFetch = (f: unknown) => f as unknown as typeof fetch;
@@ -59,5 +59,15 @@ describe('resolveActor', () => {
 
   it('still rejects a blank typed name when there is no staff member', () => {
     expect(() => resolveActor(null, '  ')).toThrow('Enter your name');
+  });
+});
+
+describe('verifiedActor', () => {
+  it('turns the backend-verified staff member into a verified actor', () => {
+    expect(verifiedActor({ id: '9', name: 'Sam Patel', source: 'verified' })).toEqual({ id: '9', name: 'Sam Patel', source: 'staff-member' });
+  });
+
+  it('is null when there is no verified staff member', () => {
+    for (const v of [null, undefined, {}, { id: '9' }, { id: '9', name: '   ' }, { name: 'Sam' }]) expect(verifiedActor(v as never)).toBeNull();
   });
 });

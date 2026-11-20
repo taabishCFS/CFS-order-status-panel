@@ -5,7 +5,7 @@ import { saveChange } from './writes';
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
 // Who is saving, and the save itself. Shared by every action on the Order Detail page.
-// `write(build)` calls build(state, { actor, now, entryId }) and resolves true when the save went through.
+// `write(build, actorOverride)` calls build(state, { actor, now, entryId }) and resolves true when the save went through.
 export function useWriter({ orderId, detail, refresh, setNotice, afterSave }) {
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
@@ -14,11 +14,11 @@ export function useWriter({ orderId, detail, refresh, setNotice, afterSave }) {
 
   useEffect(() => { fetchStaffActor().then(setStaff); }, []);
 
-  async function write(build) {
+  async function write(build, actorOverride = null) {
     setNotice(null);
     let actor;
     try {
-      actor = resolveActor(staff ?? null, name);
+      actor = actorOverride ?? resolveActor(staff ?? null, name);
     } catch (e) {
       setNotice({ tone: 'warning', text: e.message });
       return false;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { applyConfigurationChange } from '../../cfs-order-status/src/detailState';
+import { verifiedActor } from '../../cfs-order-status/src/identity';
 import { callBackendResult } from './backend';
 import { canQuote, formatDelta, formatMoney, outcomeText, reasonText, selectionFromConfiguration, selectionToRequest, summarise } from './configuration';
 
@@ -87,7 +88,11 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
     const from = summarise(editing.configuration);
     const to = summarise({ baseCents: 0, unitCents: 0, options: quote.options });
     const note = `Price difference ${formatDelta(result.deltaMinor, currency)}. Reason: ${reason.trim()}`;
-    const logged = await writer.write((state, meta) => applyConfigurationChange(state, { ...meta, lineId: editing.lineItemId, from, to, note }));
+    // The backend verified who made the change, so the history uses that identity (no typed name needed).
+    const logged = await writer.write(
+      (state, meta) => applyConfigurationChange(state, { ...meta, lineId: editing.lineItemId, from, to, note }),
+      verifiedActor(verified),
+    );
     stop();
     setReason('');
     setMessage({

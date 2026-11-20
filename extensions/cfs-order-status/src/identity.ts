@@ -34,6 +34,14 @@ export async function fetchStaffActor(fetchFn: typeof fetch = fetch): Promise<Ac
   }
 }
 
+// The staff member the backend verified from the Shopify session token (api/whoami), as an actor.
+// Null when there is none. Used when Shopify's own sign-in does not name the staff member.
+export function verifiedActor(user: { id?: string; name?: string } | null | undefined): Actor | null {
+  const name = typeof user?.name === 'string' ? user.name.trim() : '';
+  if (!user?.id || !name) return null;
+  return { id: String(user.id), name, source: 'staff-member' };
+}
+
 // Verified staff member if there is one, otherwise the typed name (marked unverified).
 export function resolveActor(staff: Actor | null, typedName: string): Actor {
   return staff ?? selfDeclaredActor(typedName);
