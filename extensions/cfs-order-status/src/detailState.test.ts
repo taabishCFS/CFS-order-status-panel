@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   INSTRUCTIONS_MAX,
   NOTE_MAX,
+  applyConfigurationChange,
   applyDelivery,
   applyExpectedDate,
   applyInstructions,
@@ -167,5 +168,17 @@ describe('applyChange status 4 clears the expected date', () => {
     const s = save(withDate([A]), OTHER, [A]);
     expect(s.expected?.[A]?.date).toBe('2026-12-01');
     expect(s.history[0].values).toBeUndefined();
+  });
+});
+
+describe('applyConfigurationChange', () => {
+  it('adds one history entry for the line with the old and new options and the note, and changes nothing else', () => {
+    const before = withStatuses({ [A]: 4 });
+    const next = applyConfigurationChange(before, { ...txt('x'), lineId: A, from: 'Fabric: Caramel', to: 'Fabric: Black', note: 'Price difference +£140.00. Reason: Asked' });
+    expect(next.history).toHaveLength(1);
+    expect(next.history[0]).toMatchObject({ scope: 'configuration', changes: [], values: [{ target: A, from: 'Fabric: Caramel', to: 'Fabric: Black' }], note: 'Price difference +£140.00. Reason: Asked' });
+    expect(next.lines).toEqual(before.lines);
+    expect(next.schemaVersion).toBe(2);
+    expect(before.history).toHaveLength(0);
   });
 });

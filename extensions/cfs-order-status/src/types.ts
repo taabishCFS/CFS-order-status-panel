@@ -1,7 +1,7 @@
 import type { Actor } from './identity';
 
 export type StatusScope = 'order' | 'lines';
-export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions';
+export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration';
 
 export interface Stamp {
   statusId: number;

@@ -15,6 +15,7 @@ describe('scopeLabel', () => {
     expect(scopeLabel('delivery')).toBe('Delivery confirmation');
     expect(scopeLabel('note')).toBe('Note');
     expect(scopeLabel('instructions')).toBe('Instructions');
+    expect(scopeLabel('configuration')).toBe('Configuration');
   });
 });
 
@@ -51,6 +52,18 @@ describe('describeEntry', () => {
     expect(describeEntry(entry({ scope: 'note', note: 'Called customer' }), titleOf)).toEqual(['Called customer']);
     expect(describeEntry(entry({ scope: 'instructions', values: [{ target: 'order', from: null, to: 'x' }] }), titleOf)).toEqual([
       'Instructions updated',
+    ]);
+  });
+
+  it('describes a configuration change: the line, old and new options, and the note', () => {
+    const e = entry({
+      scope: 'configuration',
+      values: [{ target: L1, from: 'Fabric: Carlton Caramel', to: 'Fabric: Carlton Black' }],
+      note: 'Price difference +£140.00. Reason: Customer asked',
+    });
+    expect(describeEntry(e, titleOf)).toEqual([
+      'Oslo Sideboard (Oak): options Fabric: Carlton Caramel → Fabric: Carlton Black',
+      'Price difference +£140.00. Reason: Customer asked',
     ]);
   });
 });

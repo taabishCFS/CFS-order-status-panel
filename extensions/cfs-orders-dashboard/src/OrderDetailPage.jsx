@@ -4,6 +4,7 @@ import { describeEntry, scopeLabel } from '../../cfs-order-status/src/historyTex
 import { deliveryOf, expectedOf } from '../../cfs-order-status/src/lineInfo';
 import { labelFor } from '../../cfs-order-status/src/statuses';
 import { callBackend } from './backend';
+import ConfigurationSection from './ConfigurationSection.jsx';
 import DeliverySection from './DeliverySection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
@@ -168,6 +169,8 @@ export default function OrderDetailPage({ id }) {
           </s-table-body>
         </s-table>
       </s-section>
+
+      <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
 
       <ExpectedDateSection picked={picked} writer={writer} />
       <DeliverySection picked={picked} writer={writer} />

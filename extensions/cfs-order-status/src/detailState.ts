@@ -56,6 +56,15 @@ export function applyNote(state: StatusState, input: Meta & { text: string }): S
   return { ...state, schemaVersion: 2, history: withEntry(state, input, 'note', { note }) };
 }
 
+// Records that a configured line's options were changed (the change itself is made by the backend).
+export function applyConfigurationChange(
+  state: StatusState,
+  input: Meta & { lineId: string; from: string; to: string; note: string },
+): StatusState {
+  const values: ValueChange[] = [{ target: input.lineId, from: input.from, to: input.to }];
+  return { ...state, schemaVersion: 2, history: withEntry(state, input, 'configuration', { values, note: input.note }) };
+}
+
 export function applyInstructions(state: StatusState, input: Meta & { text: string }): StatusState {
   const text = input.text.trim();
   if (text.length > INSTRUCTIONS_MAX) throw new Error(`Instructions are limited to ${INSTRUCTIONS_MAX} characters`);
