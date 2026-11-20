@@ -26,6 +26,25 @@ beforeEach(() => {
   apply = vi.fn(async () => ({ outcome: "applied", version: 2, deltaMinor: 100 }));
 });
 
+// The extension calls these POST routes from the browser. The browser first sends an OPTIONS
+// preflight, which React Router hands to a route's loader; without one the preflight fails and the
+// browser reports "Failed to fetch".
+describe("browser preflight for the POST routes", () => {
+  for (const [name, route] of [["quote", quote], ["configuration", configuration]]) {
+    it(`/api/lines/${name}: a loader answers through authenticate.admin, so the library can reply to OPTIONS`, async () => {
+      const preflight = new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*" } });
+      admin = async (request) => { if (request.method === "OPTIONS") throw preflight; return { session: session(), admin: { graphql }, cors: (r) => r }; };
+      const thrown = await route.loader({ request: new Request("https://app.test/api/lines/x", { method: "OPTIONS" }) }).catch((e) => e);
+      expect(thrown).toBe(preflight);
+    });
+
+    it(`/api/lines/${name}: a plain GET is refused with 405`, async () => {
+      const res = await route.loader({ request: new Request("https://app.test/api/lines/x") });
+      expect([res.status, (await res.json()).error]).toEqual([405, "method_not_allowed"]);
+    });
+  }
+});
+
 describe("GET /api/lines/choices", () => {
   const ask = (product) => choices.loader({ request: new Request(`https://app.test/api/lines/choices${product === undefined ? "" : `?product=${product}`}`) });
 

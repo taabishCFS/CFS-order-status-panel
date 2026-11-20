@@ -4,6 +4,13 @@ import { callConfigurator, ConfiguratorError } from "../configurator/client.serv
 import { readChange, statusFor } from "../configurator/request.server";
 import { authenticate } from "../shopify.server";
 
+// The browser sends an OPTIONS preflight before a POST from the extension. React Router gives that
+// to a loader, and authenticate.admin answers it. Without this the browser reports "Failed to fetch".
+export const loader = async ({ request }) => {
+  const { cors } = await authenticate.admin(request);
+  return cors(Response.json({ error: "method_not_allowed" }, { status: 405 }));
+};
+
 // Prices a new selection for one saved line and gives the whole-line difference. Changes nothing.
 export const action = async ({ request }) => {
   const { session, cors } = await authenticate.admin(request);
