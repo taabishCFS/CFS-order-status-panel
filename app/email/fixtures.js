@@ -16,7 +16,7 @@ const matches = (row, where = {}) =>
 export function fakeOutboxDb() {
   const rows = [];
   const defaults = () => ({
-    id: `e${rows.length + 1}`, createdAt: new Date(), status: "queued", attempts: 0, nextAttemptAt: new Date(),
+    id: `e${rows.length + 1}`, createdAt: new Date(), attempts: 0, nextAttemptAt: new Date(),
     mode: null, providerId: null, error: null, sentAt: null, claimedAt: null, replyTo: null, actorId: null, actorName: null,
   });
   return {
@@ -56,7 +56,7 @@ export function fakeOutboxDb() {
 export const draft = (over = {}) => ({
   shop: "s.myshopify.com", orderId: "gid://shopify/Order/1", orderName: "#1001", templateKey: "status.3", templateVersion: 1,
   kind: "customer", recipient: "cust@example.com", from: "CS <cs@x.com>", replyTo: "cs@x.com",
-  subject: "Order in Progress", html: "<p>Hi</p>", actorId: "9", actorName: "Sam Patel", dedupeKey: "k1:save:customer", ...over,
+  subject: "Order in Progress", html: "<p>Hi</p>", actorId: "9", actorName: "Sam Patel", status: "queued", dedupeKey: "k1:save:customer", ...over,
 });
 
 // In-memory stand-in for the emailTemplate, emailTemplateVersion and emailSite tables.

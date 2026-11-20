@@ -81,6 +81,7 @@ export const action = async ({ request, params }) => {
       templateKey: key,
       templateVersion: current.version,
       kind: "test",
+      status: "queued",
       recipient,
       from: `${preview.site.fromName} <${config.fromAddress}>`,
       replyTo: preview.site.serviceEmail,

@@ -89,11 +89,11 @@ export async function queueOrderEmails(db, { shop, orderId, request, actor, conf
       kind: "customer",
       recipient: recipient || null,
       subject,
-      ...(recipient ? {} : { status: "skipped", error: "no_recipient" }),
+      ...(recipient ? { status: "queued" } : { status: "skipped", error: "no_recipient" }),
       dedupeKey: `${request.idempotencyKey}:${unit}:customer`,
     });
     if (config.internalCopyTo) {
-      drafts.push({ ...base, kind: "internal_copy", recipient: config.internalCopyTo, subject: `${subject} : ${actor.name}`, dedupeKey: `${request.idempotencyKey}:${unit}:internal_copy` });
+      drafts.push({ ...base, kind: "internal_copy", status: "queued", recipient: config.internalCopyTo, subject: `${subject} : ${actor.name}`, dedupeKey: `${request.idempotencyKey}:${unit}:internal_copy` });
     }
   }
 
