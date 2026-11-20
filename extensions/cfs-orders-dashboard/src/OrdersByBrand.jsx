@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 import { fetchStaffActor, resolveActor } from '../../cfs-order-status/src/identity';
 import { STATUSES, labelFor, statusById } from '../../cfs-order-status/src/statuses';
 import { bulkChangeStatus, bulkExpectedDate, groupByOrder } from './bulk';
+import { DEFAULT_MESSAGE, DEFAULT_SUBJECT, callBulkEmail } from './bulkEmail';
 import { loadBrands, loadExportLink, loadLineList } from './listApi';
 import Pager from './Pager.jsx';
 import { formatDate, formatMoney, lineTitle, matchesFind, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
@@ -28,6 +29,12 @@ export default function OrdersByBrand() {
   const [report, setReport] = useState(null);
   const [exporting, setExporting] = useState(null); // 2 or 3 while a download link is being prepared
   const [exportNote, setExportNote] = useState(null); // { tone, text, link? }
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkSubject, setBulkSubject] = useState(DEFAULT_SUBJECT);
+  const [bulkMessage, setBulkMessage] = useState(DEFAULT_MESSAGE);
+  const [bulkPreview, setBulkPreview] = useState(null); // { ok, ... } from a preview call, or null while loading
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkNote, setBulkNote] = useState(null); // { tone, text }
 
   useEffect(() => { fetchStaffActor().then(setStaff); }, []);
 
@@ -80,6 +87,27 @@ export default function OrdersByBrand() {
     setExporting(null);
     if (!res.ok) { setExportNote({ tone: 'critical', text: res.message }); return; }
     setExportNote({ tone: 'success', text: `Export ${kind} is ready (up to 5,000 lines, the link works for 5 minutes).`, link: res.data });
+  }
+
+  // Who would be emailed for the ticked lines (a preview: nothing is sent).
+  useEffect(() => {
+    if (!bulkOpen) return undefined;
+    if (picked.size === 0) { setBulkOpen(false); return undefined; }
+    let current = true;
+    setBulkPreview(null);
+    callBulkEmail({ lineIds: [...picked], subject: bulkSubject, message: bulkMessage, key: 'preview', dryRun: true }).then((r) => { if (current) setBulkPreview(r); });
+    return () => { current = false; };
+  }, [bulkOpen, picked]);
+
+  async function sendBulk() {
+    setBulkBusy(true);
+    setBulkNote(null);
+    const res = await callBulkEmail({ lineIds: [...picked], subject: bulkSubject, message: bulkMessage, key: crypto.randomUUID(), dryRun: false });
+    setBulkBusy(false);
+    if (!res.ok) { setBulkNote({ tone: 'critical', text: res.message }); return; }
+    const skipped = res.withoutEmail ? ` ${res.withoutEmail} order${res.withoutEmail === 1 ? ' has' : 's have'} no email address and got nothing.` : '';
+    setBulkNote({ tone: 'success', text: `${res.customers} email${res.customers === 1 ? '' : 's'} queued for ${res.orders} order${res.orders === 1 ? '' : 's'}.${skipped} Each order's Emails section shows the result.` });
+    setBulkOpen(false);
   }
 
   const noneTicked = picked.size === 0;
@@ -140,6 +168,7 @@ export default function OrdersByBrand() {
           <s-button disabled={noneTicked || bulkStatus === '' || working || staff === undefined || undefined} loading={working || undefined} onClick={saveStatus}>Save status</s-button>
           <s-date-field label="Expected date" value={bulkDate} onChange={(e) => setBulkDate(e.currentTarget.value)} />
           <s-button disabled={noneTicked || working || staff === undefined || undefined} onClick={saveDate}>Save Expt. Date</s-button>
+          <s-button disabled={noneTicked || undefined} onClick={() => { setBulkNote(null); setBulkOpen(true); }}>Send Bulk Email</s-button>
           {staff === null && <s-text-field label="Your name (not verified)" value={name} onInput={(e) => setName(e.currentTarget.value)} />}
         </s-stack>
         {report && (
@@ -148,6 +177,36 @@ export default function OrdersByBrand() {
           </s-banner>
         )}
       </s-section>
+
+      {bulkNote && <s-banner tone={bulkNote.tone} dismissible onDismiss={() => setBulkNote(null)}>{bulkNote.text}</s-banner>}
+      {bulkOpen && (
+        <s-section heading="Send Bulk Email">
+          <s-stack direction="block" gap="base">
+            <s-text>One email per customer. The selected order numbers are included in their message.</s-text>
+            {!bulkPreview && <s-text>Checking recipients…</s-text>}
+            {bulkPreview && !bulkPreview.ok && <s-banner tone="warning">{bulkPreview.message}</s-banner>}
+            {bulkPreview?.ok && (
+              <s-stack direction="block" gap="small-300">
+                <s-text type="strong">Recipients ({bulkPreview.customers})</s-text>
+                {bulkPreview.recipients.slice(0, 20).map((r) => (
+                  <s-text key={r.email}>{r.name} · {r.email} · {r.orders.join(', ')}</s-text>
+                ))}
+                {bulkPreview.recipients.length > 20 && <s-text color="subdued">and {bulkPreview.recipients.length - 20} more</s-text>}
+                {bulkPreview.withoutEmail > 0 && <s-text color="subdued">{bulkPreview.withoutEmail} selected order{bulkPreview.withoutEmail === 1 ? ' has' : 's have'} no email address and will be skipped.</s-text>}
+              </s-stack>
+            )}
+            <s-text-field label="Email subject" value={bulkSubject} onInput={(e) => setBulkSubject(e.currentTarget.value)} />
+            <s-text-area label="Message" rows={10} value={bulkMessage} onInput={(e) => setBulkMessage(e.currentTarget.value)} />
+            <s-text color="subdued">Placeholders: {'{{customer_name}}'}, {'{{order_numbers}}'}</s-text>
+            <s-stack direction="inline" gap="small">
+              <s-button variant="primary" disabled={!bulkPreview?.ok || !bulkMessage.trim() || bulkBusy || staff === undefined || undefined} loading={bulkBusy || undefined} onClick={sendBulk}>
+                {bulkPreview?.ok ? `Send ${bulkPreview.customers} email${bulkPreview.customers === 1 ? '' : 's'}` : 'Send Updates'}
+              </s-button>
+              <s-button disabled={bulkBusy || undefined} onClick={() => setBulkOpen(false)}>Cancel</s-button>
+            </s-stack>
+          </s-stack>
+        </s-section>
+      )}
 
       <s-section padding="none">
         <s-table>

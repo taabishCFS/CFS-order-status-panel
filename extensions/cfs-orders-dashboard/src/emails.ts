@@ -131,6 +131,7 @@ export interface EmailRow {
 const SKIP_REASON: Record<string, string> = {
   no_recipient: 'no email address on the order',
   not_on_allowlist: 'test mode: address not on the allowlist',
+  included_in_bulk: 'sent in one email with this customer’s other orders',
 };
 
 export function describeEmail(row: EmailRow): string {

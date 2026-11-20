@@ -139,6 +139,12 @@ declare module './src/bulk.ts' {
 }
 
 //@ts-ignore
+declare module './src/bulkEmail.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/listApi.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };

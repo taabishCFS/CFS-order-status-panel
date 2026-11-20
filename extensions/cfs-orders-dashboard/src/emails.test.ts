@@ -93,6 +93,12 @@ describe('describeEmail and templateLabel', () => {
     expect(describeEmail({ ...row, mode: 'live' })).toContain('· Sent');
   });
 
+  it('explains an order that was covered by a bulk email sent for another order', () => {
+    const text = describeEmail({ ...row, templateKey: 'bulk.customer', status: 'skipped', error: 'included_in_bulk' });
+    expect(text).toContain('Skipped');
+    expect(text).toContain('sent in one email with this customer’s other orders');
+  });
+
   it('shows the error for a failed email and marks an internal copy', () => {
     expect(describeEmail({ ...row, status: 'failed', error: 'Resend 500' })).toContain('Resend 500');
     expect(describeEmail({ ...row, kind: 'internal_copy' })).toContain('internal copy');
