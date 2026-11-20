@@ -39,10 +39,6 @@ export function formatMoney(minor: number, currency: string): string {
   return currency === 'GBP' ? `£${amount}` : `${currency} ${amount}`;
 }
 
-// Only CFS has a known logo address; other sites show their code as text.
-export const siteLogo = (site: string | null): string | null =>
-  site === 'CFS' ? 'https://www.choicefurnituresuperstore.co.uk/img/brand/Choice-Obsedian.png' : null;
-
 const TONES: Record<number, 'warning' | 'success' | 'critical'> = { 1: 'warning', 4: 'success', 7: 'critical', 32: 'critical', 50: 'critical' };
 export const statusTone = (id: number): 'warning' | 'success' | 'critical' | 'neutral' => TONES[id] ?? 'neutral';
 
@@ -64,4 +60,12 @@ export function toggleOne(selected: Set<string>, lineId: string): Set<string> {
 
 export function toggleAll(selected: Set<string>, rows: LineRow[]): Set<string> {
   return rows.length > 0 && rows.every((r) => selected.has(r.lineId)) ? new Set() : new Set(rows.map((r) => r.lineId));
+}
+
+// "1 - 50 Records Of 120". With All, the range is the whole list.
+export function rangeText(page: number, size: number, total: number, all: boolean): string {
+  if (total === 0) return '0 Records';
+  const first = all ? 1 : (page - 1) * size + 1;
+  const last = all ? total : Math.min(page * size, total);
+  return `${first} - ${last} Records Of ${total}`;
 }

@@ -66,6 +66,9 @@ export interface LineRow {
 export interface LineListData {
   rows: LineRow[];
   summary: { lines: number; orders: number; units: number };
+  total: number;
+  page: number;
+  pageCount: number;
   capped: boolean;
 }
 

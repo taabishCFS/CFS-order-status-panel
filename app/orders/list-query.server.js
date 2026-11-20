@@ -63,18 +63,19 @@ export async function listOrders(db, shop, params) {
   return { rows, total, page, pageCount, capped };
 }
 
-/** Lines for Orders by Brand: { rows, summary: { lines, orders, units }, capped }. */
+/** One page of lines for Orders by Brand: { rows, summary: { lines, orders, units }, total, page, pageCount, capped }. */
 export async function listLines(db, shop, params) {
   const where = buildLineWhere(shop, params);
-  const [grouped, stored] = await Promise.all([
-    db.orderLine.groupBy({ by: ["orderId"], where, _count: { _all: true }, _sum: { quantity: true } }),
-    db.orderLine.findMany({ where, orderBy: [{ orderCreatedAt: "desc" }, { lineId: "asc" }], take: MAX_ALL_LINES }),
-  ]);
+  const grouped = await db.orderLine.groupBy({ by: ["orderId"], where, _count: { _all: true }, _sum: { quantity: true } });
   const summary = {
     lines: grouped.reduce((n, g) => n + g._count._all, 0),
     orders: grouped.length,
     units: grouped.reduce((n, g) => n + (g._sum.quantity ?? 0), 0),
   };
+  const size = params.all ? MAX_ALL_LINES : PAGE_SIZE;
+  const pageCount = params.all ? 1 : Math.max(1, Math.ceil(summary.lines / size));
+  const page = params.all ? 1 : Math.min(params.page, pageCount);
+  const stored = await db.orderLine.findMany({ where, orderBy: [{ orderCreatedAt: "desc" }, { lineId: "asc" }], skip: (page - 1) * size, take: size });
   const orderIds = [...new Set(stored.map((l) => l.orderId))];
   const orders = orderIds.length ? await db.order.findMany({ where: { shop, orderId: { in: orderIds } }, select: { orderId: true, name: true, site: true } }) : [];
   const byId = new Map(orders.map((o) => [o.orderId, o]));
@@ -96,7 +97,7 @@ export async function listLines(db, shop, params) {
     deliveryOutcome: l.deliveryOutcome,
     supplierInvoicePaid: false,
   }));
-  return { rows, summary, capped: summary.lines > MAX_ALL_LINES };
+  return { rows, summary, total: summary.lines, page, pageCount, capped: params.all && summary.lines > MAX_ALL_LINES };
 }
 
 export async function listBrands(db, shop) {

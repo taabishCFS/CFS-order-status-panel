@@ -3,14 +3,15 @@ import { fetchStaffActor, resolveActor } from '../../cfs-order-status/src/identi
 import { STATUSES, labelFor, statusById } from '../../cfs-order-status/src/statuses';
 import { bulkChangeStatus, bulkExpectedDate, groupByOrder } from './bulk';
 import { loadBrands, loadLineList } from './listApi';
-import { formatDate, formatMoney, lineTitle, matchesFind, siteLogo, statusTone, toggleAll, toggleOne } from './orderList';
+import Pager from './Pager.jsx';
+import { formatDate, formatMoney, lineTitle, matchesFind, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const dmy = (d) => (d ? d.split('-').reverse().join('/') : '');
 
 // Orders by Brand: one row per order line. Filters run on the backend, so they cover every order.
 export default function OrdersByBrand() {
-  const [applied, setApplied] = useState({ brand: '', statusId: null, from: '', to: '', insurance: false });
+  const [applied, setApplied] = useState({ brand: '', statusId: null, from: '', to: '', insurance: false, page: 1, all: false });
   const [draft, setDraft] = useState({ brand: '', statusId: '', from: '', to: '' });
   const [brands, setBrands] = useState([]);
   const [data, setData] = useState(null);
@@ -40,7 +41,8 @@ export default function OrdersByBrand() {
 
   useEffect(() => { load(); }, [load]);
 
-  const go = (extra = {}) => setApplied((a) => ({ ...a, brand: draft.brand, statusId: draft.statusId === '' ? null : Number(draft.statusId), from: draft.from, to: draft.to, ...extra }));
+  const go = (extra = {}) => setApplied((a) => ({ ...a, brand: draft.brand, statusId: draft.statusId === '' ? null : Number(draft.statusId), from: draft.from, to: draft.to, page: 1, all: false, ...extra }));
+  const goPage = (page) => setApplied((a) => ({ ...a, page, all: false }));
   const rows = useMemo(() => (data?.rows ?? []).filter((r) => matchesFind(r, find)), [data, find]);
   const allPicked = rows.length > 0 && rows.every((r) => picked.has(r.lineId));
   const summary = data?.summary ?? { lines: 0, orders: 0, units: 0 };
@@ -100,10 +102,11 @@ export default function OrdersByBrand() {
 
       <s-section>
         <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
-          <s-text>{summary.lines} lines · {summary.orders} orders · {summary.units} units · No pagination</s-text>
-          <s-text>{picked.size} lines selected</s-text>
+          <s-text>{data ? rangeText(data.page, 50, data.total, applied.all) : 'Loading...'}</s-text>
+          {data && <Pager page={data.page} pageCount={data.pageCount} all={applied.all} onPage={goPage} onAll={() => setApplied((a) => ({ ...a, all: true, page: 1 }))} />}
           <s-search-field label="Find in loaded lines" placeholder="Order, product or code" value={find} onInput={(e) => setFind(e.currentTarget.value)} />
         </s-stack>
+        <s-text color="subdued">{summary.lines} lines · {summary.orders} orders · {summary.units} units · {picked.size} selected</s-text>
       </s-section>
 
       <s-section>
@@ -128,38 +131,45 @@ export default function OrdersByBrand() {
         <s-table>
           <s-table-header-row>
             <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allPicked} onChange={() => setPicked(toggleAll(picked, rows))} /></s-table-header>
-            <s-table-header>Site</s-table-header>
-            <s-table-header listSlot="primary">Order No</s-table-header>
-            <s-table-header>Brand</s-table-header>
+            <s-table-header listSlot="primary">Order</s-table-header>
             <s-table-header>Product</s-table-header>
-            <s-table-header>Code</s-table-header>
-            <s-table-header>Exp. Delivery</s-table-header>
+            <s-table-header>Brand</s-table-header>
             <s-table-header format="numeric">Qty</s-table-header>
             <s-table-header format="numeric">Sold Price</s-table-header>
-            <s-table-header>Order Date</s-table-header>
-            <s-table-header>Supp.Invoice Paid?</s-table-header>
+            <s-table-header>Exp. Delivery</s-table-header>
             <s-table-header>Status</s-table-header>
           </s-table-header-row>
           <s-table-body>
-            {rows.map((r) => {
-              const logo = siteLogo(r.site);
-              return (
-                <s-table-row key={r.lineId}>
-                  <s-table-cell><s-checkbox label={`Select ${r.product}`} labelAccessibilityVisibility="exclusive" checked={picked.has(r.lineId)} onChange={() => setPicked(toggleOne(picked, r.lineId))} /></s-table-cell>
-                  <s-table-cell>{logo ? <s-image src={logo} alt={r.site} inlineSize="fill" /> : <s-text>{r.site ?? ''}</s-text>}</s-table-cell>
-                  <s-table-cell><s-link href={orderUrl(r.orderId)}>{r.orderName}</s-link></s-table-cell>
-                  <s-table-cell>{r.brand}{r.brand === 'Unmapped' && <s-badge tone="warning">No vendor</s-badge>}</s-table-cell>
-                  <s-table-cell>{r.product}{r.variantTitle ? ` (${r.variantTitle})` : ''}</s-table-cell>
-                  <s-table-cell>{r.sku ?? ''}</s-table-cell>
-                  <s-table-cell>{dmy(r.expectedDate)}</s-table-cell>
-                  <s-table-cell>{r.quantity}</s-table-cell>
-                  <s-table-cell>{formatMoney(r.priceMinor, r.currency)}</s-table-cell>
-                  <s-table-cell>{formatDate(r.orderCreatedAt)}</s-table-cell>
-                  <s-table-cell><s-text tone={r.supplierInvoicePaid ? 'success' : 'critical'}>{r.supplierInvoicePaid ? 'Yes' : 'No'}</s-text></s-table-cell>
-                  <s-table-cell>{r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : <s-text>Not set</s-text>}</s-table-cell>
-                </s-table-row>
-              );
-            })}
+            {rows.map((r) => (
+              <s-table-row key={r.lineId}>
+                <s-table-cell><s-checkbox label={`Select ${r.product}`} labelAccessibilityVisibility="exclusive" checked={picked.has(r.lineId)} onChange={() => setPicked(toggleOne(picked, r.lineId))} /></s-table-cell>
+                <s-table-cell>
+                  <s-stack direction="block" gap="small-500">
+                    <s-stack direction="inline" gap="small-300" alignItems="center">
+                      <s-link href={orderUrl(r.orderId)}>{r.orderName}</s-link>
+                      {r.site && <s-badge>{r.site}</s-badge>}
+                    </s-stack>
+                    <s-text color="subdued">{formatDate(r.orderCreatedAt)}</s-text>
+                  </s-stack>
+                </s-table-cell>
+                <s-table-cell>
+                  <s-stack direction="block" gap="small-500">
+                    <s-text>{r.product}</s-text>
+                    {(r.variantTitle || r.sku) && <s-text color="subdued">{[r.variantTitle, r.sku].filter(Boolean).join(' · ')}</s-text>}
+                  </s-stack>
+                </s-table-cell>
+                <s-table-cell>{r.brand === 'Unmapped' ? <s-badge tone="warning">No vendor</s-badge> : r.brand}</s-table-cell>
+                <s-table-cell>{r.quantity}</s-table-cell>
+                <s-table-cell>{formatMoney(r.priceMinor, r.currency)}</s-table-cell>
+                <s-table-cell>{dmy(r.expectedDate) || <s-text color="subdued">Not set</s-text>}</s-table-cell>
+                <s-table-cell>
+                  <s-stack direction="block" gap="small-500">
+                    {r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : <s-text color="subdued">Not set</s-text>}
+                    <s-text tone={r.supplierInvoicePaid ? 'success' : 'critical'}>Supp. invoice: {r.supplierInvoicePaid ? 'Paid' : 'Not paid'}</s-text>
+                  </s-stack>
+                </s-table-cell>
+              </s-table-row>
+            ))}
           </s-table-body>
         </s-table>
         {!loading && rows.length === 0 && !error && <s-box padding="base"><s-text>No lines match.</s-text></s-box>}

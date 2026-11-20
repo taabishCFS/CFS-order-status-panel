@@ -152,3 +152,10 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - **Existing orders need a one-off refresh:** press **Refresh order data** on the Orders screen after deploying (it drives the existing backfill route).
 - **Not built (later slices):** exports, bulk email, Process Order, By Order expand row, Store Orders filter. Supp. Invoice Paid shows "No".
 - **Tests:** backend 390, status extension 104, dashboard 90; build passes. Not yet checked live; see `docs/order-lists.md`.
+
+## Orders by Brand paging and readable table (2026-11-20)
+- Backend `listLines` now pages 50 lines at a time (`page`, `all`, `total`, `pageCount`); All is capped at 5,000 lines. Tests added.
+- Shared `Pager.jsx` and `rangeText` used by both lists; Orders by Brand shows "1 - 50 Records Of N" with Page buttons, Next and All.
+- Orders by Brand table cut from 12 to 8 columns: Order (link, site badge, date), Product (variant and code underneath), Brand, Qty, Sold Price, Exp. Delivery, Status (with supplier invoice line).
+- Site logo image replaced by a site badge (the logo did not load inside the app screen).
+- Order Detail and the By Order list show the `#` order number as the order id.

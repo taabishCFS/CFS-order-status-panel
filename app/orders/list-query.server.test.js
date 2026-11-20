@@ -67,14 +67,29 @@ describe("listOrders", () => {
 describe("listLines", () => {
   const stored = (n, orderN, over = {}) => ({ orderId: `gid://shopify/Order/${orderN}`, lineId: `L${n}`, title: `Item ${n}`, vendor: "Actona", sku: `S${n}`, variantTitle: null, quantity: 2, priceMinor: 5000, currency: "GBP", lineStatusId: 3, expectedDate: "2026-12-10", deliveryOutcome: null, orderCreatedAt: new Date("2026-11-20T10:00:00Z"), ...over });
 
-  it("takes at most 5000 lines and joins the order name and site", async () => {
-    const db = fakeDb({ fullLines: [stored(1, 1), stored(2, 1, { vendor: null })], grouped: [{ orderId: "gid://shopify/Order/1", _count: { _all: 2 }, _sum: { quantity: 4 } }], total: 1 });
+  it("pages 50 lines at a time and joins the order name and site", async () => {
+    const db = fakeDb({ fullLines: [stored(1, 1), stored(2, 1, { vendor: null })], grouped: [{ orderId: "gid://shopify/Order/1", _count: { _all: 120 }, _sum: { quantity: 4 } }] });
     db.order.findMany = vi.fn(async () => [{ orderId: "gid://shopify/Order/1", name: "#1", site: "CFS" }]);
-    const res = await listLines(db, "s", params());
-    expect(db.orderLine.findMany.mock.calls[0][0]).toMatchObject({ take: 5000 });
+    const res = await listLines(db, "s", params({ page: 2 }));
+    expect(db.orderLine.findMany.mock.calls[0][0]).toMatchObject({ skip: 50, take: 50 });
     expect(db.order.findMany.mock.calls[0][0].where).toMatchObject({ shop: "s", orderId: { in: ["gid://shopify/Order/1"] } });
+    expect(res).toMatchObject({ total: 120, page: 2, pageCount: 3, capped: false });
     expect(res.rows[0]).toMatchObject({ orderName: "#1", site: "CFS", brand: "Actona", product: "Item 1", quantity: 2, lineStatusId: 3, expectedDate: "2026-12-10", supplierInvoicePaid: false });
     expect(res.rows[1].brand).toBe("Unmapped");
+  });
+
+  it("clamps a page past the end to the last page", async () => {
+    const db = fakeDb({ fullLines: [], grouped: [{ orderId: "a", _count: { _all: 120 }, _sum: { quantity: 1 } }] });
+    const res = await listLines(db, "s", params({ page: 99 }));
+    expect(res.page).toBe(3);
+    expect(db.orderLine.findMany.mock.calls[0][0].skip).toBe(100);
+  });
+
+  it("All takes up to 5000 lines and says when it was cut short", async () => {
+    const db = fakeDb({ fullLines: [], grouped: [{ orderId: "a", _count: { _all: 6000 }, _sum: { quantity: 1 } }] });
+    const res = await listLines(db, "s", params({ all: true }));
+    expect(db.orderLine.findMany.mock.calls[0][0]).toMatchObject({ skip: 0, take: 5000 });
+    expect(res).toMatchObject({ capped: true, page: 1, pageCount: 1 });
   });
 
   it("builds the summary from one grouped query and flags a capped list", async () => {
@@ -85,6 +100,7 @@ describe("listLines", () => {
     expect(db.orderLine.groupBy).toHaveBeenCalledTimes(1);
     expect(res.summary).toEqual({ lines: 5, orders: 2, units: 6 });
     expect(res.capped).toBe(false);
+    expect(res.total).toBe(5);
   });
 });
 

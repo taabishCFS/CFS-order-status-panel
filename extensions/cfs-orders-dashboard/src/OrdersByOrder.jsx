@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'preact/hooks';
 import { labelFor } from '../../cfs-order-status/src/statuses';
 import { archiveOrders, loadBrands, loadOrderList } from './listApi';
 import { runBackfill } from './mirrorSync';
-import { formatDate, formatMoney, gatewayLabel, pageItems, payTypeLabel, siteLogo, statusTone } from './orderList';
+import Pager from './Pager.jsx';
+import { formatDate, formatMoney, gatewayLabel, payTypeLabel, rangeText, statusTone } from './orderList';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const TONE = { red: 'critical', blue: 'info' };
@@ -38,8 +39,6 @@ export default function OrdersByOrder() {
   const goPage = (page) => setApplied((a) => ({ ...a, page, all: false }));
   const rows = data?.rows ?? [];
   const allPicked = rows.length > 0 && rows.every((r) => picked.has(r.orderId));
-  const first = data && data.total > 0 ? (data.page - 1) * 50 + 1 : 0;
-  const last = data ? (applied.all ? data.rows.length : Math.min(data.page * 50, data.total)) : 0;
 
   const toggle = (id) => setPicked((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const toggleAll = () => setPicked(allPicked ? new Set() : new Set(rows.map((r) => r.orderId)));
@@ -89,17 +88,8 @@ export default function OrdersByOrder() {
 
       <s-section>
         <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
-          <s-text>{data ? `${first} - ${last} Records Of ${data.total}` : 'Loading...'}</s-text>
-          {data && (
-            <s-stack direction="inline" gap="small-200" alignItems="center">
-              <s-text>Page:</s-text>
-              {pageItems(applied.all ? 0 : data.page, data.pageCount).map((item) => {
-                if (item === 'next') return applied.all ? null : <s-button key="next" onClick={() => goPage(data.page + 1)}>Next</s-button>;
-                if (item === 'all') return <s-button key="all" variant={applied.all ? 'primary' : 'secondary'} onClick={() => setApplied((a) => ({ ...a, all: true, page: 1 }))}>All</s-button>;
-                return <s-button key={item} variant={!applied.all && item === data.page ? 'primary' : 'secondary'} onClick={() => goPage(item)}>{String(item)}</s-button>;
-              })}
-            </s-stack>
-          )}
+          <s-text>{data ? rangeText(data.page, 50, data.total, applied.all) : 'Loading...'}</s-text>
+          {data && <Pager page={data.page} pageCount={data.pageCount} all={applied.all} onPage={goPage} onAll={() => setApplied((a) => ({ ...a, all: true, page: 1 }))} />}
           <s-button tone="critical" disabled={picked.size === 0 || undefined} onClick={() => setConfirming(true)}>
             {applied.archived ? 'Restore' : 'Archive'} selected ({picked.size})
           </s-button>
@@ -129,7 +119,6 @@ export default function OrdersByOrder() {
           <s-table-body>
             {rows.map((r) => {
               const tone = TONE[r.tone];
-              const logo = siteLogo(r.site);
               const statuses = r.lineStatuses.filter((id) => id != null);
               return (
                 <s-table-row key={r.orderId}>
@@ -140,7 +129,7 @@ export default function OrdersByOrder() {
                       <s-text color="subdued">{r.name}</s-text>
                     </s-stack>
                   </s-table-cell>
-                  <s-table-cell>{logo ? <s-image src={logo} alt={r.site} inlineSize="fill" /> : <s-text>{r.site ?? ''}</s-text>}</s-table-cell>
+                  <s-table-cell>{r.site ? <s-badge>{r.site}</s-badge> : null}</s-table-cell>
                   <s-table-cell><s-link href={orderUrl(r.orderId)}><s-text tone={tone}>{r.name}</s-text></s-link></s-table-cell>
                   <s-table-cell>
                     <s-text tone={tone}>{r.customerName ?? r.email ?? 'Guest'}</s-text>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { LineRow } from './listApi';
-import { formatDate, formatMoney, gatewayLabel, lineTitle, matchesFind, pageItems, payTypeLabel, siteLogo, statusTone, toggleAll, toggleOne } from './orderList';
+import { formatDate, formatMoney, gatewayLabel, lineTitle, matchesFind, pageItems, payTypeLabel, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
 
 describe('pageItems', () => {
   it('lists every page, then Next and All, when there are few pages', () => {
@@ -34,10 +34,11 @@ describe('labels and formats', () => {
     expect(formatMoney(107065, 'GBP')).toBe('£1070.65');
     expect(formatMoney(1000, 'EUR')).toBe('EUR 10.00');
   });
-  it('gives the CFS logo and nothing for sites without one', () => {
-    expect(siteLogo('CFS')).toMatch(/^https:\/\/.*Choice-Obsedian\.png$/);
-    expect(siteLogo('TFS')).toBeNull();
-    expect(siteLogo(null)).toBeNull();
+  it('words the record range', () => {
+    expect(rangeText(1, 50, 120, false)).toBe('1 - 50 Records Of 120');
+    expect(rangeText(3, 50, 120, false)).toBe('101 - 120 Records Of 120');
+    expect(rangeText(1, 50, 0, false)).toBe('0 Records');
+    expect(rangeText(1, 50, 80, true)).toBe('1 - 80 Records Of 80');
   });
   it('colours Payment Process orange and failed statuses red', () => {
     expect(statusTone(1)).toBe('warning');
