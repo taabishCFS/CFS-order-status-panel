@@ -10,6 +10,7 @@ import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
 import StatusSection from './StatusSection.jsx';
+import SupplierInvoiceSection from './SupplierInvoiceSection.jsx';
 import { useEmails } from './useEmails';
 import { useOrderDetail } from './useOrderDetail';
 import { useWriter } from './useWriter';
@@ -175,6 +176,8 @@ export default function OrderDetailPage({ id }) {
       </s-section>
 
       <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
+
+      <SupplierInvoiceSection id={id} lines={lines} currency={detail.totals.total?.currency ?? 'GBP'} verified={verified} />
 
       <ExpectedDateSection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />

@@ -79,6 +79,8 @@ export async function listLines(db, shop, params) {
   const orderIds = [...new Set(stored.map((l) => l.orderId))];
   const orders = orderIds.length ? await db.order.findMany({ where: { shop, orderId: { in: orderIds } }, select: { orderId: true, name: true, site: true } }) : [];
   const byId = new Map(orders.map((o) => [o.orderId, o]));
+  const paidRows = stored.length ? await db.lineSupplierInvoice.findMany({ where: { shop, paid: true, lineId: { in: stored.map((l) => l.lineId) } }, select: { lineId: true } }) : [];
+  const paid = new Set(paidRows.map((r) => r.lineId));
   const rows = stored.map((l) => ({
     lineId: l.lineId,
     orderId: l.orderId,
@@ -95,7 +97,7 @@ export async function listLines(db, shop, params) {
     lineStatusId: l.lineStatusId,
     expectedDate: l.expectedDate,
     deliveryOutcome: l.deliveryOutcome,
-    supplierInvoicePaid: false,
+    supplierInvoicePaid: paid.has(l.lineId),
   }));
   return { rows, summary, total: summary.lines, page, pageCount, capped: params.all && summary.lines > MAX_ALL_LINES };
 }

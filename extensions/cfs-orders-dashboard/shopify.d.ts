@@ -79,6 +79,12 @@ declare module './src/StatusSection.jsx' {
 }
 
 //@ts-ignore
+declare module './src/SupplierInvoiceSection.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/useEmails.js' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
@@ -110,6 +116,12 @@ declare module './src/EmailTick.jsx' {
 
 //@ts-ignore
 declare module './src/emails.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/supplierInvoice.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }

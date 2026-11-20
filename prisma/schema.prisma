@@ -96,6 +96,25 @@ model OrderLine {
   @@index([shop, lineStatusId])
 }
 
+// Supplier invoice details for one order line, entered by staff (the legacy "Supplier Invoice Update").
+model LineSupplierInvoice {
+  id            String   @id @default(cuid())
+  shop          String
+  orderId       String
+  lineId        String
+  invoiceDate   String? // YYYY-MM-DD
+  invoiceNumber String?
+  amountMinor   Int?
+  paid          Boolean  @default(false)
+  updatedById   String?
+  updatedByName String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([shop, lineId])
+  @@index([shop, orderId])
+}
+
 // One saved configuration of one configured order line. Version 1 is the original from the
 // configurator; later versions are staff changes. The newest applied version is the current one.
 model LineConfiguration {

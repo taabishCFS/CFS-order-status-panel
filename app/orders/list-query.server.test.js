@@ -5,10 +5,11 @@ const params = (over = {}) => ({ page: 1, all: false, brand: null, from: null, t
 const order = (n, over = {}) => ({ orderId: `gid://shopify/Order/${n}`, name: `#${n}`, createdAt: new Date("2026-11-20T10:00:00Z"), site: "CFS", customerName: `Cust ${n}`, email: `c${n}@x.com`, gateway: "kody", totalMinor: 10000, currency: "GBP", financialStatus: "PAID", cancelledAt: null, orderStatusId: null, orderTakenBy: null, orderSource: null, archivedAt: null, ...over });
 const line = (orderN, n, over = {}) => ({ orderId: `gid://shopify/Order/${orderN}`, lineId: `L${n}`, lineStatusId: 3, ...over });
 
-function fakeDb({ orders = [], total = orders.length, lines = [], repeats = [], grouped = [], fullLines = [], vendors = [] } = {}) {
+function fakeDb({ orders = [], total = orders.length, lines = [], repeats = [], grouped = [], fullLines = [], vendors = [], paidLines = [] } = {}) {
   return {
     order: { count: vi.fn(async () => total), findMany: vi.fn(async () => orders), groupBy: vi.fn(async () => repeats), updateMany: vi.fn(async () => ({ count: 2 })) },
     orderLine: { findMany: vi.fn(async (a) => (a.select?.vendor ? vendors : a.take ? fullLines : lines)), count: vi.fn(async () => grouped.length), groupBy: vi.fn(async () => grouped), updateMany: vi.fn(async () => ({ count: 5 })) },
+    lineSupplierInvoice: { findMany: vi.fn(async () => paidLines.map((lineId) => ({ lineId, paid: true }))) },
     $transaction: async (fn) => fn(this ?? {}),
   };
 }
@@ -76,6 +77,13 @@ describe("listLines", () => {
     expect(res).toMatchObject({ total: 120, page: 2, pageCount: 3, capped: false });
     expect(res.rows[0]).toMatchObject({ orderName: "#1", site: "CFS", brand: "Actona", product: "Item 1", quantity: 2, lineStatusId: 3, expectedDate: "2026-12-10", supplierInvoicePaid: false });
     expect(res.rows[1].brand).toBe("Unmapped");
+  });
+
+  it("marks a line Supp. Invoice Paid only when staff ticked it paid", async () => {
+    const db = fakeDb({ fullLines: [stored(1, 1), stored(2, 1)], paidLines: ["L2"], grouped: [{ orderId: "gid://shopify/Order/1", _count: { _all: 2 }, _sum: { quantity: 4 } }] });
+    const res = await listLines(db, "s", params());
+    expect(db.lineSupplierInvoice.findMany.mock.calls[0][0].where).toEqual({ shop: "s", paid: true, lineId: { in: ["L1", "L2"] } });
+    expect(res.rows.map((r) => r.supplierInvoicePaid)).toEqual([false, true]);
   });
 
   it("clamps a page past the end to the last page", async () => {

@@ -57,7 +57,7 @@ describe("export 2 (supplier chase-up sheet)", () => {
   it("uses --- for a line with no variant and blank for no date or status", () => {
     const row = exportRow(2, line({ variantTitle: null, sku: null, expectedDate: null, lineStatusId: null }), { ...ctx, statusLabel: null });
     expect(row.slice(4, 7)).toEqual(["", "---", "---"]);
-    expect(row.slice(8, 10)).toEqual(["", ""]);
+    expect(row.slice(8, 10)).toEqual(["", "---"]);
   });
   it("shows the order date in UK time, not UTC", () => {
     expect(exportRow(2, line({ orderCreatedAt: new Date("2026-06-30T23:30:00Z") }), ctx)[1]).toBe("01/07/2026");
@@ -74,6 +74,10 @@ describe("export 3 (per-brand ordering sheet)", () => {
   it("takes the line discount off the final sale price per unit", () => {
     expect(exportRow(3, line({ discountMinor: 2400 }), ctx)[12]).toBe("107.99");
   });
+  it("prints --- for a missing expected date, as the legacy export does", () => {
+    expect(exportRow(3, line({ expectedDate: null }), ctx).at(-1)).toBe("---");
+  });
+
   it("leaves cost and range blank when Shopify has none, and names a missing brand Unmapped", () => {
     const row = exportRow(3, line({ vendor: "" }), { ...ctx, cost: null });
     expect(row.slice(2, 4)).toEqual(["Unmapped", ""]);

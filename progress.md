@@ -176,3 +176,8 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Built on the email module: `bulk.customer` template, the outbox queue, log/test/live modes, the allowlist and per-hour cap all apply. Staff-typed text is escaped (no HTML), with line breaks kept (the legacy mail allowed raw HTML).
 - Logging: the customer's email is recorded on their first order; each further order they were covered for gets a "Skipped, sent in one email with this customer's other orders" row, so every order's Emails section shows it. The internal copy (INTERNAL_COPY_TO) is added per customer. The legacy hard-coded personal copy address is not carried over.
 - Files: `app/email/bulk-email.server.js`, `app/routes/api.emails.bulk.jsx`, `extensions/cfs-orders-dashboard/src/bulkEmail.ts`, Orders by Brand screen.
+
+## Order Detail parity: plan and slice 1, supplier invoices (2026-11-20)
+- Plan for the whole legacy Order Detail screen (from five legacy screenshots) saved as `docs/order-detail-parity-plan.md`: slices 1 supplier invoice, 2 addresses and order info, 3 status extras and tracking, 4 totals and services, 5 line actions, 6 Process Order, 7 delivery booking (parked), 8 header documents.
+- Slice 1 built: table `LineSupplierInvoice` (migration `20261122110000_line_supplier_invoice`), `api/orders/:id/supplier-invoices` (GET all, POST one line, verified staff), "Supplier Invoice Update" collapsible section on Order Detail (date, number, amount, paid, Save per line), and "Supp. Invoice Paid" in Orders by Brand now reads the saved flag instead of always "No". Last saver and time are kept on each record; no history entry yet.
+- Export 2 and 3 now print `---` for a missing expected date (legacy behaviour).

@@ -15,7 +15,7 @@ export function csvCell(value) {
 export const buildCsv = (headers, rows) => [headers, ...rows].map((r) => r.map(csvCell).join(",")).join("\r\n") + "\r\n";
 
 const ukDate = (d) => new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
-const dmy = (iso) => (iso ? iso.split("-").reverse().join("/") : "");
+const dmy = (iso) => (iso ? iso.split("-").reverse().join("/") : "---");
 const pounds = (minor) => (minor / 100).toFixed(2);
 
 /**
