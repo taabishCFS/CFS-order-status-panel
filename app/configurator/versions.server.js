@@ -31,7 +31,7 @@ export async function currentConfiguration(db, call, { shop, orderId }) {
   }
 
   for (const line of order.lines) {
-    if (!line.configuration) continue;
+    if (!line.configuration || (!line.editable && line.reason === "not_configured")) continue;
     await db.lineConfiguration.upsert({
       where: { shop_lineItemId_version: { shop, lineItemId: line.lineItemId, version: 1 } },
       create: {

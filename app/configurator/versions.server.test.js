@@ -68,6 +68,14 @@ describe("currentConfiguration", () => {
     expect(db.rows.map((r) => r.lineItemId)).toEqual(["gid://shopify/LineItem/1"]);
   });
 
+  it("an ordinary item the configurator flags not_configured gets no version, even if it carries an empty configuration", async () => {
+    const db = fakeVersionsDb();
+    const ordinary = line({ lineItemId: "gid://shopify/LineItem/3", configuration: { baseCents: 14900, unitCents: 14900, options: [] }, editable: false, reason: "not_configured" });
+    const out = await currentConfiguration(db, callWith([ordinary]), { shop: SHOP, orderId: ORDER });
+    expect(db.rows).toHaveLength(0);
+    expect(out.lines[0]).toMatchObject({ editable: false, reason: "not_configured", version: null, configuration: null });
+  });
+
   it("an order with no checkout snapshot gives no lines and the reason", async () => {
     const db = fakeVersionsDb();
     const call = async () => { throw new ConfiguratorError({ status: 404, code: "no_snapshot" }); };
