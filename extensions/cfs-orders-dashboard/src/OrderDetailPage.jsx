@@ -21,6 +21,7 @@ export default function OrderDetailPage({ id }) {
   const { detail, customer, loading, loadFailed, notice, setNotice, refresh } = useOrderDetail(orderId);
   const [older, setOlder] = useState({ entries: [], cursor: null, hasNext: true, loading: false, error: null });
   const [picked, setPicked] = useState([]);
+  const [showHistory, setShowHistory] = useState(true);
   // Staff member verified by the backend from the session token; null when unavailable.
   const [verified, setVerified] = useState(null);
   useEffect(() => {
@@ -181,6 +182,8 @@ export default function OrderDetailPage({ id }) {
       </s-section>
 
       <s-section heading={`History (${total})`}>
+        <s-button onClick={() => setShowHistory((v) => !v)}>{showHistory ? 'Hide history' : 'Show history'}</s-button>
+        {showHistory && <s-box maxBlockSize="480px" style={{ maxHeight: '480px', overflowY: 'auto' }}>
         <s-stack direction="block" gap="small">
           {state.history.length === 0 && <s-text>No changes yet.</s-text>}
           {[...[...state.history].reverse(), ...older.entries].map((h) => (
@@ -196,6 +199,7 @@ export default function OrderDetailPage({ id }) {
           {older.error && <s-banner tone="warning">Older history could not be loaded: {older.error}</s-banner>}
           {canShowOlder && <s-button loading={older.loading || undefined} onClick={showOlder}>Show older history</s-button>}
         </s-stack>
+        </s-box>}
       </s-section>
     </s-page>
   );
