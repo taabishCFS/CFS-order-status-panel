@@ -45,6 +45,7 @@ function world({ lines = [snapshotLine()], orderState = {}, quote, editFails, fi
     loadOrderState: async () => ({ currency: "GBP", cancelledAt: null, lines: { [LINE]: { quantity: 2, unfulfilledQuantity: 2 } }, ...orderState }),
     editOrder: async (_g, args) => {
       log.edit.push(args);
+      if (editFails instanceof Error || editFails instanceof Response) throw editFails;
       if (editFails) throw new OrderEditError(editFails, "commit");
       return { adjustment: { kind: args.deltaMinor > 0 ? "custom_item" : "discount", amountMinor: Math.abs(args.deltaMinor), currency: args.currency } };
     },
@@ -192,6 +193,13 @@ describe("applyConfiguration", () => {
     expect(w.db.rows[1].adjustment).toEqual({ error: "Order changed" });
     const retry = await previewChange({ db: w.db, call: w.call, shop: SHOP, orderId: ORDER, lineItemId: LINE, choiceIds: ["17020886", "17020910"], quantities: {} });
     expect(retry).toMatchObject({ ok: true, version: 1 });
+  });
+
+  it("an HTTP refusal from Shopify (for example a missing access scope) is recorded with its status", async () => {
+    const w = world({ editFails: new Response("denied", { status: 403 }) });
+    const out = await applyConfiguration(request(w));
+    expect(out).toEqual({ outcome: "failed", message: "Shopify edit failed (HTTP 403)" });
+    expect(w.db.rows[1].adjustment).toEqual({ error: "Shopify edit failed (HTTP 403)" });
   });
 
   it("the next attempt after a failed one uses the next free version number", async () => {

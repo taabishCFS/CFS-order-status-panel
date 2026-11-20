@@ -93,3 +93,11 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Config: `shopify.app.toml` (scopes `read_orders,write_orders`; metaobject definition).
 - Docs: `CFS-Order-Status-MVP.md`, `CFS-Order-Status-Design.md`, `CFS-Order-Status-Design-Phase2.md`, `docs/production-config.md`, `docs/superpowers/plans/2026-11-19-verified-identity-and-history-archive.md`.
 - Copies of the MVP doc and project notes are in `C:\Users\Admin\Documents\CFS2030\Migration\Orders-and-My-Account`.
+
+## Phase 4 acceptance: first money change failed on a missing scope (2026-11-20)
+
+- Applying the +£89.99 drawer change on #1035 line 2 failed with "Shopify edit failed. Nothing was changed." The order was untouched (total £2,089.97, outstanding £0.00) and the two attempts are saved as failed versions 2 and 3 on that line (line 2 is still version 1, editable).
+- **Cause:** the app's access scopes were `read_orders,write_orders`. Shopify's order-edit mutations (`orderEditBegin`, add item, commit) need `write_order_edits`. The earlier live checks used the Shopify connector, which has wider access, so this was not caught until the app itself called Shopify.
+- **Fix:** `write_order_edits` added to `shopify.app.toml` and `.env.example`. Failure messages now carry the HTTP status when Shopify refuses a call (`Shopify edit failed (HTTP 403)`), with a test; 126 backend tests pass.
+- **To do before retesting:** `shopify app deploy`, approve the new permission for the app in the dev store admin (Shopify asks the staff user to accept the updated access), set `SCOPES` on the Render service to match, redeploy Render.
+- Also this session: the history entry now uses the backend-verified staff member (deployed); the version list and the saved price-neutral change on #1035 line 1 are confirmed after a reload.

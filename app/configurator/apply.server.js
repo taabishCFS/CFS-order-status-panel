@@ -146,8 +146,10 @@ export async function applyConfiguration({
         note: `Configuration change by ${staff.name} (v${version}): ${why}.`,
       });
     } catch (error) {
-      console.error("Apply configuration: Shopify edit failed", error?.message);
-      const message = error instanceof OrderEditError ? error.message : "Shopify edit failed";
+      // The Shopify client throws the HTTP response itself for a refusal such as a missing access scope.
+      const detail = error instanceof Response ? `HTTP ${error.status}` : error?.message;
+      console.error("Apply configuration: Shopify edit failed", detail, error instanceof Response ? await error.clone().text().catch(() => "") : "");
+      const message = error instanceof OrderEditError ? error.message : detail ? `Shopify edit failed (${detail})` : "Shopify edit failed";
       await db.lineConfiguration.update({ where: { id: row.id }, data: { status: "failed", adjustment: { error: message } } }).catch(() => {});
       return { outcome: "failed", message };
     }
