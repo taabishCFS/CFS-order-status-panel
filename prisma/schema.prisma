@@ -27,3 +27,50 @@ model Session {
   refreshToken        String?
   refreshTokenExpires DateTime?
 }
+
+// Read-only copy of Shopify orders, kept current by webhooks and the backfill. Money is in minor units (pence).
+model Order {
+  id               String   @id @default(cuid())
+  shop             String
+  orderId          String
+  name             String
+  createdAt        DateTime
+  cancelledAt      DateTime?
+  shopifyUpdatedAt DateTime
+  customerName     String?
+  email            String?
+  shippingAddress  String?
+  billingAddress   String?
+  financialStatus  String?
+  currency         String
+  subtotalMinor    Int
+  discountMinor    Int
+  shippingMinor    Int
+  totalMinor       Int
+  tags             String[]
+  sourceName       String?
+  site             String?
+  syncedAt         DateTime @default(now()) @updatedAt
+
+  @@unique([shop, orderId])
+  @@index([shop, createdAt])
+}
+
+model OrderLine {
+  id            String  @id @default(cuid())
+  shop          String
+  orderId       String
+  lineId        String
+  sku           String?
+  vendor        String?
+  variantTitle  String?
+  title         String
+  quantity      Int
+  currency      String
+  priceMinor    Int
+  discountMinor Int
+  properties    Json
+
+  @@index([shop, orderId])
+  @@index([shop, sku])
+}

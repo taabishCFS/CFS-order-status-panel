@@ -9,7 +9,15 @@ embedded = true
 automatically_update_urls_on_dev = true
 
 [webhooks]
-api_version = "2027-01"
+api_version = "2026-10"
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/uninstalled"
+  topics = [ "app/uninstalled" ]
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/orders"
+  topics = [ "orders/create", "orders/updated", "orders/cancelled", "refunds/create" ]
 
 [access.admin]
 direct_api_mode = "online"

@@ -22,6 +22,7 @@ export default function OrderDetailPage({ id }) {
   const [older, setOlder] = useState({ entries: [], cursor: null, hasNext: true, loading: false, error: null });
   const [picked, setPicked] = useState([]);
   const [showHistory, setShowHistory] = useState(true);
+  const [visible, setVisible] = useState(5);
   // Staff member verified by the backend from the session token; null when unavailable.
   const [verified, setVerified] = useState(null);
   useEffect(() => {
@@ -183,10 +184,10 @@ export default function OrderDetailPage({ id }) {
 
       <s-section heading={`History (${total})`}>
         <s-button onClick={() => setShowHistory((v) => !v)}>{showHistory ? 'Hide history' : 'Show history'}</s-button>
-        {showHistory && <s-box maxBlockSize="480px" style={{ maxHeight: '480px', overflowY: 'auto' }}>
+        {showHistory && <>
         <s-stack direction="block" gap="small">
           {state.history.length === 0 && <s-text>No changes yet.</s-text>}
-          {[...[...state.history].reverse(), ...older.entries].map((h) => (
+          {[...[...state.history].reverse(), ...older.entries].slice(0, visible).map((h) => (
             <s-box key={h.id} padding="small" border="base" borderRadius="base">
               <s-stack direction="block" gap="small-300">
                 <s-text type="strong">
@@ -197,9 +198,10 @@ export default function OrderDetailPage({ id }) {
             </s-box>
           ))}
           {older.error && <s-banner tone="warning">Older history could not be loaded: {older.error}</s-banner>}
-          {canShowOlder && <s-button loading={older.loading || undefined} onClick={showOlder}>Show older history</s-button>}
+          {visible < state.history.length + older.entries.length && <s-button onClick={() => setVisible((v) => v + 10)}>Show 10 more</s-button>}
+          {visible >= state.history.length + older.entries.length && canShowOlder && <s-button loading={older.loading || undefined} onClick={showOlder}>Show older history</s-button>}
         </s-stack>
-        </s-box>}
+        </>}
       </s-section>
     </s-page>
   );
