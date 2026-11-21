@@ -65,6 +65,16 @@ export function applyConfigurationChange(
   return { ...state, schemaVersion: 2, history: withEntry(state, input, 'configuration', { values, note: input.note }) };
 }
 
+const TRACKING = /^[A-Za-z0-9 \-]{3,40}$/;
+
+// Saves the courier tracking number on the order. Sending it to the customer is a separate email request.
+export function applyTracking(state: StatusState, input: Meta & { number: string }): StatusState {
+  const number = input.number.trim();
+  if (!TRACKING.test(number)) throw new Error('The tracking number must be 3 to 40 letters, numbers, spaces or dashes');
+  const values: ValueChange[] = [{ target: 'order', from: state.tracking?.number ?? null, to: number }];
+  return { ...state, schemaVersion: 2, tracking: { number, at: input.now, by: input.actor }, history: withEntry(state, input, 'tracking', { values }) };
+}
+
 // Records that contact details (email, phone, shipping address) were changed. The change itself is made by the backend.
 export function applyContactChange(state: StatusState, input: Meta & { changes: { label: string; from: string | null; to: string | null }[] }): StatusState {
   if (input.changes.length === 0) throw new Error('There is nothing to record');

@@ -17,6 +17,7 @@ describe('scopeLabel', () => {
     expect(scopeLabel('instructions')).toBe('Instructions');
     expect(scopeLabel('configuration')).toBe('Configuration');
     expect(scopeLabel('contact')).toBe('Contact details');
+    expect(scopeLabel('tracking')).toBe('Tracking');
   });
 });
 
@@ -54,6 +55,15 @@ describe('describeEntry', () => {
     expect(describeEntry(entry({ scope: 'instructions', values: [{ target: 'order', from: null, to: 'x' }] }), titleOf)).toEqual([
       'Instructions updated',
     ]);
+  });
+
+  it('shows the extras saved with a status change (cancel reason, credit note, service remarks) under it', () => {
+    const e = entry({ scope: 'lines', changes: [{ target: L1, fromId: 4, toId: 7, toLabel: 'Cancelled' }], note: 'Cancel reason: Customer changed mind' });
+    expect(describeEntry(e, titleOf)).toEqual(['Oslo Sideboard (Oak): In Stock → Cancelled', 'Cancel reason: Customer changed mind']);
+  });
+
+  it('describes a tracking number change', () => {
+    expect(describeEntry(entry({ scope: 'tracking', values: [{ target: 'order', from: null, to: 'GE1 2' }] }), titleOf)).toEqual(['Tracking number: none → GE1 2']);
   });
 
   it('describes a contact change as one line per detail, with none for a blank old value', () => {

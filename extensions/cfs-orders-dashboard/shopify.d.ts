@@ -85,6 +85,12 @@ declare module './src/StatusSection.jsx' {
 }
 
 //@ts-ignore
+declare module './src/TrackingSection.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/SupplierInvoiceSection.jsx' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };

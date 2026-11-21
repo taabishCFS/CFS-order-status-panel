@@ -8,6 +8,7 @@ import {
   applyExpectedDate,
   applyInstructions,
   applyNote,
+  applyTracking,
   headerProposal,
 } from './detailState';
 import type { Actor } from './identity';
@@ -169,6 +170,23 @@ describe('applyChange status 4 clears the expected date', () => {
     const s = save(withDate([A]), OTHER, [A]);
     expect(s.expected?.[A]?.date).toBe('2026-12-01');
     expect(s.history[0].values).toBeUndefined();
+  });
+});
+
+describe('applyTracking', () => {
+  it('stores the tracking number with who and when, and adds a history entry with the old and new number', () => {
+    const first = applyTracking(withStatuses({}), { ...txt('x'), number: '  GE123 456 789  ' });
+    expect(first.tracking).toEqual({ number: 'GE123 456 789', at: '2026-11-19T10:00:00Z', by: actor });
+    expect(first.history[0]).toMatchObject({ scope: 'tracking', changes: [], values: [{ target: 'order', from: null, to: 'GE123 456 789' }] });
+    const second = applyTracking(first, { ...txt('y'), number: 'GE999' });
+    expect(second.history[1].values).toEqual([{ target: 'order', from: 'GE123 456 789', to: 'GE999' }]);
+    expect(second.schemaVersion).toBe(2);
+  });
+
+  it('refuses an empty, too short, too long or odd-looking number', () => {
+    for (const bad of ['', '  ', 'ab', 'x'.repeat(41), 'GE123<script>']) {
+      expect(() => applyTracking(withStatuses({}), { ...txt('x'), number: bad })).toThrow(/tracking/i);
+    }
   });
 });
 

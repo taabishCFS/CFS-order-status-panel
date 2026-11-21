@@ -10,6 +10,7 @@ const LABELS: Record<Scope, string> = {
   instructions: 'Instructions',
   configuration: 'Configuration',
   contact: 'Contact details',
+  tracking: 'Tracking',
 };
 
 export const scopeLabel = (scope: Scope): string => LABELS[scope];
@@ -21,6 +22,7 @@ export function describeEntry(entry: HistoryEntry, titleOf: (target: string) => 
   for (const c of entry.changes) {
     out.push(`${name(c.target)}: ${c.fromId == null ? 'Not set' : labelFor(c.fromId)} → ${c.toLabel}`);
   }
+  if ((entry.scope === 'order' || entry.scope === 'lines') && entry.note) out.push(entry.note);
   if (entry.scope === 'note') out.push(entry.note ?? '');
   if (entry.scope === 'instructions') out.push('Instructions updated');
   if (entry.scope === 'expected-date') {
@@ -32,6 +34,9 @@ export function describeEntry(entry: HistoryEntry, titleOf: (target: string) => 
   if (entry.scope === 'configuration') {
     for (const v of entry.values ?? []) out.push(`${name(v.target)}: options ${v.from ?? 'not recorded'} → ${v.to ?? 'not recorded'}`);
     if (entry.note) out.push(entry.note);
+  }
+  if (entry.scope === 'tracking') {
+    for (const v of entry.values ?? []) out.push(`Tracking number: ${v.from ?? 'none'} → ${v.to ?? 'none'}`);
   }
   if (entry.scope === 'contact') {
     for (const v of entry.values ?? []) out.push(`${v.target}: ${v.from ?? 'none'} → ${v.to ?? 'none'}`);

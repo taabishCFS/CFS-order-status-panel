@@ -1,11 +1,27 @@
 import type { Actor } from './identity';
 
 export type StatusScope = 'order' | 'lines';
-export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration' | 'contact';
+export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration' | 'contact' | 'tracking';
+
+// Extra details staff give with some statuses: a cancel reason (7), a credit note amount in pounds (21), service remarks (15).
+export interface StatusExtras {
+  cancelReason?: string;
+  creditNoteAmount?: string;
+  serviceRemarks?: string;
+}
 
 export interface Stamp {
   statusId: number;
   label: string;
+  at: string;
+  by: Actor;
+  extras?: StatusExtras;
+}
+
+// Raised when a line or the order is cancelled: a refund is due, for the whole order or part of it.
+export interface RefundFlag {
+  type: 'full' | 'part';
+  reason: string | null;
   at: string;
   by: Actor;
 }
@@ -53,6 +69,12 @@ export interface Instructions {
   by: Actor;
 }
 
+export interface TrackingNumber {
+  number: string;
+  at: string;
+  by: Actor;
+}
+
 export interface StatusState {
   // 1 = statuses and history only. 2 adds the optional fields below; version 1 records still load.
   schemaVersion: 1 | 2;
@@ -65,4 +87,6 @@ export interface StatusState {
   expected?: Record<string, DatedStamp>;
   delivery?: Record<string, DeliveryStamp>;
   instructions?: Instructions | null;
+  refund?: RefundFlag | null;
+  tracking?: TrackingNumber | null;
 }

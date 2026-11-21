@@ -92,3 +92,51 @@ describe('reconcileLines', () => {
     expect(s.lines[BED_B].statusId).toBe(43);
   });
 });
+
+describe('applyChange extras (cancel reason, credit note, service remarks, refund flag)', () => {
+  const CANCELLED: CfsStatus = { id: 7, label: 'Cancelled' };
+  const CREDIT: CfsStatus = { id: 21, label: 'Credit Note' };
+  const SERVICE: CfsStatus = { id: 15, label: 'Service' };
+  const IN_STOCK: CfsStatus = { id: 4, label: 'In Stock' };
+  const go = (state: ReturnType<typeof emptyState>, scope: 'order' | 'lines', status: CfsStatus, lineIds: string[], extras?: Record<string, string>, allLineIds?: string[]) =>
+    applyChange(state, { scope, lineIds, status, actor, now: `2026-11-21T10:00:0${n}Z`, entryId: `x-${n++}`, extras, allLineIds });
+
+  it('keeps the cancel reason on a cancelled line and in the history entry', () => {
+    const next = go(emptyState(), 'lines', CANCELLED, [BED_A], { cancelReason: '  Customer changed mind ' }, [BED_A, BED_B]);
+    expect(next.lines[BED_A].extras).toEqual({ cancelReason: 'Customer changed mind' });
+    expect(next.history[0].note).toBe('Cancel reason: Customer changed mind');
+    expect(next.schemaVersion).toBe(2);
+  });
+
+  it('keeps the credit note amount as pounds and pence, and refuses an amount that is not money', () => {
+    const next = go(emptyState(), 'lines', CREDIT, [BED_A], { creditNoteAmount: '£1,025.5' });
+    expect(next.lines[BED_A].extras).toEqual({ creditNoteAmount: '1025.50' });
+    expect(next.history[0].note).toBe('Credit note amount: 1025.50');
+    for (const bad of ['abc', '-3', '1.234', '12345678']) {
+      expect(() => go(emptyState(), 'lines', CREDIT, [BED_A], { creditNoteAmount: bad })).toThrow(/credit note/i);
+    }
+  });
+
+  it('keeps service remarks, and refuses more than 500 characters', () => {
+    const next = go(emptyState(), 'lines', SERVICE, [BED_A], { serviceRemarks: 'Engineer visit Tuesday' });
+    expect(next.lines[BED_A].extras).toEqual({ serviceRemarks: 'Engineer visit Tuesday' });
+    expect(() => go(emptyState(), 'lines', SERVICE, [BED_A], { serviceRemarks: 'x'.repeat(501) })).toThrow(/500/);
+  });
+
+  it('ignores extras that do not belong to the chosen status and stores nothing when blank', () => {
+    const next = go(emptyState(), 'lines', IN_STOCK, [BED_A], { cancelReason: 'nope', serviceRemarks: 'nope' });
+    expect(next.lines[BED_A].extras).toBeUndefined();
+    expect(next.history[0].note).toBeUndefined();
+    expect(go(emptyState(), 'lines', CANCELLED, [BED_A], { cancelReason: '  ' }).lines[BED_A].extras).toBeUndefined();
+  });
+
+  it('raises a full refund flag when every line is cancelled and a part flag otherwise', () => {
+    const part = go(emptyState(), 'lines', CANCELLED, [BED_A], { cancelReason: 'Out of range' }, [BED_A, BED_B]);
+    expect(part.refund).toMatchObject({ type: 'part', reason: 'Out of range', by: actor });
+    const full = go(part, 'lines', CANCELLED, [BED_B], undefined, [BED_A, BED_B]);
+    expect(full.refund).toMatchObject({ type: 'full', reason: 'Out of range' });
+    const whole = go(emptyState(), 'order', CANCELLED, [], { cancelReason: 'Fraud check' });
+    expect(whole.refund).toMatchObject({ type: 'full', reason: 'Fraud check' });
+    expect(go(emptyState(), 'lines', IN_STOCK, [BED_A]).refund).toBeUndefined();
+  });
+});

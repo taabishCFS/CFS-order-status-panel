@@ -191,3 +191,10 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - New history scope `contact` (types, labels, archive, text); new files: `order-contact.js`, `order-contact.server.js`, `api.orders.$id.contact.jsx`, dashboard `contact.ts`, `CustomerSection.jsx`. Tests: backend 470, status extension 107, dashboard 115, all passing; builds OK.
 - Not yet tried live in the admin. The province-code field was added to the form and its loader in one step, so that one test was not watched failing first.
 - Fix after first live look: Source no longer shows an app id number (uses the app name, or blank); billing note no longer runs into the text above it.
+
+## Order Detail slice 3: status extras and tracking (2026-11-21)
+- Status section: choosing Cancelled shows a Cancel reason box, Credit Note shows a Credit note amount (pounds and pence, up to 7 digits), Service shows Service remarks (up to 500 characters). They are kept on the line (or order) stamp and shown under the history entry. Extras that do not belong to the chosen status are ignored.
+- Cancelled also raises a refund-due flag on the record: full when the whole order or every line is cancelled, otherwise part, with the reason. It shows as "Refund due" in the Status section. It does not move any money.
+- New Tracking section: tracking number (3 to 40 letters, numbers, spaces, dashes), saved with who and when and a "Tracking" history entry. Tick "Email the customer" to also queue the existing tracking email (uses the usual email mode: log, test or live).
+- Not done: status 4 supplier delivery date stamp; REFUND tick-box meaning; expected date "Update Conditions" (needs the option list from staff).
+- No backend change and no migration. Tests: backend 470, status extension 116, dashboard 116, builds OK.

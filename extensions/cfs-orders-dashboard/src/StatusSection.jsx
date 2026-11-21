@@ -14,6 +14,8 @@ export default function StatusSection({ orderId, detail, picked, loading, loadFa
   const [statusId, setStatusId] = useState('');
   const [declined, setDeclined] = useState(null);
   const [emailIt, setEmailIt] = useState(false);
+  const [extras, setExtras] = useState({ cancelReason: '', creditNoteAmount: '', serviceRemarks: '' });
+  const setExtra = (key) => (e) => setExtras((x) => ({ ...x, [key]: e.currentTarget.value }));
 
   const lineIds = detail.lines.map((l) => l.id);
   const proposal = headerProposal(detail.state, lineIds);
@@ -28,7 +30,7 @@ export default function StatusSection({ orderId, detail, picked, loading, loadFa
     let changeId = '';
     const ok = await write((state, meta) => {
       changeId = meta.entryId;
-      return applyChange(state, { scope: forScope, lineIds: ids, status, ...meta });
+      return applyChange(state, { scope: forScope, lineIds: ids, status, extras, allLineIds: lineIds, ...meta });
     });
     if (!ok) return;
     if (email) await sendAfterSave({ body: emailRequest({ orderId, statusId: status.id, ...input, changeId }), setNotice, emails });
@@ -44,6 +46,7 @@ export default function StatusSection({ orderId, detail, picked, loading, loadFa
     await save(scope, status, picked, emailIt);
     setStatusId('');
     setEmailIt(false);
+    setExtras({ cancelReason: '', creditNoteAmount: '', serviceRemarks: '' });
   }
 
   return (
@@ -55,6 +58,9 @@ export default function StatusSection({ orderId, detail, picked, loading, loadFa
             <s-button slot="primary-action" disabled={!ready || undefined} onClick={() => save('order', statusById(proposal), [])}>Set order status</s-button>
             <s-button slot="secondary-actions" onClick={() => setDeclined(proposal)}>Not now</s-button>
           </s-banner>
+        )}
+        {detail.state.refund && (
+          <s-text>Refund due: {detail.state.refund.type === 'full' ? 'full' : 'part'} refund{detail.state.refund.reason ? ` (${detail.state.refund.reason})` : ''}, raised by {detail.state.refund.by.name}.</s-text>
         )}
         <s-select label="Apply to" value={scope} onChange={(e) => setScope(e.currentTarget.value)}>
           <s-option value="order">Whole order</s-option>
@@ -72,6 +78,9 @@ export default function StatusSection({ orderId, detail, picked, loading, loadFa
             <s-link href={`shopify://admin/orders/${orderId.split('/').pop()}`}>open this order</s-link>.
           </s-banner>
         )}
+        {statusId === '7' && <s-text-field label="Cancel reason" value={extras.cancelReason} onInput={setExtra('cancelReason')} />}
+        {statusId === '21' && <s-text-field label="Credit note amount (£)" value={extras.creditNoteAmount} onInput={setExtra('creditNoteAmount')} />}
+        {statusId === '15' && <s-text-area label="Service remarks" rows={2} value={extras.serviceRemarks} onInput={setExtra('serviceRemarks')} />}
         <EmailTick emails={emails} checked={emailIt} onChange={setEmailIt} />
         <s-button variant="primary" disabled={!canSaveNow || undefined} loading={saving || undefined} onClick={onSave}>Save status</s-button>
       </s-stack>

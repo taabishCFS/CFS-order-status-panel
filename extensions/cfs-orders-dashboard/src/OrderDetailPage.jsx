@@ -11,6 +11,7 @@ import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
 import StatusSection from './StatusSection.jsx';
+import TrackingSection from './TrackingSection.jsx';
 import SupplierInvoiceSection from './SupplierInvoiceSection.jsx';
 import { useEmails } from './useEmails';
 import { useOrderDetail } from './useOrderDetail';
@@ -166,6 +167,7 @@ export default function OrderDetailPage({ id }) {
 
       <ExpectedDateSection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <TrackingSection orderId={orderId} detail={detail} writer={writer} setNotice={setNotice} emails={emails} />
       <EmailsSection emails={emails} canRetry={Boolean(verified)} />
       <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />
 

@@ -14,15 +14,15 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Customer Order Instructions (the customer's own note, read-only) | Done | 2 done |
 | Order/Delivery Instructions (staff, prints on delivery note) with ADD/UPDATE | Done (Notes section) | done |
 | Supplier Invoice Update: date, number, amount, paid per line | Backend done; screen in progress | 1 |
-| Refund info: REFUND checkbox | Missing | 3 |
-| Tracking No. with Email / Save and GO | Missing (template `tracking` exists) | 3 |
-| Status extras: cancel reason (7), credit note amount (21), service remarks (15), status 4 supplier delivery date | Missing | 3 |
+| Refund info: REFUND checkbox | Refund-due flag raised by Cancelled and shown in Status (full or part); no REFUND tick-box yet (meaning to confirm with staff) | 3 done |
+| Tracking No. with Email / Save and GO | Done (Email = the tick-box) | 3 done |
+| Status extras: cancel reason (7), credit note amount (21), service remarks (15), status 4 supplier delivery date | Reason, credit note and remarks done; status 4 already clears the expected date; supplier delivery date stamp still to do | 3 partly |
 | Line buttons: Delivery Confirm, Delivery Not Confirm | Done | done |
 | Line buttons: Add To Accounts, Replacement, Add New Product | Missing | 5 |
 | Totals: subtotal, offer discount, coupon (code and %), delivery, grand total, paid, balance | Subtotal, discounts, shipping, total only | 4 |
 | Update Delivery & Services (six services with price and tick, staff password, update history) | Missing | 4 |
 | Process Order & Chase Up (GO) | Missing | 6 |
-| Expected Date: date, Update Conditions, GO, Email, Save, history | Date, Email, Save, history done; Update Conditions missing | 3 |
+| Expected Date: date, Update Conditions, GO, Email, Save, history | Date, Email, Save, history done; Update Conditions waits for staff to list the options | later |
 | Book Delivery (type, date, driver, van, drop, AM/PM, Book & Email, Book & Save, Reschedule, history) | Parked | 7 |
 | Header buttons: Save PDF, Exc/Inc VAT invoice, Delivery Note (+ log), Resend Inv., Print Label, Print Return Label | Missing | 8 |
 
