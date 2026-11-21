@@ -17,6 +17,8 @@ export interface DetailLine {
   quantity: number;
   unit: Money | null;
   discount: Money | null;
+  offer: Money | null;
+  coupon: Money | null;
   final: Money | null;
 }
 
@@ -218,19 +220,28 @@ export function breakdownOf(o: {
   };
 }
 
-function toDetailLine(l: RawLine): DetailLine {
+function toDetailLine(l: RawLine, apps: RawApplication[] = []): DetailLine {
   const unit = asMoney(l.originalUnitPriceSet);
   // Discount allocations cover the quantity first ordered. After an edit that changed the quantity
   // they would be wrong, so those lines show no discount or final price rather than a wrong one.
   const edited = l.quantity !== l.currentQuantity;
   let discount: Money | null = null;
   let final: Money | null = null;
+  let offer: Money | null = null;
+  let coupon: Money | null = null;
   if (unit && !edited) {
+    const part = (typename: string) =>
+      fromMinor(
+        (l.discountAllocations ?? []).reduce((sum, a) => (apps[a.discountApplication?.index ?? -1]?.__typename === typename ? sum + toMinor(a.allocatedAmountSet?.shopMoney.amount ?? '0') : sum), 0),
+        unit.currency,
+      );
+    offer = part('AutomaticDiscountApplication');
+    coupon = part('DiscountCodeApplication');
     const m = lineMoney(unit.amount, l.currentQuantity, (l.discountAllocations ?? []).map((a) => a.allocatedAmountSet?.shopMoney.amount ?? '0'), unit.currency);
     discount = m.discount;
     final = m.final;
   }
-  return { id: l.id, title: l.title, variantTitle: l.variantTitle, sku: l.sku, vendor: l.vendor, quantity: l.currentQuantity, unit, discount, final };
+  return { id: l.id, title: l.title, variantTitle: l.variantTitle, sku: l.sku, vendor: l.vendor, quantity: l.currentQuantity, unit, discount, offer, coupon, final };
 }
 
 export async function loadOrderDetail(orderId: string, fetchFn: typeof fetch = fetch): Promise<OrderDetail> {
@@ -244,7 +255,7 @@ export async function loadOrderDetail(orderId: string, fetchFn: typeof fetch = f
     id: o.id,
     name: o.name,
     createdAt: o.createdAt,
-    lines: (o.lineItems.nodes as RawLine[]).filter((l) => l.currentQuantity > 0 && !/\[svc:[a-z_]+\]/.test(l.title)).map(toDetailLine),
+    lines: (o.lineItems.nodes as RawLine[]).filter((l) => l.currentQuantity > 0 && !/\[svc:[a-z_]+\]/.test(l.title)).map((l) => toDetailLine(l, o.discountApplications?.nodes ?? [])),
     totals: {
       subtotal: asMoney(o.currentSubtotalPriceSet),
       discounts: asMoney(o.currentTotalDiscountsSet),

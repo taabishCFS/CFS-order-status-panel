@@ -44,3 +44,10 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 ## Bulk email and exports
 18. Who may send Bulk Email to customers?
 19. Export 2 and 3: confirm the "Final Sale Price" rule, how accessory cost is split, and where PO Number comes from.
+
+## De-allocate, Export 1, Store Orders, status emails, site mapping
+20. "Add To De-allocate list": what does it record, and who reads or acts on that list?
+21. Export 1: where does the production cost come from in the new shop (a product field, a supplier sheet, somewhere else)?
+22. "Store Orders" filter on the order list: what makes an order a store order (a tag, a location, a sales channel)?
+23. Which order statuses should email the customer automatically when staff change them, and with which template for each?
+24. Site, "By" (who took the order) and Source on the order list: where should these come from in the new shop? Today they only show if the order carries the tags `site:CFS`, `taken-by:NAME` or `source:NAME`.

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'preact/hooks';
 import { labelFor } from '../../cfs-order-status/src/statuses';
 import { archiveOrders, loadBrands, loadOrderList } from './listApi';
 import { runBackfill } from './mirrorSync';
+import ExpandedOrder from './ExpandedOrder.jsx';
 import Pager from './Pager.jsx';
 import { formatDate, formatMoney, gatewayLabel, payTypeLabel, rangeText, statusTone } from './orderList';
 
@@ -21,6 +22,7 @@ export default function OrdersByOrder() {
   const [confirming, setConfirming] = useState(false);
   const [notice, setNotice] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [open, setOpen] = useState([]); // orders whose lines are expanded, newest first
 
   useEffect(() => { loadBrands().then((r) => r.ok && setBrands(r.brands)); }, []);
 
@@ -41,6 +43,7 @@ export default function OrdersByOrder() {
   const allPicked = rows.length > 0 && rows.every((r) => picked.has(r.orderId));
 
   const toggle = (id) => setPicked((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleOpen = (r) => setOpen((o) => (o.some((x) => x.orderId === r.orderId) ? o.filter((x) => x.orderId !== r.orderId) : [{ orderId: r.orderId, name: r.name }, ...o]));
   const toggleAll = () => setPicked(allPicked ? new Set() : new Set(rows.map((r) => r.orderId)));
 
   // Copies every order from Shopify into the lists' data. Needed once after an update adds new fields; safe to repeat.
@@ -103,6 +106,8 @@ export default function OrdersByOrder() {
         )}
       </s-section>
 
+      {open.map((o) => <ExpandedOrder key={o.orderId} orderId={o.orderId} name={o.name} onClose={() => setOpen((list) => list.filter((x) => x.orderId !== o.orderId))} />)}
+
       <s-section padding="none">
         <s-table>
           <s-table-header-row>
@@ -115,6 +120,7 @@ export default function OrdersByOrder() {
             <s-table-header format="numeric">Total</s-table-header>
             <s-table-header>Pay Type</s-table-header>
             <s-table-header>Status</s-table-header>
+            <s-table-header>Lines</s-table-header>
           </s-table-header-row>
           <s-table-body>
             {rows.map((r) => {
@@ -149,6 +155,9 @@ export default function OrdersByOrder() {
                       {statuses.length === 0 && <s-text>Not set</s-text>}
                       {statuses.map((id, i) => <s-badge key={`${id}-${i}`} tone={statusTone(id)}>{labelFor(id)}</s-badge>)}
                     </s-stack>
+                  </s-table-cell>
+                  <s-table-cell>
+                    <s-button variant="tertiary" onClick={() => toggleOpen(r)}>{open.some((x) => x.orderId === r.orderId) ? 'Hide' : 'Lines'}</s-button>
                   </s-table-cell>
                 </s-table-row>
               );

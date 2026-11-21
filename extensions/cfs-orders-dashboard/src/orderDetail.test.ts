@@ -116,6 +116,21 @@ describe('loadOrderDetail', () => {
     expect(d.state.schemaVersion).toBe(1);
   });
 
+  it('splits the discount on each line into the offer (automatic) and the coupon (code) part', async () => {
+    const alloc = (amount: string, index: number) => ({ allocatedAmountSet: money(amount), discountApplication: { index } });
+    const order = {
+      ...baseOrder([line({ discountAllocations: [alloc('27.0', 0), alloc('18.36', 1), alloc('2.0', 2)] }), line({ id: 'gid://shopify/LineItem/12', discountAllocations: [] })]),
+      discountApplications: { nodes: [
+        { __typename: 'AutomaticDiscountApplication', targetType: 'LINE_ITEM', title: 'Sale', value: { __typename: 'PricingPercentageValue', percentage: 20 } },
+        { __typename: 'DiscountCodeApplication', targetType: 'LINE_ITEM', code: 'SAVE10', value: { __typename: 'PricingPercentageValue', percentage: 10 } },
+        { __typename: 'ManualDiscountApplication', targetType: 'LINE_ITEM', title: 'Price change', value: { __typename: 'MoneyV2', amount: '2.0' } },
+      ] },
+    };
+    const d = await loadOrderDetail(ORDER, asFetch(shopify(order)));
+    expect(d.lines[0]).toMatchObject({ offer: { amount: '27.00' }, coupon: { amount: '18.36' } });
+    expect(d.lines[1]).toMatchObject({ offer: { amount: '0.00' }, coupon: { amount: '0.00' } });
+  });
+
   it('leaves delivery service charges (titles marked [svc:...]) out of the items', async () => {
     const f = shopify(baseOrder([line(), line({ id: 'gid://shopify/LineItem/13', title: 'Two Man Delivery [svc:two_man]' })]));
     const d = await loadOrderDetail(ORDER, asFetch(f));
