@@ -19,7 +19,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Status extras: cancel reason (7), credit note amount (21), service remarks (15), status 4 supplier delivery date | Reason, credit note and remarks done; status 4 already clears the expected date; supplier delivery date stamp still to do | 3 partly |
 | Line buttons: Delivery Confirm, Delivery Not Confirm | Done | done |
 | Line buttons: Add To Accounts, Replacement, Add New Product | Missing | 5 |
-| Totals: subtotal, offer discount, coupon (code and %), delivery, grand total, paid, balance | Subtotal, discounts, shipping, total only | 4 |
+| Totals: subtotal, offer discount, coupon (code and %), delivery, grand total, paid, balance | Done | 4 done |
 | Update Delivery & Services (six services with price and tick, staff password, update history) | Missing | 4 |
 | Process Order & Chase Up (GO) | Missing | 6 |
 | Expected Date: date, Update Conditions, GO, Email, Save, history | Date, Email, Save, history done; Update Conditions waits for staff to list the options | later |

@@ -198,3 +198,9 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - New Tracking section: tracking number (3 to 40 letters, numbers, spaces, dashes), saved with who and when and a "Tracking" history entry. Tick "Email the customer" to also queue the existing tracking email (uses the usual email mode: log, test or live).
 - Not done: status 4 supplier delivery date stamp; REFUND tick-box meaning; expected date "Update Conditions" (needs the option list from staff).
 - No backend change and no migration. Tests: backend 470, status extension 116, dashboard 116, builds OK.
+
+## Order Detail slice 4a: totals block (2026-11-21)
+- Totals now follow the legacy layout: Subtotal, Offer discount (automatic discounts), Coupon [CODE] [percent], Price adjustments (manual discounts, including price changes made here), each delivery line (a zero price reads "Free"), Grand total, Paid, Balance, and Refunded when above zero.
+- Amounts are the sum of each discount's allocations on the lines, in whole pence. Not exact on a line whose quantity was edited (the same limit as the line discount column).
+- Update Delivery & Services (the six service charges, staff password, update history) is not built: it waits for staff to say how a charge reaches the Shopify order and the VAT rule.
+- Tests: dashboard 118, all suites green, build OK. Not yet tried live.

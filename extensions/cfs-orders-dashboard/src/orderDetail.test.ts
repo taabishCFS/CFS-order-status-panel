@@ -68,6 +68,40 @@ describe('lineMoney', () => {
 });
 
 describe('loadOrderDetail', () => {
+  it('splits discounts into offer, coupons (with code and percent) and adjustments, and reads delivery, paid and balance', async () => {
+    const alloc = (amount: string, index: number) => ({ allocatedAmountSet: money(amount), discountApplication: { index } });
+    const order = {
+      ...baseOrder([
+        line({ discountAllocations: [alloc('27.0', 0), alloc('18.36', 1)] }),
+        line({ id: 'gid://shopify/LineItem/12', discountAllocations: [alloc('2.0', 2), alloc('1.0', 0)] }),
+      ]),
+      discountApplications: { nodes: [
+        { __typename: 'AutomaticDiscountApplication', targetType: 'LINE_ITEM', title: 'Offer', value: { __typename: 'PricingPercentageValue', percentage: 20 } },
+        { __typename: 'DiscountCodeApplication', targetType: 'LINE_ITEM', code: 'BLACK12', value: { __typename: 'PricingPercentageValue', percentage: 12 } },
+        { __typename: 'ManualDiscountApplication', targetType: 'LINE_ITEM', title: 'Configuration change', value: { __typename: 'MoneyV2', amount: '2.0' } },
+      ] },
+      shippingLines: { nodes: [{ title: 'Free Door Delivery', originalPriceSet: money('0.0') }, { title: 'Room of choice', originalPriceSet: money('20.0') }] },
+      totalReceivedSet: money('134.63'),
+      totalOutstandingSet: money('0.0'),
+      totalRefundedSet: money('5.0'),
+    };
+    const d = await loadOrderDetail(ORDER, asFetch(shopify(order)));
+    expect(d.breakdown).toEqual({
+      offer: { amount: '28.00', currency: 'GBP' },
+      adjustments: { amount: '2.00', currency: 'GBP' },
+      coupons: [{ code: 'BLACK12', percent: 12, amount: { amount: '18.36', currency: 'GBP' } }],
+      delivery: [{ title: 'Free Door Delivery', price: { amount: '0.00', currency: 'GBP' } }, { title: 'Room of choice', price: { amount: '20.00', currency: 'GBP' } }],
+      paid: { amount: '134.63', currency: 'GBP' },
+      balance: { amount: '0.00', currency: 'GBP' },
+      refunded: { amount: '5.00', currency: 'GBP' },
+    });
+  });
+
+  it('gives an empty breakdown when Shopify sends none of these fields', async () => {
+    const d = await loadOrderDetail(ORDER, asFetch(shopify(baseOrder([line()]))));
+    expect(d.breakdown).toEqual({ offer: null, adjustments: null, coupons: [], delivery: [], paid: null, balance: null, refunded: null });
+  });
+
   it('drops removed lines, uses the current quantity and returns the saved record and digest', async () => {
     const f = shopify(baseOrder([line(), line({ id: 'gid://shopify/LineItem/12', currentQuantity: 0 })]));
     const d = await loadOrderDetail(ORDER, asFetch(f));

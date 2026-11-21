@@ -22,6 +22,13 @@ const dmy = (iso) => (iso ? iso.split('-').reverse().join('/') : 'Not set');
 const when = (iso) => new Date(iso).toLocaleString('en-GB');
 const DELIVERY = { confirmed: 'Confirmed', declined: 'Declined' };
 
+const TotalRow = ({ label, value, strong }) => (
+  <s-stack direction="inline" gap="base" justifyContent="space-between">
+    <s-text type={strong ? 'strong' : undefined}>{label}</s-text>
+    <s-text type={strong ? 'strong' : undefined}>{value}</s-text>
+  </s-stack>
+);
+
 export default function OrderDetailPage({ id }) {
   const orderId = `gid://shopify/Order/${id}`;
   const { detail, customer, loading, loadFailed, notice, setNotice, refresh } = useOrderDetail(orderId);
@@ -173,10 +180,20 @@ export default function OrderDetailPage({ id }) {
 
       <s-section heading="Totals">
         <s-stack direction="block" gap="small-300">
-          <s-text>Subtotal: {money(detail.totals.subtotal)}</s-text>
-          <s-text>Discounts: {money(detail.totals.discounts)}</s-text>
-          <s-text>Shipping: {money(detail.totals.shipping)}</s-text>
-          <s-text type="strong">Total: {money(detail.totals.total)}</s-text>
+          <TotalRow label="Subtotal" value={money(detail.totals.subtotal)} />
+          {detail.breakdown.offer && <TotalRow label="Offer discount" value={`(-) ${money(detail.breakdown.offer)}`} />}
+          {detail.breakdown.coupons.map((c) => (
+            <TotalRow key={c.code} label={`Coupon [${c.code}]${c.percent !== null ? ` [${c.percent.toFixed(2)}%]` : ''}`} value={`(-) ${money(c.amount)}`} />
+          ))}
+          {detail.breakdown.adjustments && <TotalRow label="Price adjustments" value={`(-) ${money(detail.breakdown.adjustments)}`} />}
+          {detail.breakdown.delivery.length === 0 && <TotalRow label="Delivery" value={money(detail.totals.shipping)} />}
+          {detail.breakdown.delivery.map((d, i) => (
+            <TotalRow key={i} label={d.title} value={Number(d.price.amount) === 0 ? 'Free' : money(d.price)} />
+          ))}
+          <TotalRow strong label="Grand total" value={money(detail.totals.total)} />
+          <TotalRow label="Paid" value={money(detail.breakdown.paid)} />
+          <TotalRow label="Balance" value={money(detail.breakdown.balance)} />
+          {detail.breakdown.refunded && Number(detail.breakdown.refunded.amount) > 0 && <TotalRow label="Refunded" value={money(detail.breakdown.refunded)} />}
         </s-stack>
       </s-section>
 

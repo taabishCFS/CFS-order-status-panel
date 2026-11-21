@@ -20,12 +20,30 @@ export interface DetailLine {
   final: Money | null;
 }
 
+export interface Coupon {
+  code: string;
+  percent: number | null;
+  amount: Money;
+}
+
+// The totals block as the legacy screen shows it: offer discount, coupons, delivery lines, paid and balance.
+export interface Breakdown {
+  offer: Money | null;
+  adjustments: Money | null;
+  coupons: Coupon[];
+  delivery: { title: string; price: Money }[];
+  paid: Money | null;
+  balance: Money | null;
+  refunded: Money | null;
+}
+
 export interface OrderDetail {
   id: string;
   name: string;
   createdAt: string;
   lines: DetailLine[];
   totals: { subtotal: Money | null; discounts: Money | null; shipping: Money | null; total: Money | null };
+  breakdown: Breakdown;
   state: StatusState;
   digest: string | null;
 }
@@ -99,11 +117,25 @@ const DETAIL_QUERY = `#graphql
       currentTotalDiscountsSet { shopMoney { amount currencyCode } }
       currentShippingPriceSet { shopMoney { amount currencyCode } }
       currentTotalPriceSet { shopMoney { amount currencyCode } }
+      totalReceivedSet { shopMoney { amount currencyCode } }
+      totalOutstandingSet { shopMoney { amount currencyCode } }
+      totalRefundedSet { shopMoney { amount currencyCode } }
+      shippingLines(first: 5) { nodes { title originalPriceSet { shopMoney { amount currencyCode } } } }
+      discountApplications(first: 20) {
+        nodes {
+          __typename
+          targetType
+          value { __typename ... on PricingPercentageValue { percentage } ... on MoneyV2 { amount } }
+          ... on DiscountCodeApplication { code }
+          ... on AutomaticDiscountApplication { title }
+          ... on ManualDiscountApplication { title }
+        }
+      }
       lineItems(first: 100) {
         nodes {
           id title variantTitle sku vendor quantity currentQuantity
           originalUnitPriceSet { shopMoney { amount currencyCode } }
-          discountAllocations { allocatedAmountSet { shopMoney { amount currencyCode } } }
+          discountAllocations { allocatedAmountSet { shopMoney { amount currencyCode } } discountApplication { index } }
         }
       }
     }
@@ -123,7 +155,67 @@ interface RawLine {
   quantity: number;
   currentQuantity: number;
   originalUnitPriceSet: MoneySet;
-  discountAllocations?: { allocatedAmountSet: MoneySet }[];
+  discountAllocations?: { allocatedAmountSet: MoneySet; discountApplication?: { index: number } }[];
+}
+
+interface RawApplication {
+  __typename: string;
+  targetType?: string;
+  code?: string;
+  value?: { __typename: string; percentage?: number };
+}
+
+// Splits the order's line discounts by kind: automatic ones are the "offer", code ones are coupons,
+// and manual ones (including price changes made here) are adjustments. Each amount is the sum of the
+// allocations on the lines, added in whole pence.
+export function breakdownOf(o: {
+  discountApplications?: { nodes: RawApplication[] };
+  lineItems: { nodes: RawLine[] };
+  shippingLines?: { nodes: { title: string; originalPriceSet: MoneySet }[] };
+  totalReceivedSet?: MoneySet;
+  totalOutstandingSet?: MoneySet;
+  totalRefundedSet?: MoneySet;
+}): Breakdown {
+  const apps = o.discountApplications?.nodes ?? [];
+  const sums = new Map<number, number>();
+  let currency = 'GBP';
+  for (const line of o.lineItems.nodes) {
+    for (const a of line.discountAllocations ?? []) {
+      const index = a.discountApplication?.index;
+      const set = a.allocatedAmountSet;
+      if (index === undefined || !set) continue;
+      currency = set.shopMoney.currencyCode;
+      sums.set(index, (sums.get(index) ?? 0) + toMinor(set.shopMoney.amount));
+    }
+  }
+  let offer = 0;
+  let adjustments = 0;
+  let hasOffer = false;
+  let hasAdjustments = false;
+  const coupons: Coupon[] = [];
+  apps.forEach((app, index) => {
+    if (app.targetType && app.targetType !== 'LINE_ITEM') return;
+    const minor = sums.get(index) ?? 0;
+    if (app.__typename === 'DiscountCodeApplication') {
+      const percent = app.value?.__typename === 'PricingPercentageValue' ? app.value.percentage ?? null : null;
+      coupons.push({ code: app.code ?? '', percent, amount: fromMinor(minor, currency) });
+    } else if (app.__typename === 'AutomaticDiscountApplication') {
+      offer += minor;
+      hasOffer = true;
+    } else {
+      adjustments += minor;
+      hasAdjustments = true;
+    }
+  });
+  return {
+    offer: hasOffer ? fromMinor(offer, currency) : null,
+    adjustments: hasAdjustments ? fromMinor(adjustments, currency) : null,
+    coupons,
+    delivery: (o.shippingLines?.nodes ?? []).map((s) => ({ title: s.title, price: asMoney(s.originalPriceSet) ?? fromMinor(0, currency) })),
+    paid: asMoney(o.totalReceivedSet),
+    balance: asMoney(o.totalOutstandingSet),
+    refunded: asMoney(o.totalRefundedSet),
+  };
 }
 
 function toDetailLine(l: RawLine): DetailLine {
@@ -159,6 +251,7 @@ export async function loadOrderDetail(orderId: string, fetchFn: typeof fetch = f
       shipping: asMoney(o.currentShippingPriceSet),
       total: asMoney(o.currentTotalPriceSet),
     },
+    breakdown: breakdownOf(o),
     state,
     digest,
   };
