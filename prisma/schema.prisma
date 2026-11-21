@@ -217,3 +217,25 @@ model EmailSite {
 
   @@unique([shop, code])
 }
+
+// A request to refund an order (all or part), entered by staff. Accounts act on the list; nothing here moves money.
+model RefundRequest {
+  id            String   @id @default(cuid())
+  shop          String
+  orderId       String
+  orderName     String
+  clientKey     String
+  reason        String
+  type          String // part | full
+  amountMinor   Int
+  lineIds       String[]
+  notes         String   @default("")
+  status        String // requested | done | cancelled
+  createdById   String?
+  createdByName String?
+  createdAt     DateTime @default(now())
+
+  @@unique([shop, clientKey])
+  @@index([shop, orderId])
+  @@index([shop, status, createdAt])
+}

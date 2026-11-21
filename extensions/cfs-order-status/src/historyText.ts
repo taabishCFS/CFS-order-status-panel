@@ -11,6 +11,8 @@ const LABELS: Record<Scope, string> = {
   configuration: 'Configuration',
   contact: 'Contact details',
   tracking: 'Tracking',
+  refund: 'Refund request',
+  condition: 'Update conditions',
 };
 
 export const scopeLabel = (scope: Scope): string => LABELS[scope];
@@ -33,6 +35,13 @@ export function describeEntry(entry: HistoryEntry, titleOf: (target: string) => 
   }
   if (entry.scope === 'configuration') {
     for (const v of entry.values ?? []) out.push(`${name(v.target)}: options ${v.from ?? 'not recorded'} → ${v.to ?? 'not recorded'}`);
+    if (entry.note) out.push(entry.note);
+  }
+  if (entry.scope === 'condition') {
+    for (const v of entry.values ?? []) out.push(`Condition: ${v.from ?? 'none'} → ${v.to ?? 'none'}`);
+  }
+  if (entry.scope === 'refund') {
+    for (const v of entry.values ?? []) if (v.to) out.push(v.to);
     if (entry.note) out.push(entry.note);
   }
   if (entry.scope === 'tracking') {

@@ -1,3 +1,4 @@
+import { conditionLabel, isCondition } from './conditions';
 import type { Actor } from './identity';
 import type { HistoryEntry, StatusState, ValueChange } from './types';
 
@@ -63,6 +64,20 @@ export function applyConfigurationChange(
 ): StatusState {
   const values: ValueChange[] = [{ target: input.lineId, from: input.from, to: input.to }];
   return { ...state, schemaVersion: 2, history: withEntry(state, input, 'configuration', { values, note: input.note }) };
+}
+
+// Saves how a delayed order is handled (Update Conditions). Any refund it implies is requested separately.
+export function applyCondition(state: StatusState, input: Meta & { value: string }): StatusState {
+  if (!isCondition(input.value)) throw new Error('Choose one of the listed conditions');
+  const values: ValueChange[] = [{ target: 'order', from: state.condition ? conditionLabel(state.condition.value) : null, to: conditionLabel(input.value) }];
+  return { ...state, schemaVersion: 2, condition: { value: input.value, at: input.now, by: input.actor }, history: withEntry(state, input, 'condition', { values }) };
+}
+
+// Records that a refund was requested (the request itself is saved by the backend). Moves no money.
+export function applyRefundRequest(state: StatusState, input: Meta & { summary: string; notes: string }): StatusState {
+  const values: ValueChange[] = [{ target: 'order', from: null, to: input.summary }];
+  const notes = input.notes.trim();
+  return { ...state, schemaVersion: 2, history: withEntry(state, input, 'refund', { values, ...(notes ? { note: notes } : {}) }) };
 }
 
 const TRACKING = /^[A-Za-z0-9 \-]{3,40}$/;

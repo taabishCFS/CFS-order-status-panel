@@ -61,6 +61,8 @@ export interface LineRow {
   expectedDate: string | null;
   deliveryOutcome: string | null;
   supplierInvoicePaid: boolean;
+  stockTint?: 'yellow' | 'red' | null;
+  stockDueDate?: string | null;
 }
 
 export interface LineListData {

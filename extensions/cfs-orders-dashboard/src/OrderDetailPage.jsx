@@ -10,6 +10,7 @@ import DeliverySection from './DeliverySection.jsx';
 import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
+import RefundSection from './RefundSection.jsx';
 import StatusSection from './StatusSection.jsx';
 import TrackingSection from './TrackingSection.jsx';
 import SupplierInvoiceSection from './SupplierInvoiceSection.jsx';
@@ -174,8 +175,9 @@ export default function OrderDetailPage({ id }) {
 
       <SupplierInvoiceSection id={id} lines={lines} currency={detail.totals.total?.currency ?? 'GBP'} verified={verified} />
 
-      <ExpectedDateSection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <RefundSection id={id} detail={detail} writer={writer} verified={verified} setNotice={setNotice} />
       <TrackingSection orderId={orderId} detail={detail} writer={writer} setNotice={setNotice} emails={emails} />
       <EmailsSection emails={emails} canRetry={Boolean(verified)} />
       <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />

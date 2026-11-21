@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { LineRow } from './listApi';
-import { formatDate, formatMoney, gatewayLabel, lineTitle, matchesFind, pageItems, payTypeLabel, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
+import { stockBadge, formatDate, formatMoney, gatewayLabel, lineTitle, matchesFind, pageItems, payTypeLabel, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
 
 describe('pageItems', () => {
   it('lists every page, then Next and All, when there are few pages', () => {
@@ -78,5 +78,16 @@ describe('selection helpers', () => {
   it('select-all picks every row, and clears when every row is already picked', () => {
     expect([...toggleAll(new Set(['A']), rows)].sort()).toEqual(['A', 'B']);
     expect([...toggleAll(new Set(['A', 'B']), rows)]).toEqual([]);
+  });
+});
+
+describe('stockBadge', () => {
+  it('is a warning with the due date (day/month/year) for a yellow line and critical without a date for a red one', () => {
+    expect(stockBadge({ stockTint: 'yellow', stockDueDate: '2026-12-25' })).toEqual({ tone: 'warning', text: 'Out of stock · due 25/12/2026' });
+    expect(stockBadge({ stockTint: 'red', stockDueDate: null })).toEqual({ tone: 'critical', text: 'Out of stock · no due date' });
+  });
+  it('is nothing for an untinted line or a row from an older answer', () => {
+    expect(stockBadge({ stockTint: null, stockDueDate: null })).toBeNull();
+    expect(stockBadge({})).toBeNull();
   });
 });

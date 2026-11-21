@@ -69,3 +69,13 @@ export function rangeText(page: number, size: number, total: number, all: boolea
   const last = all ? total : Math.min(page * size, total);
   return `${first} - ${last} Records Of ${total}`;
 }
+
+/** The out-of-stock badge for a line: yellow tint = warning with the due date, red tint = critical. Null when the line is not tinted. */
+export function stockBadge(row: { stockTint?: 'yellow' | 'red' | null; stockDueDate?: string | null }): { tone: 'warning' | 'critical'; text: string } | null {
+  if (row.stockTint === 'yellow' && row.stockDueDate) {
+    const [y, m, d] = row.stockDueDate.split('-');
+    return { tone: 'warning', text: `Out of stock · due ${d}/${m}/${y}` };
+  }
+  if (row.stockTint === 'red') return { tone: 'critical', text: 'Out of stock · no due date' };
+  return null;
+}

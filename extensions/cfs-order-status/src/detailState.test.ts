@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 import {
   INSTRUCTIONS_MAX,
   NOTE_MAX,
+  applyCondition,
   applyConfigurationChange,
   applyContactChange,
   applyDelivery,
   applyExpectedDate,
   applyInstructions,
   applyNote,
+  applyRefundRequest,
   applyTracking,
   headerProposal,
 } from './detailState';
@@ -170,6 +172,34 @@ describe('applyChange status 4 clears the expected date', () => {
     const s = save(withDate([A]), OTHER, [A]);
     expect(s.expected?.[A]?.date).toBe('2026-12-01');
     expect(s.history[0].values).toBeUndefined();
+  });
+});
+
+describe('applyCondition', () => {
+  it('stores the condition on the order with who and when, and records old and new in the history', () => {
+    const first = applyCondition(withStatuses({}), { ...txt('x'), value: 'WaitForEntireOrder' });
+    expect(first.condition).toEqual({ value: 'WaitForEntireOrder', at: '2026-11-19T10:00:00Z', by: actor });
+    expect(first.history[0]).toMatchObject({ scope: 'condition', changes: [], values: [{ target: 'order', from: null, to: 'WAIT FOR ENTIRE ORDER' }] });
+    const second = applyCondition(first, { ...txt('y'), value: 'OKForPartDelivery' });
+    expect(second.history[1].values).toEqual([{ target: 'order', from: 'WAIT FOR ENTIRE ORDER', to: 'OK FOR PART DELIVERY' }]);
+    expect(second.schemaVersion).toBe(2);
+  });
+  it('refuses a condition that is not on the list', () => {
+    expect(() => applyCondition(withStatuses({}), { ...txt('x'), value: 'Whatever' })).toThrow(/condition/i);
+  });
+});
+
+describe('applyRefundRequest', () => {
+  it('adds one history entry saying what was requested and why, and changes no status', () => {
+    const before = withStatuses({ [A]: 4 });
+    const next = applyRefundRequest(before, { ...txt('x'), summary: 'Part refund £25.00: Damaged Part Refund', notes: 'Leg snapped' });
+    expect(next.history).toHaveLength(1);
+    expect(next.history[0]).toMatchObject({ scope: 'refund', changes: [], values: [{ target: 'order', from: null, to: 'Part refund £25.00: Damaged Part Refund' }], note: 'Leg snapped' });
+    expect(next.lines).toEqual(before.lines);
+    expect(next.schemaVersion).toBe(2);
+  });
+  it('leaves the note out when there are no notes', () => {
+    expect(applyRefundRequest(withStatuses({}), { ...txt('x'), summary: 'Full refund £10.00: Discontinued', notes: '' }).history[0].note).toBeUndefined();
   });
 });
 

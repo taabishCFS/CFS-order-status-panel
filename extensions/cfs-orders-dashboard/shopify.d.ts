@@ -79,6 +79,12 @@ declare module './src/NotesSection.jsx' {
 }
 
 //@ts-ignore
+declare module './src/RefundSection.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/StatusSection.jsx' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
@@ -134,6 +140,18 @@ declare module './src/EmailTick.jsx' {
 
 //@ts-ignore
 declare module './src/emails.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/refunds.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/refundReasons.json' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }

@@ -70,7 +70,7 @@ export async function archiveEntries(
   }
 }
 
-const ENTRY_SCOPES = ['order', 'lines', 'expected-date', 'delivery', 'note', 'instructions', 'configuration', 'contact', 'tracking'];
+const ENTRY_SCOPES = ['order', 'lines', 'expected-date', 'delivery', 'note', 'instructions', 'configuration', 'contact', 'tracking', 'refund', 'condition'];
 
 // Archived items are data written by this app, but anything else stored under the type (or a
 // corrupt payload) must never break the history list: skip what is not a real entry.

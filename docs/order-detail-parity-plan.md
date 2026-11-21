@@ -14,7 +14,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Customer Order Instructions (the customer's own note, read-only) | Done | 2 done |
 | Order/Delivery Instructions (staff, prints on delivery note) with ADD/UPDATE | Done (Notes section) | done |
 | Supplier Invoice Update: date, number, amount, paid per line | Backend done; screen in progress | 1 |
-| Refund info: REFUND checkbox | Refund-due flag raised by Cancelled and shown in Status (full or part); no REFUND tick-box yet (meaning to confirm with staff) | 3 done |
+| Refund info: REFUND checkbox | Done: tick opens the form (reason, products, type, amount, notes), ADD REFUND adds a request to a list. No money moves; a refund-list page for accounts is part of the accounts module | 3 done |
 | Tracking No. with Email / Save and GO | Done (Email = the tick-box) | 3 done |
 | Status extras: cancel reason (7), credit note amount (21), service remarks (15), status 4 supplier delivery date | Reason, credit note and remarks done; status 4 already clears the expected date; supplier delivery date stamp done | 3 done |
 | Line buttons: Delivery Confirm, Delivery Not Confirm | Done | done |
@@ -22,7 +22,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Totals: subtotal, offer discount, coupon (code and %), delivery, grand total, paid, balance | Done | 4 done |
 | Update Delivery & Services (six services with price and tick, staff password, update history) | Missing | 4 |
 | Process Order & Chase Up (GO) | Missing | 6 |
-| Expected Date: date, Update Conditions, GO, Email, Save, history | Date, Email, Save, history done; Update Conditions waits for staff to list the options | later |
+| Expected Date: date, Update Conditions, GO, Email, Save, history | Done (order-level condition; 50% and 75% add a delay-refund request) | 3 done |
 | Book Delivery (type, date, driver, van, drop, AM/PM, Book & Email, Book & Save, Reschedule, history) | Parked | 7 |
 | Header buttons: Save PDF, Exc/Inc VAT invoice, Delivery Note (+ log), Resend Inv., Print Label, Print Return Label | Missing | 8 |
 

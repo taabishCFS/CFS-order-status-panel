@@ -1,7 +1,7 @@
 import type { Actor } from './identity';
 
 export type StatusScope = 'order' | 'lines';
-export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration' | 'contact' | 'tracking';
+export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration' | 'contact' | 'tracking' | 'refund' | 'condition';
 
 // Extra details staff give with some statuses: a cancel reason (7), a credit note amount in pounds (21), service remarks (15).
 export interface StatusExtras {
@@ -75,6 +75,12 @@ export interface TrackingNumber {
   by: Actor;
 }
 
+export interface OrderCondition {
+  value: string;
+  at: string;
+  by: Actor;
+}
+
 export interface StatusState {
   // 1 = statuses and history only. 2 adds the optional fields below; version 1 records still load.
   schemaVersion: 1 | 2;
@@ -91,4 +97,5 @@ export interface StatusState {
   instructions?: Instructions | null;
   refund?: RefundFlag | null;
   tracking?: TrackingNumber | null;
+  condition?: OrderCondition | null;
 }

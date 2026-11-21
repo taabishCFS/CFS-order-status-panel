@@ -5,7 +5,7 @@ import { bulkChangeStatus, bulkExpectedDate, groupByOrder } from './bulk';
 import { DEFAULT_MESSAGE, DEFAULT_SUBJECT, callBulkEmail } from './bulkEmail';
 import { loadBrands, loadExportLink, loadLineList } from './listApi';
 import Pager from './Pager.jsx';
-import { formatDate, formatMoney, lineTitle, matchesFind, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
+import { formatDate, formatMoney, lineTitle, matchesFind, rangeText, statusTone, stockBadge, toggleAll, toggleOne } from './orderList';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const dmy = (d) => (d ? d.split('-').reverse().join('/') : '');
@@ -245,6 +245,7 @@ export default function OrdersByBrand() {
                 <s-table-cell>
                   <s-stack direction="block" gap="small-500">
                     {r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : <s-text color="subdued">Not set</s-text>}
+                    {stockBadge(r) && <s-badge tone={stockBadge(r).tone}>{stockBadge(r).text}</s-badge>}
                     <s-text color="subdued">Delivery: {dmy(r.expectedDate) || 'Not set'}</s-text>
                     <s-text tone={r.supplierInvoicePaid ? 'success' : 'critical'}>Supp. invoice: {r.supplierInvoicePaid ? 'Paid' : 'Not paid'}</s-text>
                   </s-stack>

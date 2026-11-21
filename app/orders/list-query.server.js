@@ -91,6 +91,7 @@ export async function listLines(db, shop, params) {
     product: l.title,
     variantTitle: l.variantTitle,
     sku: l.sku,
+    variantId: l.variantId,
     quantity: l.quantity,
     priceMinor: l.priceMinor,
     currency: l.currency,
