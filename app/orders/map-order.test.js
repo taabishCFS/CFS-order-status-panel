@@ -24,6 +24,11 @@ describe("mapOrder", () => {
     expect(lines[0]).toMatchObject({ lineId: "gid://shopify/LineItem/1", sku: "SKU-1", quantity: 1 });
   });
 
+  it("does not copy delivery service charges (lines marked [svc:...]) as products", () => {
+    const { lines } = mapOrder("s", gqlOrder({ lineItems: { nodes: [gqlLine(1), gqlLine(2, { title: "Two Man Delivery [svc:two_man]" })] } }));
+    expect(lines.map((l) => l.lineId)).toEqual(["gid://shopify/LineItem/1"]);
+  });
+
   it("keeps the vendor (the legacy brand) and variant title on each line", () => {
     const { lines } = mapOrder("s", gqlOrder());
     expect(lines[0]).toMatchObject({ vendor: "Duke Beds", variantTitle: "2ft 6in" });

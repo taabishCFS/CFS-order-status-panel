@@ -66,6 +66,13 @@ export function applyConfigurationChange(
   return { ...state, schemaVersion: 2, history: withEntry(state, input, 'configuration', { values, note: input.note }) };
 }
 
+// Records that delivery service charges were added, changed or removed (the backend makes the change on the Shopify order).
+export function applyServicesChange(state: StatusState, input: Meta & { changes: { label: string; from: string | null; to: string | null }[] }): StatusState {
+  if (input.changes.length === 0) throw new Error('There is nothing to record');
+  const values: ValueChange[] = input.changes.map((c) => ({ target: c.label, from: c.from, to: c.to }));
+  return { ...state, schemaVersion: 2, history: withEntry(state, input, 'services', { values }) };
+}
+
 // Saves how a delayed order is handled (Update Conditions). Any refund it implies is requested separately.
 export function applyCondition(state: StatusState, input: Meta & { value: string }): StatusState {
   if (!isCondition(input.value)) throw new Error('Choose one of the listed conditions');

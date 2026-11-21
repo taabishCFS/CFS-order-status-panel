@@ -20,6 +20,7 @@ describe('scopeLabel', () => {
     expect(scopeLabel('tracking')).toBe('Tracking');
     expect(scopeLabel('refund')).toBe('Refund request');
     expect(scopeLabel('condition')).toBe('Update conditions');
+    expect(scopeLabel('services')).toBe('Delivery & services');
   });
 });
 
@@ -62,6 +63,11 @@ describe('describeEntry', () => {
   it('shows the extras saved with a status change (cancel reason, credit note, service remarks) under it', () => {
     const e = entry({ scope: 'lines', changes: [{ target: L1, fromId: 4, toId: 7, toLabel: 'Cancelled' }], note: 'Cancel reason: Customer changed mind' });
     expect(describeEntry(e, titleOf)).toEqual(['Oslo Sideboard (Oak): In Stock → Cancelled', 'Cancel reason: Customer changed mind']);
+  });
+
+  it('describes a services change: added, changed and removed', () => {
+    const e = entry({ scope: 'services', values: [{ target: 'Two Man Delivery', from: null, to: '£60.00' }, { target: 'Scotland Delivery', from: '£25.00', to: null }] });
+    expect(describeEntry(e, titleOf)).toEqual(['Two Man Delivery: not on the order → £60.00', 'Scotland Delivery: £25.00 → removed']);
   });
 
   it('describes a condition change', () => {

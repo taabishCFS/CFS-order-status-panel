@@ -20,7 +20,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Line buttons: Delivery Confirm, Delivery Not Confirm | Done | done |
 | Line buttons: Add To Accounts, Replacement, Add New Product | Missing | 5 |
 | Totals: subtotal, offer discount, coupon (code and %), delivery, grand total, paid, balance | Done | 4 done |
-| Update Delivery & Services (six services with price and tick, staff password, update history) | Missing | 4 |
+| Update Delivery & Services (six services with price and tick, staff password, update history) | Built (verified staff instead of a password; the history is the update history); not yet tried live | 4 done |
 | Process Order & Chase Up (GO) | Missing | 6 |
 | Expected Date: date, Update Conditions, GO, Email, Save, history | Done (order-level condition; 50% and 75% add a delay-refund request) | 3 done |
 | Book Delivery (type, date, driver, van, drop, AM/PM, Book & Email, Book & Save, Reschedule, history) | Parked | 7 |

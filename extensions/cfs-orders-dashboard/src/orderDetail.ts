@@ -244,7 +244,7 @@ export async function loadOrderDetail(orderId: string, fetchFn: typeof fetch = f
     id: o.id,
     name: o.name,
     createdAt: o.createdAt,
-    lines: (o.lineItems.nodes as RawLine[]).filter((l) => l.currentQuantity > 0).map(toDetailLine),
+    lines: (o.lineItems.nodes as RawLine[]).filter((l) => l.currentQuantity > 0 && !/\[svc:[a-z_]+\]/.test(l.title)).map(toDetailLine),
     totals: {
       subtotal: asMoney(o.currentSubtotalPriceSet),
       discounts: asMoney(o.currentTotalDiscountsSet),

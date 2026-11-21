@@ -11,6 +11,7 @@ import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
 import RefundSection from './RefundSection.jsx';
+import ServicesSection from './ServicesSection.jsx';
 import StatusSection from './StatusSection.jsx';
 import TrackingSection from './TrackingSection.jsx';
 import SupplierInvoiceSection from './SupplierInvoiceSection.jsx';
@@ -200,6 +201,8 @@ export default function OrderDetailPage({ id }) {
           {detail.breakdown.refunded && Number(detail.breakdown.refunded.amount) > 0 && <TotalRow label="Refunded" value={money(detail.breakdown.refunded)} />}
         </s-stack>
       </s-section>
+
+      <ServicesSection id={id} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
 
       <s-section heading={`History (${total})`}>
         <s-button onClick={() => setShowHistory((v) => !v)}>{showHistory ? 'Hide history' : 'Show history'}</s-button>

@@ -10,6 +10,7 @@ import {
   applyInstructions,
   applyNote,
   applyRefundRequest,
+  applyServicesChange,
   applyTracking,
   headerProposal,
 } from './detailState';
@@ -172,6 +173,20 @@ describe('applyChange status 4 clears the expected date', () => {
     const s = save(withDate([A]), OTHER, [A]);
     expect(s.expected?.[A]?.date).toBe('2026-12-01');
     expect(s.history[0].values).toBeUndefined();
+  });
+});
+
+describe('applyServicesChange', () => {
+  it('adds one history entry listing each service with its old and new amount, and changes no status', () => {
+    const before = withStatuses({ [A]: 4 });
+    const next = applyServicesChange(before, { ...txt('x'), changes: [{ label: 'Two Man Delivery', from: null, to: '£60.00' }, { label: 'Scotland Delivery', from: '£25.00', to: null }] });
+    expect(next.history).toHaveLength(1);
+    expect(next.history[0]).toMatchObject({ scope: 'services', changes: [], values: [{ target: 'Two Man Delivery', from: null, to: '£60.00' }, { target: 'Scotland Delivery', from: '£25.00', to: null }] });
+    expect(next.lines).toEqual(before.lines);
+    expect(next.schemaVersion).toBe(2);
+  });
+  it('refuses an empty list', () => {
+    expect(() => applyServicesChange(withStatuses({}), { ...txt('x'), changes: [] })).toThrow(/nothing/i);
   });
 });
 

@@ -116,6 +116,12 @@ describe('loadOrderDetail', () => {
     expect(d.state.schemaVersion).toBe(1);
   });
 
+  it('leaves delivery service charges (titles marked [svc:...]) out of the items', async () => {
+    const f = shopify(baseOrder([line(), line({ id: 'gid://shopify/LineItem/13', title: 'Two Man Delivery [svc:two_man]' })]));
+    const d = await loadOrderDetail(ORDER, asFetch(f));
+    expect(d.lines.map((l) => l.id)).toEqual(['gid://shopify/LineItem/11']);
+  });
+
   it('shows discount and final price as unavailable when the line quantity was edited', () => {
     const f = shopify(baseOrder([line({ quantity: 3, currentQuantity: 2 })]));
     return loadOrderDetail(ORDER, asFetch(f)).then((d) => {

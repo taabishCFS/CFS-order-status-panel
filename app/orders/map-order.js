@@ -30,7 +30,8 @@ export function mapOrder(shop, o) {
   const tags = o.tags ?? [];
   const status = readStatusState(o.metafield?.value ?? null);
   const createdAt = new Date(o.createdAt);
-  const lineNodes = o.lineItems?.nodes ?? [];
+  // Delivery service charges (Update Delivery & Services) are custom lines marked [svc:...]; they are not products.
+  const lineNodes = (o.lineItems?.nodes ?? []).filter((l) => !/\[svc:[a-z_]+\]/.test(l.title ?? ""));
   const brandOf = (l) => l.vendor?.trim() || "Unmapped";
   const order = {
     shop,

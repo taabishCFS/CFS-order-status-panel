@@ -19,7 +19,7 @@ export const markerFor = (lineItemId, version) => `[cfg:${numericId(lineItemId)}
 
 const major = (minor) => (minor / 100).toFixed(2);
 
-const BEGIN = `#graphql
+export const BEGIN = `#graphql
   mutation orderEditBegin($id: ID!) {
     orderEditBegin(id: $id) { calculatedOrder { id } userErrors { field message } }
   }`;
@@ -35,7 +35,7 @@ const ADD_DISCOUNT = `#graphql
       addedDiscountStagedChange { id } userErrors { field message }
     }
   }`;
-const COMMIT = `#graphql
+export const COMMIT = `#graphql
   mutation orderEditCommit($id: ID!, $notifyCustomer: Boolean, $staffNote: String) {
     orderEditCommit(id: $id, notifyCustomer: $notifyCustomer, staffNote: $staffNote) {
       order { id } userErrors { field message }
@@ -61,7 +61,7 @@ const STATE = `#graphql
   }`;
 
 /** Runs one request; throws OrderEditError for a GraphQL error, a user error or a missing result. */
-async function run(graphql, stage, query, variables, field) {
+export async function run(graphql, stage, query, variables, field) {
   const response = await graphql(query, { variables });
   const json = await response.json();
   if (json.errors?.length) throw new OrderEditError(json.errors[0].message ?? "Shopify error", stage);
