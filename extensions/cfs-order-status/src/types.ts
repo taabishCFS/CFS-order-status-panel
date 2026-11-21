@@ -85,6 +85,8 @@ export interface StatusState {
   // Every change ever saved. Absent on orders saved before history archiving.
   totalEntries?: number;
   expected?: Record<string, DatedStamp>;
+  // The UK date each line last came into stock (status 4). Kept when the line moves on.
+  supplierDelivered?: Record<string, { date: string; at: string; by: Actor }>;
   delivery?: Record<string, DeliveryStamp>;
   instructions?: Instructions | null;
   refund?: RefundFlag | null;

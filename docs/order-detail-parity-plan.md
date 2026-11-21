@@ -16,7 +16,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Supplier Invoice Update: date, number, amount, paid per line | Backend done; screen in progress | 1 |
 | Refund info: REFUND checkbox | Refund-due flag raised by Cancelled and shown in Status (full or part); no REFUND tick-box yet (meaning to confirm with staff) | 3 done |
 | Tracking No. with Email / Save and GO | Done (Email = the tick-box) | 3 done |
-| Status extras: cancel reason (7), credit note amount (21), service remarks (15), status 4 supplier delivery date | Reason, credit note and remarks done; status 4 already clears the expected date; supplier delivery date stamp still to do | 3 partly |
+| Status extras: cancel reason (7), credit note amount (21), service remarks (15), status 4 supplier delivery date | Reason, credit note and remarks done; status 4 already clears the expected date; supplier delivery date stamp done | 3 done |
 | Line buttons: Delivery Confirm, Delivery Not Confirm | Done | done |
 | Line buttons: Add To Accounts, Replacement, Add New Product | Missing | 5 |
 | Totals: subtotal, offer discount, coupon (code and %), delivery, grand total, paid, balance | Done | 4 done |

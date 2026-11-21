@@ -20,6 +20,9 @@ export interface ChangeInput {
 
 const EXTRA_MAX = 500;
 
+// The calendar date in UK time (so late on a summer evening already counts as the next day), as YYYY-MM-DD.
+const ukDate = (iso: string): string => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
+
 // Keeps only the extras that belong to this status, trimmed and checked. Returns undefined when nothing is left.
 function cleanExtras(statusId: number, raw: StatusExtras | undefined): { extras?: StatusExtras; note?: string } {
   const out: StatusExtras = {};
@@ -58,6 +61,7 @@ export function applyChange(state: StatusState, input: ChangeInput): StatusState
   let order = state.order;
   const lines = { ...state.lines };
   let expected = state.expected;
+  let supplierDelivered = state.supplierDelivered;
   const values: ValueChange[] = [];
 
   if (scope === 'order') {
@@ -68,6 +72,7 @@ export function applyChange(state: StatusState, input: ChangeInput): StatusState
       changes.push({ target: lineId, fromId: state.lines[lineId]?.statusId ?? null, toId: status.id, toLabel: status.label });
       lines[lineId] = stamp;
       // In Stock means the goods are here, so any expected arrival date no longer applies.
+      if (status.id === 4) supplierDelivered = { ...supplierDelivered, [lineId]: { date: ukDate(now), at: now, by: actor } };
       const previous = state.expected?.[lineId]?.date;
       if (status.id === 4 && previous) {
         expected = { ...expected, [lineId]: { date: null, at: now, by: actor } };
@@ -87,7 +92,8 @@ export function applyChange(state: StatusState, input: ChangeInput): StatusState
   const entry = { id: entryId, at: now, by: actor, scope, changes, ...(values.length ? { values } : {}), ...(note ? { note } : {}) };
   return {
     ...state,
-    ...(values.length || extras || refund ? { schemaVersion: 2 as const } : {}),
+    ...(values.length || extras || refund || supplierDelivered !== state.supplierDelivered ? { schemaVersion: 2 as const } : {}),
+    ...(supplierDelivered !== state.supplierDelivered ? { supplierDelivered } : {}),
     ...(values.length ? { expected } : {}),
     ...(refund ? { refund } : {}),
     order,

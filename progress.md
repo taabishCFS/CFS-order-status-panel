@@ -204,3 +204,8 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Amounts are the sum of each discount's allocations on the lines, in whole pence. Not exact on a line whose quantity was edited (the same limit as the line discount column).
 - Update Delivery & Services (the six service charges, staff password, update history) is not built: it waits for staff to say how a charge reaches the Shopify order and the VAT rule.
 - Tests: dashboard 118, all suites green, build OK. Not yet tried live.
+
+## Order Detail slice 3b: supplier delivery date (2026-11-21)
+- Setting a line to In Stock (status 4) now stamps the UK date it came in (`supplierDelivered` on the record), with who and when. The stamp stays when the line moves to another status and is replaced if the line goes In Stock again. Status 4 already cleared the expected date. Shown as a "Supplier delivered" column in the Items table.
+- Out-of-stock line tint: NOT built. In the legacy page the tint comes from two product fields stamped on the order line (`inOutStock` = "OUT OF STOCK" and `DueDate`): yellow with a due date, red without. Shopify has no equivalent stamped at order time, so the stock rule and its source need a decision (see the reply to the user).
+- Tests: status extension 120, all suites green, build OK.

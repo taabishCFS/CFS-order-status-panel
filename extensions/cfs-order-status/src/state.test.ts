@@ -140,3 +140,35 @@ describe('applyChange extras (cancel reason, credit note, service remarks, refun
     expect(go(emptyState(), 'lines', IN_STOCK, [BED_A]).refund).toBeUndefined();
   });
 });
+
+describe('applyChange supplier delivery date (status 4)', () => {
+  const IN_STOCK: CfsStatus = { id: 4, label: 'In Stock' };
+  const at = (now: string, state = emptyState(), status: CfsStatus = IN_STOCK, lineIds = [BED_A]) =>
+    applyChange(state, { scope: 'lines', lineIds, status, actor, now, entryId: `s-${n++}` });
+
+  it('stamps the UK date the goods came in on each line set to In Stock', () => {
+    const next = at('2026-11-21T10:00:00Z', emptyState(), IN_STOCK, [BED_A, BED_B]);
+    expect(next.supplierDelivered).toEqual({
+      [BED_A]: { date: '2026-11-21', at: '2026-11-21T10:00:00Z', by: actor },
+      [BED_B]: { date: '2026-11-21', at: '2026-11-21T10:00:00Z', by: actor },
+    });
+    expect(next.schemaVersion).toBe(2);
+  });
+
+  it('uses UK time, so a late evening in summer is already the next day', () => {
+    expect(at('2026-06-30T23:30:00Z').supplierDelivered?.[BED_A].date).toBe('2026-07-01');
+  });
+
+  it('keeps the stamp when the line later moves to another status, and restamps on a second In Stock', () => {
+    const first = at('2026-11-20T10:00:00Z');
+    const moved = at('2026-11-21T10:00:00Z', first, ALLOCATED);
+    expect(moved.supplierDelivered?.[BED_A].date).toBe('2026-11-20');
+    expect(at('2026-11-22T10:00:00Z', moved).supplierDelivered?.[BED_A].date).toBe('2026-11-22');
+  });
+
+  it('does not stamp other statuses or a whole-order save', () => {
+    expect(at('2026-11-21T10:00:00Z', emptyState(), ALLOCATED).supplierDelivered).toBeUndefined();
+    const order = applyChange(emptyState(), { scope: 'order', lineIds: [], status: IN_STOCK, actor, now: '2026-11-21T10:00:00Z', entryId: `o-${n++}` });
+    expect(order.supplierDelivered).toBeUndefined();
+  });
+});

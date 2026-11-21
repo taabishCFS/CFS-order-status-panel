@@ -143,6 +143,7 @@ export default function OrderDetailPage({ id }) {
             <s-table-header format="numeric">Unit price</s-table-header>
             <s-table-header>Expected date</s-table-header>
             <s-table-header>Delivery</s-table-header>
+            <s-table-header>Supplier delivered</s-table-header>
             <s-table-header>Line status</s-table-header>
             <s-table-header format="numeric">Discount</s-table-header>
             <s-table-header format="numeric">Final price</s-table-header>
@@ -159,6 +160,7 @@ export default function OrderDetailPage({ id }) {
                 <s-table-cell>{money(l.unit)}</s-table-cell>
                 <s-table-cell>{dmy(expectedOf(state, l.id))}</s-table-cell>
                 <s-table-cell>{DELIVERY[deliveryOf(state, l.id)] || 'Not set'}</s-table-cell>
+                <s-table-cell>{state.supplierDelivered?.[l.id] ? dmy(state.supplierDelivered[l.id].date) : '—'}</s-table-cell>
                 <s-table-cell>{state.lines[l.id] ? labelFor(state.lines[l.id].statusId) : 'Not set'}</s-table-cell>
                 <s-table-cell>{money(l.discount)}</s-table-cell>
                 <s-table-cell>{money(l.final)}</s-table-cell>
