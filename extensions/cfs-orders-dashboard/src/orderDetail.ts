@@ -172,6 +172,7 @@ const CUSTOMER_QUERY = `#graphql
       phone
       note
       sourceName
+      app { name }
       clientIp
       paymentGatewayNames
       customerJourneySummary { firstVisit { source } }
@@ -204,7 +205,7 @@ export async function loadCustomerBlock(orderId: string, fetchFn: typeof fetch =
       shippingFields: addressFields(o.shippingAddress),
       billingFields: addressFields(o.billingAddress),
       info: {
-        source: o.customerJourneySummary?.firstVisit?.source ?? o.sourceName ?? null,
+        source: o.customerJourneySummary?.firstVisit?.source ?? (o.sourceName && !/^\d+$/.test(o.sourceName) ? o.sourceName : o.app?.name ?? null),
         payment: (o.paymentGatewayNames ?? []).join(', '),
         ip: o.clientIp ?? null,
         customerNote: o.note ?? '',

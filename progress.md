@@ -190,3 +190,4 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Review Eligible / review email state is deferred until the review email exists (needs staff wording and trigger rule).
 - New history scope `contact` (types, labels, archive, text); new files: `order-contact.js`, `order-contact.server.js`, `api.orders.$id.contact.jsx`, dashboard `contact.ts`, `CustomerSection.jsx`. Tests: backend 470, status extension 107, dashboard 115, all passing; builds OK.
 - Not yet tried live in the admin. The province-code field was added to the form and its loader in one step, so that one test was not watched failing first.
+- Fix after first live look: Source no longer shows an app id number (uses the app name, or blank); billing note no longer runs into the text above it.

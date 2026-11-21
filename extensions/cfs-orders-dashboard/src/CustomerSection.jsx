@@ -61,8 +61,10 @@ export default function CustomerSection({ id, orderId, detail, customer, writer,
   return (
     <>
       <s-section heading="Billing address">
-        <AddressRows fields={customer.billingFields} email={customer.email ?? ''} />
-        <s-text color="subdued">Shopify does not let an app change a billing address. Change it in Shopify.</s-text>
+        <s-stack direction="block" gap="base">
+          <AddressRows fields={customer.billingFields} email={customer.email ?? ''} />
+          <s-text color="subdued">Shopify does not let an app change a billing address. Change it in Shopify.</s-text>
+        </s-stack>
       </s-section>
 
       <s-section heading="Shipping address">

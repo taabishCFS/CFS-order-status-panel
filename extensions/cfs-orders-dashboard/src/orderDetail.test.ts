@@ -135,6 +135,12 @@ describe('loadCustomerBlock', () => {
     });
   });
 
+  it('names the app when the sales channel is only a number, and shows nothing when the app is unknown', async () => {
+    const reply = (app: unknown) => vi.fn(async () => ({ json: async () => ({ data: { order: { email: null, phone: null, note: null, sourceName: '341262598145', app, clientIp: null, paymentGatewayNames: [], customerJourneySummary: null, shippingAddress: null, billingAddress: null } } }) }));
+    expect(await loadCustomerBlock(ORDER, asFetch(reply({ name: 'Draft Orders' })))).toMatchObject({ info: { source: 'Draft Orders' } });
+    expect(await loadCustomerBlock(ORDER, asFetch(reply(null)))).toMatchObject({ info: { source: null } });
+  });
+
   it('falls back to the sales channel when there is no traffic source, and to blanks when nothing is known', async () => {
     const f = vi.fn(async () => ({ json: async () => ({ data: { order: { email: null, phone: null, note: null, sourceName: 'web', clientIp: null, paymentGatewayNames: [], customerJourneySummary: null, shippingAddress: null, billingAddress: null } } }) }));
     const c = await loadCustomerBlock(ORDER, asFetch(f));
