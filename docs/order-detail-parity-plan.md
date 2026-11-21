@@ -7,11 +7,11 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Legacy block | Today | Slice |
 |---|---|---|
 | Order number heading | Done (Order ID: #name) | done |
-| Billing and Shipping address, pencil to edit, tick to save (name, email, address, city, county, country, postcode, phone) | Read-only text | 2 |
-| Order information: date and time, order status, source, payment gateway | Date and status only | 2 |
-| Session and journey: IP, session id | Not shown | 2 (IP only, if Shopify has it) |
-| Review Eligible? yes/no and "Review email sent?" | Missing | 2 |
-| Customer Order Instructions (the customer's own note, read-only) | Missing | 2 |
+| Billing and Shipping address, pencil to edit, tick to save (name, email, address, city, county, country, postcode, phone) | Shipping edit done (county kept as is, Shopify wants its own codes); billing read-only because Shopify apps cannot change it | 2 done |
+| Order information: date and time, order status, source, payment gateway | Done | 2 done |
+| Session and journey: IP, session id | IP shown; Shopify gives no session id | 2 done |
+| Review Eligible? yes/no and "Review email sent?" | Missing; waits for the review email (wording and trigger rule from staff) | later |
+| Customer Order Instructions (the customer's own note, read-only) | Done | 2 done |
 | Order/Delivery Instructions (staff, prints on delivery note) with ADD/UPDATE | Done (Notes section) | done |
 | Supplier Invoice Update: date, number, amount, paid per line | Backend done; screen in progress | 1 |
 | Refund info: REFUND checkbox | Missing | 3 |

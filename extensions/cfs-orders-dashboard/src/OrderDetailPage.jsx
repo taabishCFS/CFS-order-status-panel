@@ -5,6 +5,7 @@ import { deliveryOf, expectedOf } from '../../cfs-order-status/src/lineInfo';
 import { labelFor } from '../../cfs-order-status/src/statuses';
 import { callBackend } from './backend';
 import ConfigurationSection from './ConfigurationSection.jsx';
+import CustomerSection from './CustomerSection.jsx';
 import DeliverySection from './DeliverySection.jsx';
 import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
@@ -111,23 +112,7 @@ export default function OrderDetailPage({ id }) {
         </s-stack>
       </s-section>
 
-      <s-section heading="Customer">
-        {!customer && <s-text>Loading…</s-text>}
-        {customer?.restricted && <s-text>Customer details restricted.</s-text>}
-        {customer && !customer.restricted && (
-          <s-stack direction="inline" gap="large">
-            <s-stack direction="block" gap="small-300">
-              <s-text type="strong">Shipping</s-text>
-              {customer.shipping.map((l, i) => <s-text key={i}>{l}</s-text>)}
-              {customer.email && <s-text>{customer.email}</s-text>}
-            </s-stack>
-            <s-stack direction="block" gap="small-300">
-              <s-text type="strong">Billing</s-text>
-              {customer.billing.map((l, i) => <s-text key={i}>{l}</s-text>)}
-            </s-stack>
-          </s-stack>
-        )}
-      </s-section>
+      <CustomerSection id={id} orderId={orderId} detail={detail} customer={customer} writer={writer} verified={verified} reload={reload} setNotice={setNotice} statusLabel={state.order ? labelFor(state.order.statusId) : 'Not set'} />
 
       <s-section heading="Saving as">
         {verified && <s-text>Verified as {verified.name}</s-text>}

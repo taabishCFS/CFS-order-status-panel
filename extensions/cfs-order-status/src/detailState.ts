@@ -65,6 +65,13 @@ export function applyConfigurationChange(
   return { ...state, schemaVersion: 2, history: withEntry(state, input, 'configuration', { values, note: input.note }) };
 }
 
+// Records that contact details (email, phone, shipping address) were changed. The change itself is made by the backend.
+export function applyContactChange(state: StatusState, input: Meta & { changes: { label: string; from: string | null; to: string | null }[] }): StatusState {
+  if (input.changes.length === 0) throw new Error('There is nothing to record');
+  const values: ValueChange[] = input.changes.map((c) => ({ target: c.label, from: c.from, to: c.to }));
+  return { ...state, schemaVersion: 2, history: withEntry(state, input, 'contact', { values }) };
+}
+
 export function applyInstructions(state: StatusState, input: Meta & { text: string }): StatusState {
   const text = input.text.trim();
   if (text.length > INSTRUCTIONS_MAX) throw new Error(`Instructions are limited to ${INSTRUCTIONS_MAX} characters`);

@@ -1,7 +1,7 @@
 import type { Actor } from './identity';
 
 export type StatusScope = 'order' | 'lines';
-export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration';
+export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration' | 'contact';
 
 export interface Stamp {
   statusId: number;
@@ -17,7 +17,8 @@ export interface Change {
   toLabel: string;
 }
 
-// A change to a value other than a status (expected date, delivery outcome, instructions).
+// A change to a value other than a status (expected date, delivery outcome, instructions). For a
+// contact change the target is the label of the detail (Email, Shipping address) instead of a line.
 export interface ValueChange {
   target: 'order' | string;
   from: string | null;

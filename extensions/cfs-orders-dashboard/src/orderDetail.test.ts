@@ -119,7 +119,26 @@ describe('loadCustomerBlock', () => {
   it('returns email and address lines without blanks', async () => {
     const f = vi.fn(async () => ({ json: async () => ({ data: { order: { email: 'a@example.com', shippingAddress: address, billingAddress: null } } }) }));
     const c = await loadCustomerBlock(ORDER, asFetch(f));
-    expect(c).toEqual({ restricted: false, email: 'a@example.com', shipping: ['A B', '1 High St', 'Leeds', 'LS1 1AA', 'United Kingdom'], billing: [] });
+    expect(c).toMatchObject({ restricted: false, email: 'a@example.com', shipping: ['A B', '1 High St', 'Leeds', 'LS1 1AA', 'United Kingdom'], billing: [] });
+  });
+
+  it('returns editable address fields, phone and the order information block', async () => {
+    const full = { name: 'A B', address1: '1 High St', address2: null, city: 'Leeds', province: 'West Yorkshire', provinceCode: 'WYK', zip: 'LS1 1AA', country: 'United Kingdom', countryCodeV2: 'GB', phone: '07700900123' };
+    const f = vi.fn(async () => ({ json: async () => ({ data: { order: { email: 'a@example.com', phone: null, note: 'Leave in the porch', sourceName: 'web', clientIp: '2a02::1', paymentGatewayNames: ['Kody', 'gift_card'], customerJourneySummary: { firstVisit: { source: 'Adwords' } }, shippingAddress: full, billingAddress: null } } }) }));
+    const c = await loadCustomerBlock(ORDER, asFetch(f));
+    expect(c).toMatchObject({
+      restricted: false,
+      phone: '07700900123',
+      shippingFields: { name: 'A B', address1: '1 High St', address2: '', city: 'Leeds', province: 'West Yorkshire', provinceCode: 'WYK', zip: 'LS1 1AA', country: 'United Kingdom', countryCode: 'GB', phone: '07700900123' },
+      billingFields: null,
+      info: { source: 'Adwords', payment: 'Kody, gift_card', ip: '2a02::1', customerNote: 'Leave in the porch' },
+    });
+  });
+
+  it('falls back to the sales channel when there is no traffic source, and to blanks when nothing is known', async () => {
+    const f = vi.fn(async () => ({ json: async () => ({ data: { order: { email: null, phone: null, note: null, sourceName: 'web', clientIp: null, paymentGatewayNames: [], customerJourneySummary: null, shippingAddress: null, billingAddress: null } } }) }));
+    const c = await loadCustomerBlock(ORDER, asFetch(f));
+    expect(c).toMatchObject({ phone: null, info: { source: 'web', payment: '', ip: null, customerNote: '' } });
   });
 
   it('is restricted when Shopify refuses access, whether by error or by a thrown request', async () => {

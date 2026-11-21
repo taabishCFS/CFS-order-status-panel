@@ -136,9 +136,10 @@ describe('loadOlderHistory', () => {
       values: [{ target: 'gid://shopify/LineItem/1', from: null, to: 'confirmed' }],
     };
     const configuration: HistoryEntry = { ...entry('c1'), scope: 'configuration', changes: [], values: [{ target: 'gid://shopify/LineItem/1', from: 'a', to: 'b' }], note: 'n' };
+    const contact: HistoryEntry = { ...entry('k1'), scope: 'contact', changes: [], values: [{ target: 'Email', from: 'a', to: 'b' }] };
     const bogus = { ...entry('b1'), scope: 'bogus' } as unknown as HistoryEntry;
-    const f = reply(page([note, bogus, delivery, configuration]));
-    expect((await loadOlderHistory(ORDER, {}, asFetch(f))).entries).toEqual([note, delivery, configuration]);
+    const f = reply(page([note, bogus, delivery, configuration, contact]));
+    expect((await loadOlderHistory(ORDER, {}, asFetch(f))).entries).toEqual([note, delivery, configuration, contact]);
   });
 
   it('throws the GraphQL error message', async () => {

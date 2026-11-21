@@ -9,6 +9,7 @@ const LABELS: Record<Scope, string> = {
   note: 'Note',
   instructions: 'Instructions',
   configuration: 'Configuration',
+  contact: 'Contact details',
 };
 
 export const scopeLabel = (scope: Scope): string => LABELS[scope];
@@ -31,6 +32,9 @@ export function describeEntry(entry: HistoryEntry, titleOf: (target: string) => 
   if (entry.scope === 'configuration') {
     for (const v of entry.values ?? []) out.push(`${name(v.target)}: options ${v.from ?? 'not recorded'} → ${v.to ?? 'not recorded'}`);
     if (entry.note) out.push(entry.note);
+  }
+  if (entry.scope === 'contact') {
+    for (const v of entry.values ?? []) out.push(`${v.target}: ${v.from ?? 'none'} → ${v.to ?? 'none'}`);
   }
   if (entry.scope === 'lines') {
     for (const v of entry.values ?? []) if (v.to === null && v.from) out.push(`${name(v.target)}: expected date ${v.from} cleared`);

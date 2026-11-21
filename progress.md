@@ -181,3 +181,12 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Plan for the whole legacy Order Detail screen (from five legacy screenshots) saved as `docs/order-detail-parity-plan.md`: slices 1 supplier invoice, 2 addresses and order info, 3 status extras and tracking, 4 totals and services, 5 line actions, 6 Process Order, 7 delivery booking (parked), 8 header documents.
 - Slice 1 built: table `LineSupplierInvoice` (migration `20261122110000_line_supplier_invoice`), `api/orders/:id/supplier-invoices` (GET all, POST one line, verified staff), "Supplier Invoice Update" collapsible section on Order Detail (date, number, amount, paid, Save per line), and "Supp. Invoice Paid" in Orders by Brand now reads the saved flag instead of always "No". Last saver and time are kept on each record; no history entry yet.
 - Export 2 and 3 now print `---` for a missing expected date (legacy behaviour).
+
+## Order Detail slice 2: customer and order information (2026-11-21)
+- The Customer area now follows the legacy layout: Billing address, Shipping address, Order information (date and time, status, source, payment, IP) and Customer order instructions (the customer's own note).
+- Source is the traffic source Shopify records (falls back to the sales channel); IP is `clientIp`. Shopify gives no session id, so that row is left out.
+- Shipping address, email and phone can be edited by verified staff: `POST api/orders/:id/contact` calls Shopify `orderUpdate`, then the page records a "Contact details" history entry (old and new text). If Shopify accepts but the history save fails, a warning says so.
+- Limits found against the Shopify schema: `orderUpdate` cannot change the billing address, and takes a county only as an ISO province code, so billing is read-only and the county is kept as it is.
+- Review Eligible / review email state is deferred until the review email exists (needs staff wording and trigger rule).
+- New history scope `contact` (types, labels, archive, text); new files: `order-contact.js`, `order-contact.server.js`, `api.orders.$id.contact.jsx`, dashboard `contact.ts`, `CustomerSection.jsx`. Tests: backend 470, status extension 107, dashboard 115, all passing; builds OK.
+- Not yet tried live in the admin. The province-code field was added to the form and its loader in one step, so that one test was not watched failing first.

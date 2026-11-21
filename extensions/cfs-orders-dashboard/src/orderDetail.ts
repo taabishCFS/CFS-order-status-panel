@@ -30,9 +30,39 @@ export interface OrderDetail {
   digest: string | null;
 }
 
+// An address as the edit form holds it: every value is text, blank when Shopify has none.
+export interface AddressFields {
+  name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  province: string;
+  provinceCode: string;
+  zip: string;
+  country: string;
+  countryCode: string;
+  phone: string;
+}
+
+export interface OrderInfo {
+  source: string | null;
+  payment: string;
+  ip: string | null;
+  customerNote: string;
+}
+
 export type CustomerBlock =
   | { restricted: true }
-  | { restricted: false; email: string | null; shipping: string[]; billing: string[] };
+  | {
+      restricted: false;
+      email: string | null;
+      phone: string | null;
+      shipping: string[];
+      billing: string[];
+      shippingFields: AddressFields | null;
+      billingFields: AddressFields | null;
+      info: OrderInfo;
+    };
 
 type MoneySet = { shopMoney: { amount: string; currencyCode: string } } | null | undefined;
 
@@ -134,11 +164,17 @@ export async function loadOrderDetail(orderId: string, fetchFn: typeof fetch = f
   };
 }
 
-const ADDRESS = 'name address1 address2 city zip country';
+const ADDRESS = 'name address1 address2 city province provinceCode zip country countryCodeV2 phone';
 const CUSTOMER_QUERY = `#graphql
   query CfsOrderCustomer($id: ID!) {
     order(id: $id) {
       email
+      phone
+      note
+      sourceName
+      clientIp
+      paymentGatewayNames
+      customerJourneySummary { firstVisit { source } }
       shippingAddress { ${ADDRESS} }
       billingAddress { ${ADDRESS} }
     }
@@ -147,13 +183,33 @@ const CUSTOMER_QUERY = `#graphql
 const addressLines = (a: Record<string, string | null> | null): string[] =>
   a ? ['name', 'address1', 'address2', 'city', 'zip', 'country'].map((k) => a[k]).filter((v): v is string => !!v) : [];
 
+function addressFields(a: Record<string, string | null> | null): AddressFields | null {
+  if (!a) return null;
+  const t = (k: string) => a[k] ?? '';
+  return { name: t('name'), address1: t('address1'), address2: t('address2'), city: t('city'), province: t('province'), provinceCode: t('provinceCode'), zip: t('zip'), country: t('country'), countryCode: t('countryCodeV2'), phone: t('phone') };
+}
+
 // Customer details are protected data. Any refusal reads as "restricted"; nothing is logged or stored.
 export async function loadCustomerBlock(orderId: string, fetchFn: typeof fetch = fetch): Promise<CustomerBlock> {
   try {
     const body = await post(fetchFn, CUSTOMER_QUERY, { id: orderId });
     if (body.errors?.length || !body.data?.order) return { restricted: true };
     const o = body.data.order;
-    return { restricted: false, email: o.email ?? null, shipping: addressLines(o.shippingAddress), billing: addressLines(o.billingAddress) };
+    return {
+      restricted: false,
+      email: o.email ?? null,
+      phone: o.phone || o.shippingAddress?.phone || o.billingAddress?.phone || null,
+      shipping: addressLines(o.shippingAddress),
+      billing: addressLines(o.billingAddress),
+      shippingFields: addressFields(o.shippingAddress),
+      billingFields: addressFields(o.billingAddress),
+      info: {
+        source: o.customerJourneySummary?.firstVisit?.source ?? o.sourceName ?? null,
+        payment: (o.paymentGatewayNames ?? []).join(', '),
+        ip: o.clientIp ?? null,
+        customerNote: o.note ?? '',
+      },
+    };
   } catch {
     return { restricted: true };
   }

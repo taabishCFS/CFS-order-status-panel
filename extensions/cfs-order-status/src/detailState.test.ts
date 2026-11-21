@@ -3,6 +3,7 @@ import {
   INSTRUCTIONS_MAX,
   NOTE_MAX,
   applyConfigurationChange,
+  applyContactChange,
   applyDelivery,
   applyExpectedDate,
   applyInstructions,
@@ -168,6 +169,22 @@ describe('applyChange status 4 clears the expected date', () => {
     const s = save(withDate([A]), OTHER, [A]);
     expect(s.expected?.[A]?.date).toBe('2026-12-01');
     expect(s.history[0].values).toBeUndefined();
+  });
+});
+
+describe('applyContactChange', () => {
+  it('adds one history entry listing each changed detail with its old and new value, and changes no status', () => {
+    const before = withStatuses({ [A]: 4 });
+    const next = applyContactChange(before, { ...txt('x'), changes: [{ label: 'Email', from: 'a@old.com', to: 'a@new.com' }, { label: 'Shipping address', from: '1 High St, Leeds', to: '2 Low Rd, York' }] });
+    expect(next.history).toHaveLength(1);
+    expect(next.history[0]).toMatchObject({ scope: 'contact', changes: [], values: [{ target: 'Email', from: 'a@old.com', to: 'a@new.com' }, { target: 'Shipping address', from: '1 High St, Leeds', to: '2 Low Rd, York' }] });
+    expect(next.lines).toEqual(before.lines);
+    expect(next.schemaVersion).toBe(2);
+    expect(before.history).toHaveLength(0);
+  });
+
+  it('refuses an empty list of changes', () => {
+    expect(() => applyContactChange(withStatuses({}), { ...txt('x'), changes: [] })).toThrow(/nothing/i);
   });
 });
 

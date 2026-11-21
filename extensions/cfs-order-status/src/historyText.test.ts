@@ -16,6 +16,7 @@ describe('scopeLabel', () => {
     expect(scopeLabel('note')).toBe('Note');
     expect(scopeLabel('instructions')).toBe('Instructions');
     expect(scopeLabel('configuration')).toBe('Configuration');
+    expect(scopeLabel('contact')).toBe('Contact details');
   });
 });
 
@@ -53,6 +54,11 @@ describe('describeEntry', () => {
     expect(describeEntry(entry({ scope: 'instructions', values: [{ target: 'order', from: null, to: 'x' }] }), titleOf)).toEqual([
       'Instructions updated',
     ]);
+  });
+
+  it('describes a contact change as one line per detail, with none for a blank old value', () => {
+    const e = entry({ scope: 'contact', values: [{ target: 'Email', from: null, to: 'a@new.com' }, { target: 'Shipping address', from: '1 High St', to: '2 Low Rd' }] });
+    expect(describeEntry(e, titleOf)).toEqual(['Email: none → a@new.com', 'Shipping address: 1 High St → 2 Low Rd']);
   });
 
   it('describes a configuration change: the line, old and new options, and the note', () => {
