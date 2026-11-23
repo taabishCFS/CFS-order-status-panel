@@ -84,6 +84,7 @@ export default function OrderDetailPage({ id }) {
     return (
       <s-page heading="Order">
         <s-link href="/">← Orders</s-link>
+        <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
         {notice && <s-banner tone={notice.tone} heading="Could not load this order">{notice.text}</s-banner>}
         {loading && <s-spinner accessibilityLabel="Loading order" />}
       </s-page>
@@ -123,6 +124,7 @@ export default function OrderDetailPage({ id }) {
   return (
     <s-page heading={detail.name}>
       <s-link href="/">← Orders</s-link>
+        <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="primary-action" href={`shopify://admin/orders/${id}`}>Open in Shopify</s-button>
       <s-button slot="secondary-actions" onClick={reload} loading={loading || undefined}>Refresh</s-button>
 

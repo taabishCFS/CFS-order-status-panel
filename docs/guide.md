@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 5 (23 November 2026)
+**Guide version:** 6 (23 November 2026)
 
 ## Before you start
 
@@ -30,7 +30,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 11 | Send one email to many customers | Ready, not yet tried |
 | 12 | Change a made-to-order product | Ready |
 | 13 | Download the Xero invoice report and the Delivery report | Ready |
-| 14 | Say which brands are paid on credit or pro-forma | Ready, not yet tried |
+| 14 | Say which brands are paid on credit or pro-forma | Ready |
+| 15 | Find every page from the Dashboard | Ready, not yet tried |
 
 ---
 
@@ -290,7 +291,20 @@ Some suppliers are paid on **credit** (we pay later) and some are paid **pro-for
 2. Next to each brand, choose **Credit**, **Pro-forma** or **Not set**.
 3. The change is saved straight away. A green message confirms it.
 
+![The Brand terms page](guide-images/14-brand-terms.jpg)
+
 **Good to know:** only signed-in staff can change this. A brand appears in the list once it has an order.
+
+---
+
+## 15. The Dashboard
+
+The Dashboard is a page with one big card for every part of the app, grouped as **Orders**, **Money** and **Settings**. Each card says in a sentence what the page is for.
+
+1. Press **Dashboard** at the top of any page.
+2. Click the card you want.
+
+If you ever feel lost, press **Dashboard** and start again.
 
 ---
 
@@ -314,6 +328,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 23 Nov 2026 | 6 | Added the Dashboard page |
 | 23 Nov 2026 | 5 | Added Brand terms (credit or pro-forma per brand) |
 | 23 Nov 2026 | 4 | Added the Reports page: Xero VAT Invoice Report and Delivery Report |
 | 23 Nov 2026 | 3 | Added pictures for Delivery confirmation and Configuration, and the Remove selected step |

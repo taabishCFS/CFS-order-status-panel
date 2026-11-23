@@ -81,6 +81,7 @@ export default function EmailTemplatesPage() {
   return (
     <s-page heading="Email templates">
       <s-link href="/">← Orders</s-link>
+      <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
 
       {loadError && <s-banner tone="critical" heading="Could not load the templates">{loadError}</s-banner>}
       {!list && !loadError && <s-spinner accessibilityLabel="Loading templates" />}

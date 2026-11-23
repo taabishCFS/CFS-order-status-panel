@@ -32,6 +32,7 @@ export default function BrandTermsPage() {
 
   return (
     <s-page heading="Brand terms">
+      <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="secondary-actions" href="/reports">Reports</s-button>
       <s-button slot="secondary-actions" href="/">Orders</s-button>
 

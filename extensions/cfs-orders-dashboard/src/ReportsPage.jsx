@@ -24,6 +24,7 @@ export default function ReportsPage() {
 
   return (
     <s-page heading="Reports">
+      <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="secondary-actions" href="/">Orders</s-button>
       <s-button slot="secondary-actions" href="/orders-by-brand">Orders by Brand</s-button>
       <s-button slot="secondary-actions" href="/refunds">Refund Orders List</s-button>

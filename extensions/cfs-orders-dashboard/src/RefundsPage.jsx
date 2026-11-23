@@ -109,6 +109,7 @@ export default function RefundsPage() {
 
   return (
     <s-page heading="Refundable Orders">
+      <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="secondary-actions" href="/">Orders</s-button>
       <s-button slot="secondary-actions" href="/orders-by-brand">Orders by Brand</s-button>
       <s-button slot="secondary-actions" href="/reports">Reports</s-button>
