@@ -291,3 +291,7 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - VAT invoice follows the legacy rule: VAT is one sixth of the grand total, subtotal shown divided by 1.2. Services and delivery appear as rows. Discounts are one column and row, with the coupon code named (legacy had offer and coupon columns).
 - Not built: the legacy reprint password, the assigned container text and box counts (blank lines to fill by hand), per-site header beyond the email-site table (CFS defaults when the site is unknown).
 - Questions added: staff list Q30 to Q33 and PDF questions 20 to 23 (PDF is now 27 questions; mapping updated). Tests: backend 613, status extension 135, dashboard 167; build OK; not tried live (needs the Render deploy, then `shopify app deploy`).
+
+## History stayed empty after delivery edits: cause found (2026-11-23)
+- Cause: the history write needs to know who is saving. Shopify's own staff lookup in the extension returns nothing in this app, so the write fell back to a typed name and, with the box empty, refused with "Enter your name". Earlier the panel hid that reason; the page also never used the staff member the backend had already verified. The delivery, product and other changes were made on the Shopify order but not recorded.
+- Fix: `useWriter` now uses the verified staff member (from the backend) when Shopify's own lookup gives nothing, and the typed-name box is hidden when a verified member exists. All Order Detail saves benefit. The two earlier delivery edits are not in the history and cannot be added.

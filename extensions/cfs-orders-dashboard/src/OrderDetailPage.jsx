@@ -56,6 +56,7 @@ export default function OrderDetailPage({ id }) {
   const writer = useWriter({
     orderId,
     detail,
+    verified,
     refresh,
     setNotice,
     afterSave: () => {
@@ -138,7 +139,7 @@ export default function OrderDetailPage({ id }) {
         {verified && <s-text>Verified as {verified.name}</s-text>}
         {writer.staff
           ? <s-text>{writer.staff.name}</s-text>
-          : writer.staff === null && (
+          : writer.staff === null && !verified && (
             <s-text-field label="Your name (shown as unverified in the history)" value={writer.name} onInput={(e) => writer.setName(e.currentTarget.value)} />
           )}
       </s-section>
