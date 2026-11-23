@@ -3,11 +3,11 @@ import { applyRefundRequest } from '../../cfs-order-status/src/detailState';
 import { REASON_OPTIONS, addRefund, fullRefundMinor, loadRefunds, moneyText, refundSummary } from './refunds';
 
 const newKey = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-const blank = () => ({ clientKey: newKey(), reason: '', type: '', amount: '', lineIds: [], notes: '' });
+const blank = () => ({ clientKey: newKey(), reason: '', type: '', amount: '', notes: '' });
 const when = (iso) => new Date(iso).toLocaleString('en-GB');
 
 // Payment & Refund: tick REFUND to ask for a refund. The request goes on a list for accounts; no money moves here.
-export default function RefundSection({ id, detail, writer, verified, setNotice }) {
+export default function RefundSection({ id, detail, picked, writer, verified, setNotice }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(blank);
   const [list, setList] = useState(null); // { requests, refundableMinor }
@@ -21,13 +21,14 @@ export default function RefundSection({ id, detail, writer, verified, setNotice 
   useEffect(() => { reload(); }, [id]);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.currentTarget.value }));
-  const toggleLine = (lineId, on) => setForm((f) => ({ ...f, lineIds: on ? [...f.lineIds, lineId] : f.lineIds.filter((x) => x !== lineId) }));
+  // The products are the ones ticked in the Items table above.
+  const lineIds = picked;
   const titleOf = (lineId) => detail.lines.find((l) => l.id === lineId)?.title ?? 'Removed line';
 
   async function submit() {
     setBusy(true);
     setError(null);
-    const res = await addRefund(id, { ...form, amount: shownAmount });
+    const res = await addRefund(id, { ...form, lineIds, amount: shownAmount });
     if (!res.ok) { setBusy(false); setError(res.message); return; }
     const r = res.request;
     // The request is saved. Record it in the history; if that fails the request still stands.
@@ -41,7 +42,7 @@ export default function RefundSection({ id, detail, writer, verified, setNotice 
 
   // Full Refund: the amount is worked out from the ticked products (everything refundable when none are ticked).
   // Part Refund: staff type the amount.
-  const full = form.type === 'full' && list ? fullRefundMinor(detail.lines, form.lineIds, list.refundableMinor) : null;
+  const full = form.type === 'full' && list ? fullRefundMinor(detail.lines, lineIds, list.refundableMinor) : null;
   const shownAmount = full !== null ? moneyText(full) : form.amount;
   const ready = form.reason && form.type && shownAmount !== '' && !busy && verified;
 
@@ -59,10 +60,10 @@ export default function RefundSection({ id, detail, writer, verified, setNotice 
               {REASON_OPTIONS.map((r) => <s-option key={r.code} value={r.code}>{r.label}</s-option>)}
             </s-select>
             <s-stack direction="block" gap="small-300">
-              <s-text type="strong">Product(s)</s-text>
-              {detail.lines.map((l) => (
-                <s-checkbox key={l.id} label={l.title} checked={form.lineIds.includes(l.id)} onChange={(e) => toggleLine(l.id, e.currentTarget.checked)} />
-              ))}
+              <s-text type="strong">Product(s) to refund</s-text>
+              {lineIds.length === 0
+                ? <s-text color="subdued">No products ticked: the whole order is refunded. To refund only some, tick them in the Items table above.</s-text>
+                : lineIds.map((lid) => <s-text key={lid}>• {titleOf(lid)}</s-text>)}
             </s-stack>
             <s-select label="Refund type" value={form.type} onChange={set('type')}>
               <s-option value="">Select Refund Type</s-option>
@@ -75,7 +76,7 @@ export default function RefundSection({ id, detail, writer, verified, setNotice 
               readOnly={full !== null || undefined}
               onInput={set('amount')}
               details={
-                full !== null ? (form.lineIds.length ? 'Worked out from the ticked products, after discount.' : 'Everything still refundable. Tick products to refund only those.')
+                full !== null ? (lineIds.length ? 'Worked out from the ticked products, after discount.' : 'Everything still refundable. Tick products to refund only those.')
                 : form.type === 'full' ? 'The price of a ticked product could not be worked out. Enter the amount.'
                 : form.type === 'part' ? 'Enter the amount to refund.' : undefined
               }

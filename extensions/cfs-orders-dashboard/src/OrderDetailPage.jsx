@@ -175,7 +175,10 @@ export default function OrderDetailPage({ id }) {
             {lines.map((l) => (
               <s-table-row key={l.id}>
                 <s-table-cell>
-                  <s-checkbox label={`Select ${l.title}`} labelAccessibilityVisibility="exclusive" checked={picked.includes(l.id)} onChange={(e) => toggle(l.id, e.currentTarget.checked)} />
+                  {/* A configuration price line belongs to its product; it is not ticked or refunded on its own. */}
+                  {!/\[cfg:\d+:v\d+\]/.test(l.title) && (
+                    <s-checkbox label={`Select ${l.title}`} labelAccessibilityVisibility="exclusive" checked={picked.includes(l.id)} onChange={(e) => toggle(l.id, e.currentTarget.checked)} />
+                  )}
                 </s-table-cell>
                 <s-table-cell>{l.title}{l.variantTitle ? ` (${l.variantTitle})` : ''}</s-table-cell>
                 <s-table-cell>{l.sku || 'Unavailable'}</s-table-cell>
@@ -195,6 +198,8 @@ export default function OrderDetailPage({ id }) {
 
       <ProductSection id={id} lines={lines} picked={picked} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
       <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
+
+      <RefundSection id={id} detail={detail} picked={picked} writer={writer} verified={verified} setNotice={setNotice} />
 
       <StatusSection orderId={orderId} detail={detail} picked={picked} loading={loading} loadFailed={loadFailed} writer={writer} setNotice={setNotice} emails={emails} />
 
@@ -223,7 +228,6 @@ export default function OrderDetailPage({ id }) {
       <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
 
-      <RefundSection id={id} detail={detail} writer={writer} verified={verified} setNotice={setNotice} />
 
       <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />
 

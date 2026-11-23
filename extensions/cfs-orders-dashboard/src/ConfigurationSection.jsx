@@ -109,7 +109,7 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
   if (!data) return <s-section heading="Configuration"><s-text>Loading…</s-text></s-section>;
   if (data.error) return <s-section heading="Configuration"><s-banner tone="warning">Configuration is unavailable right now ({data.error}).</s-banner></s-section>;
   if (data.reason) return <s-section heading="Configuration"><s-text>{reasonText(data.reason)}</s-text></s-section>;
-  if (data.lines.every((l) => !l.configuration)) return null;
+  if (data.lines.every((l) => !l.configuration)) return <s-section heading="Configuration"><s-text color="subdued">None of the products on this order was bought through the configurator, so there is nothing to change here.</s-text></s-section>;
 
   const ready = writer.ready && Boolean(verified) && !busy;
 

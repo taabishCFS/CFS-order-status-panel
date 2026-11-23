@@ -317,3 +317,5 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 ## Order Detail page tidied (2026-11-23)
 - Sections reordered into the working flow: Documents, Order (now includes "Saving as"), Customer, Items, Add New Product, Configuration changes, Status, Totals, Services, Expected date, Delivery, Payment & Refund, Notes, More tools, History.
 - Rarely used panels (Supplier invoice, Tracking, Email log) sit behind one "Show more tools" toggle, closed by default. No behaviour changed; tests 171, build OK.
+- Order Detail follow-up: Payment & Refund moved up under Configuration (before Status). The refund form no longer has its own product checkboxes: it uses the products ticked in the Items table (shown as a list, or "whole order" when none are ticked). The Configuration panel now says why it is empty (no product on the order was bought through the configurator) instead of disappearing. Tests 171, build OK.
+- Items table: configuration price lines (`[cfg:...]`) no longer have a tick box, so they cannot be picked for a refund, status change or product swap on their own.
