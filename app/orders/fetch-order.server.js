@@ -26,6 +26,10 @@ const ORDER_QUERY = `#graphql
       totalDiscountsSet { ${MONEY} }
       totalShippingPriceSet { ${MONEY} }
       totalPriceSet { ${MONEY} }
+      currentSubtotalPriceSet { ${MONEY} }
+      currentTotalDiscountsSet { ${MONEY} }
+      currentShippingPriceSet { ${MONEY} }
+      currentTotalPriceSet { ${MONEY} }
       ${LINES}
     }
   }`;

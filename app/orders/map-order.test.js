@@ -4,6 +4,14 @@ import { mapOrder, siteOf } from "./map-order.js";
 
 const money = (amount) => ({ shopMoney: { amount, currencyCode: "GBP" } });
 
+describe("mapOrder after an order edit", () => {
+  it("uses the current amounts, not the ones the order was placed at", () => {
+    const { order } = mapOrder("s.myshopify.com", gqlOrder({ currentTotalPriceSet: money("293.0"), currentSubtotalPriceSet: money("273.0"), currentShippingPriceSet: money("20.0"), currentTotalDiscountsSet: money("0.0") }));
+    expect(order.total.minor).toBe(29300);
+    expect(order.subtotal.minor).toBe(27300);
+  });
+});
+
 describe("mapOrder", () => {
   it("turns money strings into minor units with the currency", () => {
     const { order, lines } = mapOrder("s.myshopify.com", gqlOrder());
