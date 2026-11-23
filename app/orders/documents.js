@@ -14,6 +14,7 @@ export const DELIVERED_STATUS_ID = 6;
 export const statusName = (id) => statuses.find((s) => s.id === id)?.label ?? "Not set";
 export const mdyDate = (iso) => new Date(iso).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric", timeZone: "UTC" });
 export const dmyDate = (iso) => new Date(iso).toLocaleDateString("en-GB", { timeZone: "UTC" });
+const CONFIG_MARKER = /\[cfg:(\d+):v\d+\]/;
 const SERVICE_MARKER = /\s*\[svc:([a-z_]+)\]/;
 
 export const COMPANY = {
@@ -55,10 +56,18 @@ export function shapeDocOrder(o, stateJson) {
   const apps = o.discountApplications?.nodes ?? [];
   const lines = [];
   const services = [];
+  // A configuration change is a separate price-difference line in Shopify. On the documents it is folded into the product it belongs to.
+  const folds = new Map();
+  for (const l of o.lineItems.nodes) {
+    const m = CONFIG_MARKER.exec(l.title);
+    if (m && l.currentQuantity > 0) folds.set(m[1], (folds.get(m[1]) ?? 0) + money(l.originalUnitPriceSet) * l.currentQuantity);
+  }
   for (const l of o.lineItems.nodes) {
     if (l.currentQuantity < 1) continue;
+    if (CONFIG_MARKER.test(l.title)) continue;
     const marker = SERVICE_MARKER.exec(l.title);
-    const unit = money(l.originalUnitPriceSet);
+    const folded = folds.get(String(l.id).split("/").pop()) ?? 0;
+    const unit = money(l.originalUnitPriceSet) + Math.round(folded / l.currentQuantity);
     if (marker) {
       services.push({ label: SERVICES.find((s) => s.key === marker[1])?.label ?? l.title.replace(SERVICE_MARKER, ""), minor: unit * l.currentQuantity });
       continue;

@@ -309,3 +309,7 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Payment & Refund: choosing Full Refund now fills the Amount by itself, like Shopify: the ticked products at their final price (after discount), or everything still refundable when none are ticked, never above what is still refundable. The field is read-only for a full refund. If a ticked product has no reliable price (its quantity was edited) the field opens for typing.
 - Part Refund: staff type the amount (the button stays off until they do).
 - Tests: 171 dashboard (4 new for `fullRefundMinor`); build OK.
+
+- Refund payment question: PDF question 3 now sets out both options (record only, or the system creates the refund in Shopify) with follow-ups on restock, email, delivery/service charges and who may press Refunded. Staff list Q35. Behaviour built so far: record only. PDF regenerated.
+
+- Configuration change lines are now hidden on the invoices, Save PDF and delivery note and folded into the product they belong to (matched by the `[cfg:<line id>:vN]` marker in the title), so the product shows its current price. The separate lines stay in Shopify admin. Totals are unchanged.

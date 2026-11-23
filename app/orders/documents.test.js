@@ -39,6 +39,17 @@ describe("shapeDocOrder", () => {
   });
 });
 
+describe("configuration changes", () => {
+  it("folds the price-difference line into its product and hides the line", () => {
+    const cfg = line({ id: "gid://shopify/LineItem/2", title: "Configuration change v2: Size: King [cfg:1:v2]", originalUnitPriceSet: money("25.0"), discountAllocations: [], customAttributes: [], variantTitle: null });
+    const d = shapeDocOrder(order({ lineItems: { nodes: [line({ id: "gid://shopify/LineItem/1", discountAllocations: [] }), cfg] }, currentTotalPriceSet: money("125.0") }), null);
+    expect(d.lines).toHaveLength(1);
+    expect(d.lines[0]).toMatchObject({ unitMinor: 12500, totalMinor: 12500, finalMinor: 12500 });
+    expect(d.subtotalMinor).toBe(12500);
+    expect(d.services).toEqual([]);
+  });
+});
+
 describe("deliveryNoteAllowed", () => {
   const base = shapeDocOrder(order(), state);
   it("allows a paid order with a line in a printable status", () => expect(deliveryNoteAllowed(base)).toEqual({ ok: true }));
