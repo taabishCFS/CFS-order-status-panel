@@ -8,6 +8,12 @@ export const action = async ({ request }) => {
   if (request.method !== "POST") return cors(new Response(null, { status: 405 }));
   const body = await request.json().catch(() => ({}));
   const after = typeof body?.after === "string" ? body.after : null;
-  const page = await backfillPage({ db, graphql: admin.graphql, shop: session.shop, after });
-  return cors(Response.json(page));
+  try {
+    const page = await backfillPage({ db, graphql: admin.graphql, shop: session.shop, after });
+    return cors(Response.json(page));
+  } catch (error) {
+    // Without this the browser only sees "Failed to fetch" (an error response with no CORS headers).
+    console.error("Backfill page failed", error?.message ?? error);
+    return cors(Response.json({ error: "backfill_failed", message: error?.message ?? "unknown" }, { status: 500 }));
+  }
 };

@@ -4,6 +4,16 @@ import { mapOrder, siteOf } from "./map-order.js";
 
 const money = (amount) => ({ shopMoney: { amount, currencyCode: "GBP" } });
 
+describe("mapOrder service and configuration lines", () => {
+  it("leaves out [svc:] and [cfg:] custom lines", () => {
+    const o = gqlOrder();
+    o.lineItems.nodes.push(gqlLine(88, { title: "Configuration change v2: Size: King [cfg:1:v2]" }), gqlLine(89, { title: "Two Man Delivery [svc:two_man]" }));
+    const { lines } = mapOrder("s.myshopify.com", o);
+    expect(lines.map((l) => l.lineId)).not.toContain("gid://shopify/LineItem/88");
+    expect(lines.length).toBe(gqlOrder().lineItems.nodes.length);
+  });
+});
+
 describe("mapOrder after an order edit", () => {
   it("uses the current amounts, not the ones the order was placed at", () => {
     const { order } = mapOrder("s.myshopify.com", gqlOrder({ currentTotalPriceSet: money("293.0"), currentSubtotalPriceSet: money("273.0"), currentShippingPriceSet: money("20.0"), currentTotalDiscountsSet: money("0.0") }));

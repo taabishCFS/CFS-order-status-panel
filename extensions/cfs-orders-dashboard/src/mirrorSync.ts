@@ -22,7 +22,10 @@ export async function runBackfill(onProgress?: (count: number) => void, fetchImp
   try {
     for (let i = 0; i < MAX_BACKFILL_PAGES; i += 1) {
       const res = await callBackendResult('/api/backfill', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ after }) }, fetchImpl);
-      if (!res.ok) return { ok: false, message: `The server answered with status ${res.status}`, count };
+      if (!res.ok) {
+        const detail = (res.body as { message?: string } | null)?.message;
+        return { ok: false, message: `The server answered with status ${res.status}${detail ? `: ${detail}` : ''}`, count };
+      }
       const body = res.body as { count: number; endCursor: string | null; hasNext: boolean };
       count += body.count;
       onProgress?.(count);

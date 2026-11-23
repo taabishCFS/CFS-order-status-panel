@@ -40,7 +40,8 @@ export default function ExpandedOrder({ orderId, name, onClose }) {
               <s-table-header format="numeric">Final Price</s-table-header>
             </s-table-header-row>
             <s-table-body>
-              {view.rows.map((r) => (
+              {/* A configuration price line belongs to its product; it is not listed as a product. */}
+              {view.rows.filter((r) => !/\[cfg:\d+:v\d+\]/.test(r.product)).map((r) => (
                 <s-table-row key={r.id}>
                   <s-table-cell>{r.product}</s-table-cell>
                   <s-table-cell>{r.brand}</s-table-cell>

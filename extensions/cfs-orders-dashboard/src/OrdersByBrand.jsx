@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
-import { fetchStaffActor, resolveActor } from '../../cfs-order-status/src/identity';
+import { resolveActor } from '../../cfs-order-status/src/identity';
+import { useStaff } from './useStaff';
 import { STATUSES, labelFor, statusById } from '../../cfs-order-status/src/statuses';
 import { bulkChangeStatus, bulkExpectedDate, groupByOrder } from './bulk';
 import { DEFAULT_MESSAGE, DEFAULT_SUBJECT, callBulkEmail } from './bulkEmail';
@@ -21,7 +22,7 @@ export default function OrdersByBrand() {
   const [picked, setPicked] = useState(() => new Set());
   const [find, setFind] = useState('');
   // undefined while checking, null when Shopify will not say who is signed in
-  const [staff, setStaff] = useState(undefined);
+  const staff = useStaff();
   const [name, setName] = useState('');
   const [bulkStatus, setBulkStatus] = useState('');
   const [bulkDate, setBulkDate] = useState('');
@@ -36,7 +37,6 @@ export default function OrdersByBrand() {
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkNote, setBulkNote] = useState(null); // { tone, text }
 
-  useEffect(() => { fetchStaffActor().then(setStaff); }, []);
 
   useEffect(() => { loadBrands().then((r) => r.ok && setBrands(r.brands)); }, []);
 

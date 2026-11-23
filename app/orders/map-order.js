@@ -30,8 +30,9 @@ export function mapOrder(shop, o) {
   const tags = o.tags ?? [];
   const status = readStatusState(o.metafield?.value ?? null);
   const createdAt = new Date(o.createdAt);
-  // Delivery service charges (Update Delivery & Services) are custom lines marked [svc:...]; they are not products.
-  const lineNodes = (o.lineItems?.nodes ?? []).filter((l) => !/\[svc:[a-z_]+\]/.test(l.title ?? ""));
+  // Delivery service charges (Update Delivery & Services) are custom lines marked [svc:...], and configuration price differences
+  // are custom lines marked [cfg:...]; neither is a product, so neither is a line on the order lists.
+  const lineNodes = (o.lineItems?.nodes ?? []).filter((l) => !/\[(svc:[a-z_]+|cfg:\d+:v\d+)\]/.test(l.title ?? ""));
   const brandOf = (l) => l.vendor?.trim() || "Unmapped";
   const order = {
     shop,

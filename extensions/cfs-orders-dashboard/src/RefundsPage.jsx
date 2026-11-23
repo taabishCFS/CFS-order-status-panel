@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import { fetchStaffActor } from '../../cfs-order-status/src/identity';
+import { useStaff } from './useStaff';
 import Pager from './Pager.jsx';
 import { formatDate, formatMoney, gatewayLabel, rangeText } from './orderList';
 import { claimOptions, exportChoice, loadRefundExportLink, loadRefundList, recordRefunded, refundAction, refundedText, sortLink, titleFor } from './refundList';
@@ -28,9 +28,7 @@ export default function RefundsPage() {
   const [add, setAdd] = useState(EMPTY_ADD);
   const [txn, setTxn] = useState({});
   const [busy, setBusy] = useState(null);
-  const [staff, setStaff] = useState(undefined); // undefined while checking, null when Shopify will not say who is signed in
-
-  useEffect(() => { fetchStaffActor().then(setStaff); }, []);
+  const staff = useStaff(); // undefined while checking, null when nobody can be verified
 
   const load = useCallback(async () => {
     setLoading(true);
