@@ -234,6 +234,14 @@ model RefundRequest {
   createdById   String?
   createdByName String?
   createdAt     DateTime @default(now())
+  // The accounts list (legacy Refund Orders List): who refunded it and the payment provider's transaction id.
+  transactionId  String?
+  refundedAt     DateTime?
+  refundedByName String?
+  claimable      String? // claimable | non_claimable, set on damaged and defect refunds
+  manual         Boolean   @default(false) // added by hand on the list, already refunded
+  removedAt      DateTime?
+  removedByName  String?
 
   @@unique([shop, clientKey])
   @@index([shop, orderId])

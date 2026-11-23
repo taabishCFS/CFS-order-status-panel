@@ -51,3 +51,9 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 22. "Store Orders" filter on the order list: what makes an order a store order (a tag, a location, a sales channel)?
 23. Which order statuses should email the customer automatically when staff change them, and with which template for each?
 24. Site, "By" (who took the order) and Source on the order list: where should these come from in the new shop? Today they only show if the order carries the tags `site:CFS`, `taken-by:NAME` or `source:NAME`.
+
+## Accounts refund list
+25. The old refund list has a "Collection" button and a "Collected: name - date" box. What is it for, who sets it, and when does a refund need it?
+26. The old refund list lets staff attach a file (photo or document) to each refund. Do you still want that? If yes, who uploads, what file types, and should the customer see the file?
+27. The old list shows the Refunded and Save buttons only to two admin groups. Should marking a refund as refunded be limited to certain staff, or can any signed-in staff member do it?
+28. The "Contact" button sends the customer a "Refund Initiated" email from the accounts address (with the attachment, and a copy to one internal address). Is the wording still right, which sender address and copy address should it use, and should it go out automatically when a refund is marked refunded?

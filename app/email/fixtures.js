@@ -16,7 +16,8 @@ const matches = (row, where = {}) =>
 export function fakeOutboxDb() {
   const rows = [];
   const defaults = () => ({
-    id: `e${rows.length + 1}`, createdAt: new Date(), attempts: 0, nextAttemptAt: new Date(),
+    // Fixed, just before the tests' own "now" (2026-11-21T10:00Z), so rows are due and the real date never matters.
+    id: `e${rows.length + 1}`, createdAt: new Date("2026-11-21T09:59:00Z"), attempts: 0, nextAttemptAt: new Date("2026-11-21T09:59:00Z"),
     mode: null, providerId: null, error: null, sentAt: null, claimedAt: null, replyTo: null, actorId: null, actorName: null,
   });
   return {

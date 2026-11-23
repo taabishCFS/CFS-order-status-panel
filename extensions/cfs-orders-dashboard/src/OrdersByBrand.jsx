@@ -117,6 +117,7 @@ export default function OrdersByBrand() {
   return (
     <s-page heading={lineTitle(applied.brand, summary.lines)}>
       <s-button slot="secondary-actions" href="/">By Order</s-button>
+      <s-button slot="secondary-actions" href="/refunds">Refund Orders List</s-button>
       <s-button slot="secondary-actions" href="/email-templates">Email templates</s-button>
       <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
 

@@ -1,6 +1,6 @@
 # Order list and Order Detail: what is left to match the legacy app
 
-Status on 2026-11-21. Goal: the Orders, Orders by Brand and Order Detail screens work exactly like the legacy CFS admin (`master_adm_book_27`). Question numbers (Q1 to Q19) refer to `docs/staff-questions-order-detail.md`. "Live check" means built and unit tested but not yet tried by a person in the admin.
+Status on 2026-11-21. Goal: the Orders, Orders by Brand and Order Detail screens work exactly like the legacy CFS admin (`master_adm_book_27`). Question numbers (Q1 to Q28) refer to `docs/staff-questions-order-detail.md`. "Live check" means built and unit tested but not yet tried by a person in the admin.
 
 ## A. Needs a staff answer or a sample before it can be built
 
@@ -20,6 +20,15 @@ Status on 2026-11-21. Goal: the Orders, Orders by Brand and Order Detail screens
 | A10 | **Services panel: Update History** | Built, kept in the order history | Confirm the history entry is what staff expect | Q4 |
 | A11 | **Refunds paid from the app?** | Built as a request list only, no money moves | Confirm refunds are still paid in the payment provider, and who acts on the list | Q6 |
 
+### Accounts refund list
+
+| # | Legacy feature | What blocks it | What we need | Question |
+|---|---|---|---|---|
+| A19 | **Collection** button and "Collected" box | Purpose unknown | What it is for, who sets it, when | Q25 |
+| A20 | **Attachment** column (upload per refund) | No file store decided | Whether still wanted, who uploads, file types, whether the customer sees it | Q26 |
+| A21 | **Who may mark refunded** | Legacy limited it to two admin groups | Whether to limit it | Q27 |
+| A22 | **Email Conf. / Contact** (Refund Initiated email) | Sender, copy address and timing unknown | Confirm wording, sender, copy address, automatic or button | Q28 |
+
 ### Order lists
 
 | # | Legacy feature | What blocks it | What we need | Question |
@@ -37,7 +46,7 @@ Status on 2026-11-21. Goal: the Orders, Orders by Brand and Order Detail screens
 | # | Item | Notes |
 |---|---|---|
 | B1 | **By Order "expand row"** | Built 2026-11-21 (Lines button opens a panel above the table); needs a live check. Delivery Date is --- until Book Delivery. |
-| B2 | **Accounts refund list page** | Staff already raise refund requests on Order Detail; nothing shows them to accounts. A page listing open requests with mark done or declined and history. Partly depends on A11. |
+| B2 | **Accounts refund list page** | Built 2026-11-23 (list, filters, sort, Transaction Id Save, Claimable, Add Order, Remove, CSV and Xero exports); needs a live check and the migration. Attachment, Email Conf. and Collection wait for A19 to A22. |
 | B3 | **Tidy `docs/order-lists.md`** | It still says Supp. Invoice Paid shows "No" and that exports are not built. |
 
 ## C. Built, not yet checked live
@@ -55,7 +64,8 @@ A person needs to try each of these in the admin. These are the quickest way to 
    - Refund request.
    - Update Conditions, including the 50% and 75% delay refund requests.
    - Services: add, change and remove on a test order.
-5. **Emails** in test mode: confirm they reach the allowed test address and look right. Production sending needs the live mode and the allowed senders.
+5. **Refund list** (after the migration runs): raise a refund on a test order, find it under Pending, save a transaction ID, check it moves to Refunded and the order history shows it, then try Add Order, Remove, Claimable on a damaged refund, Export CSV (ticked and by dates) and Export Refund By Date.
+6. **Emails** in test mode: confirm they reach the allowed test address and look right. Production sending needs the live mode and the allowed senders.
 
 ## D. Production readiness (not a legacy feature, but needed before staff use it)
 
