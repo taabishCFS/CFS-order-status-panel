@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 6 (23 November 2026)
+**Guide version:** 7 (23 November 2026)
 
 ## Before you start
 
@@ -31,7 +31,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 12 | Change a made-to-order product | Ready |
 | 13 | Download the Xero invoice report and the Delivery report | Ready |
 | 14 | Say which brands are paid on credit or pro-forma | Ready |
-| 15 | Find every page from the Dashboard | Ready, not yet tried |
+| 15 | Find every page from the Dashboard | Ready |
+| 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready, not yet tried |
 
 ---
 
@@ -272,6 +273,23 @@ Press **Reports** at the top of any page. Each report has its own box and a down
 
 You get one row per order placed on those dates, ready to import into Xero. VAT is worked out as one sixth of the order total. Cancelled orders are left out.
 
+### Outstanding Payments
+
+This shows the products we have not yet paid the supplier for.
+
+1. First set each brand to **Credit** or **Pro-forma** on **Brand terms** (see section 14).
+2. On the Reports page, choose **Brands paid on**: Credit or Pro-forma.
+3. Choose **Date from** and **Date to**. These are the dates the orders were placed.
+4. Press **Download Outstanding Payments** and click the link.
+
+Each row shows the order, brand, product, quantity, **Total Cost** (the Shopify cost per item times the quantity), status and expected date. Products whose supplier invoice is marked **paid**, products of cancelled orders and removed products are left out.
+
+**Good to know:**
+- If a product has no cost in Shopify, its Total Cost is blank. Add the cost in Shopify under the product's variant.
+- If no brand is set to that choice, the file has headings only.
+- Delivery Date is blank for now. The new system does not keep one yet.
+- Credit brands count more statuses than pro-forma brands, as in the old system.
+
 ### Delivery Report
 
 1. Press **Download Delivery Report**. No dates are needed.
@@ -301,6 +319,8 @@ Some suppliers are paid on **credit** (we pay later) and some are paid **pro-for
 
 The Dashboard is a page with one big card for every part of the app, grouped as **Orders**, **Money** and **Settings**. Each card says in a sentence what the page is for.
 
+![The Dashboard](guide-images/15-dashboard.jpg)
+
 1. Press **Dashboard** at the top of any page.
 2. Click the card you want.
 
@@ -320,7 +340,7 @@ These will be added to this guide as soon as they are built:
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
 - Showing the real Site, Taken By and Source on the list
-- The other reports (outstanding payments, unpaid invoices, margins, the big order report), payment reminders, service issues, returns and credit notes
+- The other reports (outstanding in-stock, unpaid invoices, margins, the big order report), payment reminders, service issues, returns and credit notes
 
 ---
 
@@ -328,6 +348,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 23 Nov 2026 | 7 | Added the Outstanding Payments report |
 | 23 Nov 2026 | 6 | Added the Dashboard page |
 | 23 Nov 2026 | 5 | Added Brand terms (credit or pro-forma per brand) |
 | 23 Nov 2026 | 4 | Added the Reports page: Xero VAT Invoice Report and Delivery Report |

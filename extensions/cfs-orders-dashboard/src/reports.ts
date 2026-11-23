@@ -2,13 +2,15 @@
 // download link. Every call returns { ok: false, message } instead of throwing.
 import { callBackendResult } from './backend';
 
-export type ReportKind = 'xero' | 'delivery';
+export type ReportKind = 'xero' | 'delivery' | 'outstanding';
+export type PayTerms = 'credit' | 'proforma';
 
 export interface ReportInfo {
   kind: ReportKind;
   title: string;
   description: string;
   needsDates: boolean;
+  needsTerms: boolean;
 }
 
 export const REPORTS: ReportInfo[] = [
@@ -17,13 +19,27 @@ export const REPORTS: ReportInfo[] = [
     title: 'Xero VAT Invoice Report',
     description: 'One row per order placed in the dates you choose, ready to import into Xero. VAT is one sixth of the order total. Cancelled orders are left out.',
     needsDates: true,
+    needsTerms: false,
+  },
+  {
+    kind: 'outstanding',
+    title: 'Outstanding Payments',
+    description: 'Products we have not yet paid the supplier for, for brands paid on credit or pro-forma (set on Brand terms). Shows the Shopify cost per item times the quantity. Items whose supplier invoice is marked paid are left out.',
+    needsDates: true,
+    needsTerms: true,
   },
   {
     kind: 'delivery',
     title: 'Delivery Report',
     description: 'Orders that are ready to deliver: every product is in a delivery-ready status and nothing is owed. It does not use dates.',
     needsDates: false,
+    needsTerms: false,
   },
+];
+
+export const TERMS_CHOICES: { value: PayTerms; label: string }[] = [
+  { value: 'credit', label: 'Credit' },
+  { value: 'proforma', label: 'Pro-forma' },
 ];
 
 export interface ReportLink {
@@ -34,6 +50,7 @@ export interface ReportLink {
 const EXPLAIN: Record<string, string> = {
   staff_not_verified: 'Only a verified staff member can download reports.',
   bad_dates: 'Choose a start and end date (the start must not be after the end, and the range cannot be longer than a year).',
+  bad_terms: 'Choose Credit or Pro-forma.',
   bad_request: 'That report is not available.',
 };
 
@@ -49,8 +66,9 @@ export async function loadReportLink(
   kind: ReportKind,
   range: { from: string; to: string } | null,
   fetchFn: typeof fetch = fetch,
+  terms?: PayTerms,
 ): Promise<{ ok: true; data: ReportLink } | { ok: false; message: string }> {
-  const query = range ? `&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}` : '';
+  const query = (range ? `&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}` : '') + (terms ? `&terms=${terms}` : '');
   try {
     const res = await callBackendResult(`/api/report-link?kind=${kind}${query}`, undefined, fetchFn);
     const body = res.body as (ReportLink & { error?: string }) | null;

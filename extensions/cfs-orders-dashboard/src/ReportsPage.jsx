@@ -1,21 +1,26 @@
 import { useState } from 'preact/hooks';
 import { useStaff } from './useStaff';
-import { REPORTS, loadReportLink, rangeProblem } from './reports';
+import { REPORTS, TERMS_CHOICES, loadReportLink, rangeProblem } from './reports';
 
-// The Reports screen: one card per report, a date range where the report needs one, and a download button.
+// The Reports screen: one card per report, a date range and pay terms where the report needs them, and a download button.
 export default function ReportsPage() {
-  const [range, setRange] = useState({ from: '', to: '' });
+  const [ranges, setRanges] = useState({}); // each report keeps its own dates
+  const [terms, setTerms] = useState('credit');
   const [busy, setBusy] = useState(null);
   const [notice, setNotice] = useState(null);
   const staff = useStaff(); // undefined while checking, null when nobody can be verified
 
+  const rangeOf = (kind) => ranges[kind] ?? { from: '', to: '' };
+  const setRange = (kind, part, value) => setRanges((all) => ({ ...all, [kind]: { ...rangeOf(kind), [part]: value } }));
+
   async function download(report) {
+    const range = rangeOf(report.kind);
     if (report.needsDates) {
       const problem = rangeProblem(range.from, range.to);
       if (problem) { setNotice({ tone: 'warning', text: problem }); return; }
     }
     setBusy(report.kind);
-    const res = await loadReportLink(report.kind, report.needsDates ? range : null);
+    const res = await loadReportLink(report.kind, report.needsDates ? range : null, undefined, report.needsTerms ? terms : undefined);
     setBusy(null);
     setNotice(res.ok
       ? { tone: 'success', text: `${report.title} is ready (the link works for 5 minutes).`, link: res.data }
@@ -42,10 +47,15 @@ export default function ReportsPage() {
         <s-section key={report.kind} heading={report.title}>
           <s-stack gap="base">
             <s-text>{report.description}</s-text>
+            {report.needsTerms && (
+              <s-select label="Brands paid on" value={terms} onChange={(e) => setTerms(e.currentTarget.value)}>
+                {TERMS_CHOICES.map((c) => <s-option key={c.value} value={c.value}>{c.label}</s-option>)}
+              </s-select>
+            )}
             {report.needsDates && (
               <s-stack direction="inline" gap="base" alignItems="end">
-                <s-date-field label="Date from" value={range.from} onChange={(e) => setRange({ ...range, from: e.currentTarget.value })} />
-                <s-date-field label="Date to" value={range.to} onChange={(e) => setRange({ ...range, to: e.currentTarget.value })} />
+                <s-date-field label="Date from" value={rangeOf(report.kind).from} onChange={(e) => setRange(report.kind, 'from', e.currentTarget.value)} />
+                <s-date-field label="Date to" value={rangeOf(report.kind).to} onChange={(e) => setRange(report.kind, 'to', e.currentTarget.value)} />
               </s-stack>
             )}
             <s-stack direction="inline" gap="base">

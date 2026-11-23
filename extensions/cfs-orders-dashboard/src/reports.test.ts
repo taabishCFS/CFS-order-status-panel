@@ -5,7 +5,7 @@ const reply = (status: number, body: unknown) => async () => new Response(JSON.s
 
 describe('REPORTS', () => {
   it('lists the two reports and which one needs dates', () => {
-    expect(REPORTS.map((r) => [r.kind, r.needsDates])).toEqual([['xero', true], ['delivery', false]]);
+    expect(REPORTS.map((r) => [r.kind, r.needsDates, r.needsTerms])).toEqual([['xero', true, false], ['outstanding', true, true], ['delivery', false, false]]);
   });
 });
 
@@ -35,6 +35,13 @@ describe('loadReportLink', () => {
     const fetchFn = vi.fn(reply(200, { url: 'u', filename: 'delivery_report.csv' }));
     await loadReportLink('delivery', null, fetchFn as never);
     expect(fetchFn).toHaveBeenCalledWith('/api/report-link?kind=delivery', undefined);
+  });
+  it('adds the pay terms to the outstanding link', async () => {
+    const fetchFn = vi.fn(reply(200, { url: 'u', filename: 'f.csv' }));
+    await loadReportLink('outstanding', { from: '2026-11-01', to: '2026-11-30' }, fetchFn as never, 'proforma');
+    expect(fetchFn).toHaveBeenCalledWith('/api/report-link?kind=outstanding&from=2026-11-01&to=2026-11-30&terms=proforma', undefined);
+    const bad = await loadReportLink('outstanding', { from: 'a', to: 'b' }, reply(400, { error: 'bad_terms' }) as never);
+    expect(bad).toEqual({ ok: false, message: 'Choose Credit or Pro-forma.' });
   });
   it('explains a refusal in words', async () => {
     expect(await loadReportLink('xero', { from: 'a', to: 'b' }, reply(403, { error: 'staff_not_verified' }) as never)).toEqual({ ok: false, message: 'Only a verified staff member can download reports.' });

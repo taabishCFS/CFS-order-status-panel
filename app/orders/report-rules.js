@@ -8,9 +8,17 @@ export const MAX_RANGE_DAYS = 366;
 export const DELIVERY_STATUS_IDS = [4, 5, 14, 17, 31, 33, 43, 44, 45, 46, 61];
 
 export const REPORTS = {
-  xero: { title: "Xero VAT Invoice Report", needsDates: true },
-  delivery: { title: "Delivery Report", needsDates: false },
+  xero: { title: "Xero VAT Invoice Report", needsDates: true, needsTerms: false },
+  delivery: { title: "Delivery Report", needsDates: false, needsTerms: false },
+  outstanding: { title: "Outstanding Payments", needsDates: true, needsTerms: true },
 };
+
+/** Line statuses that still count as "we owe the supplier" (legacy Outstanding Payments), by how the brand is paid. */
+export const OUTSTANDING_STATUS_IDS = {
+  credit: [14, 6, 10, 4, 35, 12, 3, 1, 57, 36],
+  proforma: [10, 35, 12, 3, 1, 57, 36],
+};
+export const TERMS_LABEL = { credit: "Credit", proforma: "Pro-forma" };
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const validDay = (text) => ISO.test(text) && !Number.isNaN(Date.parse(`${text}T00:00:00Z`)) && new Date(`${text}T00:00:00Z`).toISOString().startsWith(text);
@@ -24,12 +32,38 @@ export function parseReportRange(from, to) {
   return { from, to, gte, lte };
 }
 
-export function reportFilename(kind, range) {
-  return kind === "xero" ? `Xero_Report-${range.from}_to_${range.to}.csv` : "delivery_report.csv";
+/**
+ * The parts of a report request that come from its link or query: { range, terms }, or null when a part it needs is missing or wrong.
+ * `get` reads one value by name (for example URLSearchParams.get).
+ */
+export function parseReportParams(kind, get) {
+  const info = Object.hasOwn(REPORTS, kind) ? REPORTS[kind] : null;
+  if (!info) return null;
+  let range;
+  let terms;
+  if (info.needsDates) {
+    range = parseReportRange(get("from"), get("to"));
+    if (!range) return null;
+  }
+  if (info.needsTerms) {
+    terms = get("terms");
+    if (!Object.hasOwn(OUTSTANDING_STATUS_IDS, terms)) return null;
+  }
+  return { range, terms };
+}
+
+/** The link's query string for a report's parameters. */
+export const reportQuery = ({ range, terms }) => new URLSearchParams({ ...(range ? { from: range.from, to: range.to } : {}), ...(terms ? { terms } : {}) }).toString();
+
+export function reportFilename(kind, range, terms) {
+  if (kind === "xero") return `Xero_Report-${range.from}_to_${range.to}.csv`;
+  if (kind === "outstanding") return `${TERMS_LABEL[terms]}_Total-Outstanding-Report-${range.from}_to_${range.to}.csv`;
+  return "delivery_report.csv";
 }
 
 const ukDate = (d) => new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
 const money = (minor) => (minor / 100).toFixed(2);
+const dmy = (iso) => (iso ? iso.split("-").reverse().join("/") : "---");
 const parseAddress = (text) => {
   if (!text) return null;
   try {
@@ -90,3 +124,19 @@ export function deliveryCsv(orders, linesByOrder) {
   }
   return { csv: buildCsv(DELIVERY_HEADERS, rows), count: rows.length };
 }
+
+export const OUTSTANDING_HEADERS = ["Order No.", "Order Date", "Brand", "Item", "Qty", "Total Cost", "Item Status", "Expected Date", "Delivery Date"];
+
+/**
+ * One outstanding-payments row for a product line. ctx = { orderName, orderCreatedAt, statusLabel, costMinor }.
+ * Total cost is the Shopify cost per item times the quantity, blank when Shopify has no cost. The delivery date is blank:
+ * the new system does not keep one yet.
+ */
+export function outstandingRow(line, ctx) {
+  return [
+    String(ctx.orderName).replace(/^#/, ""), ukDate(ctx.orderCreatedAt), line.vendor?.trim() || "Unmapped", line.title, line.quantity,
+    ctx.costMinor == null ? "" : money(ctx.costMinor * line.quantity), ctx.statusLabel ?? "", dmy(line.expectedDate), "",
+  ];
+}
+
+export const outstandingCsv = (rows) => buildCsv(OUTSTANDING_HEADERS, rows);
