@@ -2,6 +2,13 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { backfillPage } from "../orders/backfill.server";
 
+// The browser sends an OPTIONS preflight before a POST from the extension. React Router gives that to a loader, and
+// authenticate.admin answers it. Without this the browser reports "Failed to fetch".
+export const loader = async ({ request }) => {
+  const { cors } = await authenticate.admin(request);
+  return cors(Response.json({ error: "method_not_allowed" }, { status: 405 }));
+};
+
 // POST { after } copies one page of existing orders into the mirror. A caller repeats with the returned endCursor.
 export const action = async ({ request }) => {
   const { admin, session, cors } = await authenticate.admin(request);
