@@ -10,6 +10,7 @@ import {
   applyInstructions,
   applyNote,
   applyRefundRequest,
+  applyProductChange,
   applyServicesChange,
   applyTracking,
   headerProposal,
@@ -260,5 +261,19 @@ describe('applyConfigurationChange', () => {
     expect(next.lines).toEqual(before.lines);
     expect(next.schemaVersion).toBe(2);
     expect(before.history).toHaveLength(0);
+  });
+});
+
+describe('applyProductChange', () => {
+  it('adds one history entry naming the product added, and the line it replaced when there was one', () => {
+    const before = withStatuses({ [A]: 4 });
+    const swapped = applyProductChange(before, { ...txt('x'), from: 'Oslo Sideboard (Oak) x 1 = £119.99', to: 'Bergen Table x 2 = £240.00' });
+    expect(swapped.history).toHaveLength(1);
+    expect(swapped.history[0]).toMatchObject({ scope: 'product', changes: [], values: [{ target: 'Product', from: 'Oslo Sideboard (Oak) x 1 = £119.99', to: 'Bergen Table x 2 = £240.00' }] });
+    expect(swapped.lines).toEqual(before.lines);
+    expect(applyProductChange(before, { ...txt('y'), from: null, to: 'Bergen Table x 2 = £240.00' }).history[0].values).toEqual([{ target: 'Product', from: null, to: 'Bergen Table x 2 = £240.00' }]);
+  });
+  it('refuses a blank product', () => {
+    expect(() => applyProductChange(withStatuses({}), { ...txt('x'), from: null, to: ' ' })).toThrow(/nothing/i);
   });
 });

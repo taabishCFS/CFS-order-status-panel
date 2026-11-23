@@ -25,10 +25,12 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 ## Replacement, accounts and line actions
 9. Replacement: what should happen when staff press it? New order number format (the old one used an R prefix), does it copy the lines, does it create a Shopify draft order?
 10. "Add To Accounts": what does it record, and who reads the list?
+*Answered 2026-11-23: question 11, a new product is added to the customer's order and the customer is charged the difference, the same way Shopify behaves when an order is edited.*
 11. "Add New Product": should it add a line to the Shopify order (changing the total), and who pays the difference?
 
 ## Process Order and Chase Up
 12. The supplier email address for each brand, and the wording of the order form and chase-up emails.
+29. How does Process Order and Chase Up work for each brand, and what should the button do? For example, Actona is ordered by hand, while Welcome can be bought from a form or by email. For each brand: what happens when the button is pressed, who is told, and what happens next?
 13. Who is allowed to press Process Order?
 
 ## Delivery booking

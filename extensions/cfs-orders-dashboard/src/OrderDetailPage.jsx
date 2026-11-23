@@ -11,6 +11,7 @@ import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
 import RefundSection from './RefundSection.jsx';
+import ProductSection from './ProductSection.jsx';
 import ServicesSection from './ServicesSection.jsx';
 import StatusSection from './StatusSection.jsx';
 import TrackingSection from './TrackingSection.jsx';
@@ -171,6 +172,8 @@ export default function OrderDetailPage({ id }) {
           </s-table-body>
         </s-table>
       </s-section>
+
+      <ProductSection id={id} lines={lines} picked={picked} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
 
       <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
 

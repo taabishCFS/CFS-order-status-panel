@@ -1,7 +1,7 @@
 import type { Actor } from './identity';
 
 export type StatusScope = 'order' | 'lines';
-export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration' | 'contact' | 'tracking' | 'refund' | 'condition' | 'services';
+export type Scope = StatusScope | 'expected-date' | 'delivery' | 'note' | 'instructions' | 'configuration' | 'contact' | 'tracking' | 'refund' | 'condition' | 'services' | 'product';
 
 // Extra details staff give with some statuses: a cancel reason (7), a credit note amount in pounds (21), service remarks (15).
 export interface StatusExtras {

@@ -73,6 +73,13 @@ export function applyServicesChange(state: StatusState, input: Meta & { changes:
   return { ...state, schemaVersion: 2, history: withEntry(state, input, 'services', { values }) };
 }
 
+// Records that a product was added to the order, or swapped for another line (the backend edits the Shopify order).
+export function applyProductChange(state: StatusState, input: Meta & { from: string | null; to: string }): StatusState {
+  if (!input.to.trim()) throw new Error('There is nothing to record');
+  const values: ValueChange[] = [{ target: 'Product', from: input.from, to: input.to }];
+  return { ...state, schemaVersion: 2, history: withEntry(state, input, 'product', { values }) };
+}
+
 // Saves how a delayed order is handled (Update Conditions). Any refund it implies is requested separately.
 export function applyCondition(state: StatusState, input: Meta & { value: string }): StatusState {
   if (!isCondition(input.value)) throw new Error('Choose one of the listed conditions');

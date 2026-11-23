@@ -18,7 +18,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 | Tracking No. with Email / Save and GO | Done (Email = the tick-box) | 3 done |
 | Status extras: cancel reason (7), credit note amount (21), service remarks (15), status 4 supplier delivery date | Reason, credit note and remarks done; status 4 already clears the expected date; supplier delivery date stamp done | 3 done |
 | Line buttons: Delivery Confirm, Delivery Not Confirm | Done | done |
-| Line buttons: Add To Accounts, Replacement, Add New Product | Missing | 5 |
+| Line buttons: Add To Accounts, Replacement, Add New Product | Add New Product built; the others missing | 5 |
 | Totals: subtotal, offer discount, coupon (code and %), delivery, grand total, paid, balance | Done | 4 done |
 | Update Delivery & Services (six services with price and tick, staff password, update history) | Built (verified staff instead of a password; the history is the update history); not yet tried live | 4 done |
 | Process Order & Chase Up (GO) | Missing | 6 |
@@ -32,7 +32,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 2. **Customer and order information.** Editable billing and shipping addresses written to Shopify (`orderUpdate`, verified staff, the old and new values go in the history), order information block (source, payment gateway, browser IP), customer note, Review Eligible and "review email sent" flags (app-owned).
 3. **Status extras and tracking.** Cancel reason, credit note amount and service remarks stored with the status change and shown in the history; refund flag; tracking number with Email or Save (uses the existing `tracking` template and queue); expected date "Update Conditions".
 4. **Totals and Update Delivery & Services.** Full totals block (offer discount, coupon code and percentage, delivery, grand total, paid, balance). Services panel needs a decision first: how a service charge reaches the Shopify order (order edit adds a custom line), VAT treatment (accounts team), and what "needs staff password" becomes (the verified-staff check, or an extra confirm).
-5. **Line actions.** Add To Accounts, Add To De-allocate list, Replacement (creates a linked record and an R order number), Add New Product (swap a line through an order edit). Needs staff answers on the replacement order flow.
+5. **Line actions.** Add To Accounts, Add To De-allocate list, Replacement (creates a linked record and an R order number), Add New Product (built 2026-11-23; swap a line through an order edit; answered: the customer is charged the difference as in a Shopify order edit). Replacement still needs staff answers on its order flow.
 6. **Process Order and Chase Up.** Supplier order form email, chase-up stamp. Blocked on staff confirming supplier addresses and wording.
 7. **Book Delivery.** Parked until the delivery booking feature.
 8. **Header documents.** Save PDF, Exc/Inc VAT invoice, delivery note and log, resend invoice, labels. A separate effort (PDF generation, label layouts); needs the invoice and label samples.

@@ -21,6 +21,7 @@ describe('scopeLabel', () => {
     expect(scopeLabel('refund')).toBe('Refund request');
     expect(scopeLabel('condition')).toBe('Update conditions');
     expect(scopeLabel('services')).toBe('Delivery & services');
+    expect(scopeLabel('product')).toBe('Product change');
   });
 });
 
@@ -68,6 +69,11 @@ describe('describeEntry', () => {
   it('describes a services change: added, changed and removed', () => {
     const e = entry({ scope: 'services', values: [{ target: 'Two Man Delivery', from: null, to: '£60.00' }, { target: 'Scotland Delivery', from: '£25.00', to: null }] });
     expect(describeEntry(e, titleOf)).toEqual(['Two Man Delivery: not on the order → £60.00', 'Scotland Delivery: £25.00 → removed']);
+  });
+
+  it('describes a product swap and a product added', () => {
+    expect(describeEntry(entry({ scope: 'product', values: [{ target: 'Product', from: 'Oslo x 1 = £10.00', to: 'Bergen x 2 = £20.00' }] }), titleOf)).toEqual(['Product replaced: Oslo x 1 = £10.00 → Bergen x 2 = £20.00']);
+    expect(describeEntry(entry({ scope: 'product', values: [{ target: 'Product', from: null, to: 'Bergen x 2 = £20.00' }] }), titleOf)).toEqual(['Product added: Bergen x 2 = £20.00']);
   });
 
   it('describes a condition change', () => {
