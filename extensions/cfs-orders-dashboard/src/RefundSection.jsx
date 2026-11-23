@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { applyRefundRequest } from '../../cfs-order-status/src/detailState';
-import { REASON_OPTIONS, addRefund, loadRefunds, moneyText, refundSummary } from './refunds';
+import { REASON_OPTIONS, addRefund, fullRefundMinor, loadRefunds, moneyText, refundSummary } from './refunds';
 
 const newKey = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 const blank = () => ({ clientKey: newKey(), reason: '', type: '', amount: '', lineIds: [], notes: '' });
@@ -27,7 +27,7 @@ export default function RefundSection({ id, detail, writer, verified, setNotice 
   async function submit() {
     setBusy(true);
     setError(null);
-    const res = await addRefund(id, form);
+    const res = await addRefund(id, { ...form, amount: shownAmount });
     if (!res.ok) { setBusy(false); setError(res.message); return; }
     const r = res.request;
     // The request is saved. Record it in the history; if that fails the request still stands.
@@ -39,7 +39,11 @@ export default function RefundSection({ id, detail, writer, verified, setNotice 
     await reload();
   }
 
-  const ready = form.reason && form.type && !busy && verified;
+  // Full Refund: the amount is worked out from the ticked products (everything refundable when none are ticked).
+  // Part Refund: staff type the amount.
+  const full = form.type === 'full' && list ? fullRefundMinor(detail.lines, form.lineIds, list.refundableMinor) : null;
+  const shownAmount = full !== null ? moneyText(full) : form.amount;
+  const ready = form.reason && form.type && shownAmount !== '' && !busy && verified;
 
   return (
     <s-section heading="Payment & Refund">
@@ -65,7 +69,17 @@ export default function RefundSection({ id, detail, writer, verified, setNotice 
               <s-option value="part">Part Refund</s-option>
               <s-option value="full">Full Refund</s-option>
             </s-select>
-            <s-text-field label="Amount (£)" value={form.amount} onInput={set('amount')} details={form.type === 'full' ? 'Leave blank to refund everything still refundable.' : undefined} />
+            <s-text-field
+              label="Amount (£)"
+              value={shownAmount}
+              readOnly={full !== null || undefined}
+              onInput={set('amount')}
+              details={
+                full !== null ? (form.lineIds.length ? 'Worked out from the ticked products, after discount.' : 'Everything still refundable. Tick products to refund only those.')
+                : form.type === 'full' ? 'The price of a ticked product could not be worked out. Enter the amount.'
+                : form.type === 'part' ? 'Enter the amount to refund.' : undefined
+              }
+            />
             <s-text-area label="Reason notes" rows={3} value={form.notes} onInput={set('notes')} />
             <s-button variant="primary" disabled={!ready || undefined} loading={busy || undefined} onClick={submit}>Add refund</s-button>
           </s-stack>

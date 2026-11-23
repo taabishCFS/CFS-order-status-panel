@@ -26,6 +26,21 @@ export interface RefundForm {
 export const REASON_OPTIONS: { code: string; label: string }[] = REASONS;
 
 export const moneyText = (minor: number): string => (minor / 100).toFixed(2);
+/**
+ * The amount of a Full Refund, worked out like Shopify does: the ticked products at their final price (after discount),
+ * or everything still refundable when none are ticked, never more than is still refundable.
+ * Returns pence, or null when a ticked product has no reliable final price (its quantity was edited), so staff must type it.
+ */
+export function fullRefundMinor(lines: { id: string; final: { amount: string } | null }[], lineIds: string[], refundableMinor: number): number | null {
+  if (lineIds.length === 0) return refundableMinor;
+  let sum = 0;
+  for (const id of lineIds) {
+    const line = lines.find((l) => l.id === id);
+    if (!line?.final) return null;
+    sum += Math.round(Number(line.final.amount) * 100);
+  }
+  return Math.min(sum, refundableMinor);
+}
 export const reasonLabel = (code: string): string => REASONS.find((r) => r.code === code)?.label ?? code;
 export const refundSummary = (type: 'part' | 'full', amountMinor: number, reason: string): string =>
   `${type === 'full' ? 'Full' : 'Part'} refund £${moneyText(amountMinor)}: ${reasonLabel(reason)}`;
