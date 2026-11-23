@@ -1,5 +1,5 @@
 import db from "../db.server";
-import { deliveryNoteHtml, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml } from "../orders/documents";
+import { deliveryNoteHtml, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml } from "../orders/document-pages";
 import { loadDocument } from "../orders/documents.server";
 import { verifyExportLink } from "../orders/export-link.server";
 import { unauthenticated } from "../shopify.server";

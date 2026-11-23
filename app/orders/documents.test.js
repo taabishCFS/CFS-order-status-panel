@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { deliveryNoteAllowed, deliveryNoteHtml, gbp, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml, shapeDocOrder, siteCodeOf, siteDetails } from "./documents";
+import { deliveryNoteHtml, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml } from "./document-pages";
+import { deliveryNoteAllowed, gbp, shapeDocOrder, siteCodeOf, siteDetails } from "./documents";
 
 const money = (amount) => ({ shopMoney: { amount, currencyCode: "GBP" } });
 const line = (over = {}) => ({
   id: "gid://shopify/LineItem/1", title: "Oslo Sideboard", variantTitle: "Oak", sku: "HN-OSL", quantity: 1, currentQuantity: 1,
   image: { url: "https://cdn/x.jpg" }, customAttributes: [{ key: "Colour", value: "Grey" }, { key: "_hidden", value: "x" }],
-  originalUnitPriceSet: money("100.0"), discountAllocations: [{ allocatedAmountSet: money("10.0") }], ...over,
+  originalUnitPriceSet: money("100.0"), discountAllocations: [{ allocatedAmountSet: money("6.0"), discountApplication: { index: 0 } }, { allocatedAmountSet: money("4.0"), discountApplication: { index: 1 } }], ...over,
 });
 const order = (over = {}) => ({
   name: "#1038", createdAt: "2026-11-22T10:00:00Z", tags: ["site:CFS"], email: "a@b.co", phone: null, note: "Leave with neighbour",
@@ -13,7 +14,7 @@ const order = (over = {}) => ({
   shippingAddress: { name: "Matt P", address1: "35 East Park Way", address2: null, city: "Wolverhampton", province: null, zip: "WV1 2DN", country: "United Kingdom", phone: "0784" },
   billingAddress: null,
   shippingLines: { nodes: [{ title: "Free Door Delivery", originalPriceSet: money("0.0") }] },
-  discountApplications: { nodes: [{ __typename: "DiscountCodeApplication", code: "BLACK12" }] },
+  discountApplications: { nodes: [{ __typename: "AutomaticDiscountApplication", value: { percentage: 6 } }, { __typename: "DiscountCodeApplication", code: "BLACK12", value: { __typename: "PricingPercentageValue", percentage: 4 } }] },
   lineItems: { nodes: [line(), line({ id: "gid://shopify/LineItem/2", title: "Two Man Delivery [svc:two_man]", originalUnitPriceSet: money("20.0"), discountAllocations: [], customAttributes: [], variantTitle: null })] },
   ...over,
 });
@@ -24,7 +25,7 @@ describe("shapeDocOrder", () => {
   it("separates service charges from products and works out the totals", () => {
     expect(doc.lines).toHaveLength(1);
     expect(doc.services).toEqual([{ label: "Two Man Delivery", minor: 2000 }]);
-    expect(doc).toMatchObject({ subtotalMinor: 10000, discountMinor: 1000, totalMinor: 11000, paidMinor: 11000, balanceMinor: 0, coupons: ["BLACK12"], siteCode: "CFS" });
+    expect(doc).toMatchObject({ subtotalMinor: 10000, offerMinor: 600, couponMinor: 400, couponValue: "4%", discountMinor: 1000, deliveryMethod: "Free Door Delivery", orderStatus: "", totalMinor: 11000, paidMinor: 11000, balanceMinor: 0, coupons: ["BLACK12"], siteCode: "CFS" });
   });
   it("reads options, status, expected date and instructions, hiding underscore properties", () => {
     expect(doc.lines[0]).toMatchObject({ options: ["Colour: Grey"], variantTitle: "Oak", statusId: 4, expectedDate: "2026-11-24", finalMinor: 9000 });
@@ -68,11 +69,16 @@ describe("documents", () => {
   it("formats money", () => expect([gbp(1999), gbp(-500)]).toEqual(["£19.99", "−£5.00"]));
   it("the Exc VAT invoice has no VAT rows, the Inc VAT one has them from the grand total", () => {
     const exc = invoiceHtml(doc, site, { vat: false });
-    expect(exc).toContain("Invoice ##1038");
+    expect(exc).toContain("Invoice #1038");
+    expect(exc).toContain("Offer Discount −");
+    expect(exc).toContain("Coupon (4%) −");
+    expect(exc).toContain("TERMINOLOGY");
+    expect(exc).toContain("/documents/cfs-logo.png");
     expect(exc).not.toContain("VAT (20%)");
     expect(exc).toContain("Two Man Delivery");
     const inc = invoiceHtml(doc, site, { vat: true });
-    expect(inc).toContain("Tax Invoice #");
+    expect(inc).toContain("VAT TAX INVOICE");
+    expect(inc).toContain("11530227");
     expect(inc).toContain("VAT (20%)");
     expect(inc).toContain("£18.33"); // 11000 / 6
     expect(inc).toContain("Subtotal (ex. VAT)");
@@ -85,8 +91,10 @@ describe("documents", () => {
     expect(html).toContain("Print / Save as PDF");
   });
   it("the delivery note lists only printable lines and the instructions", () => {
-    const html = deliveryNoteHtml(doc, site, new Date("2026-11-23T00:00:00Z"));
-    expect(html).toContain("Details of Invoice# #1038");
+    const html = deliveryNoteHtml(doc, site);
+    expect(html).toContain("Details of Invoice# 1038");
+    expect(html).toContain("11/22/2026");
+    expect(html).toContain("Free Door Delivery");
     expect(html).toContain("In Stock");
     expect(html).toContain("Call first");
     expect(html).toContain("Leave with neighbour");

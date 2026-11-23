@@ -74,7 +74,7 @@ describe("GET /exports/document", () => {
     const t = await link("kind=exc-vat");
     const res = await open(t);
     expect(res.headers.get("content-type")).toContain("text/html");
-    expect(await res.text()).toContain("Invoice ##5");
+    expect(await res.text()).toContain("Invoice #5");
     expect(await (await open(await link("kind=label"))).text()).toContain("1 Road");
     expect(await (await open(await link("kind=return-label&lineIds=gid://shopify/LineItem/1&type=Free_Stock"))).text()).toContain("Free Stock");
   });

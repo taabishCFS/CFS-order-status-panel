@@ -13,7 +13,7 @@ const QUERY = `#graphql
       shippingAddress { ${ADDRESS} }
       billingAddress { ${ADDRESS} }
       shippingLines(first: 5) { nodes { title originalPriceSet { ${MONEY} } } }
-      discountApplications(first: 20) { nodes { __typename ... on DiscountCodeApplication { code } } }
+      discountApplications(first: 20) { nodes { __typename value { __typename ... on PricingPercentageValue { percentage } ... on MoneyV2 { amount } } ... on DiscountCodeApplication { code } } }
       metafield(namespace: "$app", key: "cfs_status") { value }
       lineItems(first: 250) {
         nodes {
@@ -21,7 +21,7 @@ const QUERY = `#graphql
           image { url }
           customAttributes { key value }
           originalUnitPriceSet { ${MONEY} }
-          discountAllocations { allocatedAmountSet { ${MONEY} } }
+          discountAllocations { allocatedAmountSet { ${MONEY} } discountApplication { index } }
         }
       }
     }
