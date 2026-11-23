@@ -41,6 +41,7 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 16. When should a customer become "Review Eligible" (for example, after delivery is confirmed), how many days later is the email sent, and what should it say?
 
 ## Documents
+*Answered 2026-11-23: samples received (Invoice, Tax Invoice, delivery note, Save PDF). Delivery label and return label samples still wanted.*
 17. Please send samples of the invoice PDF (with and without VAT), the delivery note, the delivery label and the return label.
 
 ## Bulk email and exports
@@ -59,3 +60,9 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 26. The old refund list lets staff attach a file (photo or document) to each refund. Do you still want that? If yes, who uploads, what file types, and should the customer see the file?
 27. The old list shows the Refunded and Save buttons only to two admin groups. Should marking a refund as refunded be limited to certain staff, or can any signed-in staff member do it?
 28. The "Contact" button sends the customer a "Refund Initiated" email from the accounts address (with the attachment, and a copy to one internal address). Is the wording still right, which sender address and copy address should it use, and should it go out automatically when a refund is marked refunded?
+
+## Order header documents
+30. Resend Inv. (button built, switched off): which sender address, what wording, and does it attach the invoice as a file or link to the invoice page?
+31. Delivery note: is the list of line statuses that go on it still right (4, 14, 31, 33, 42 to 49, 61, 69, 73 to 75)? The legacy reprint needed a password: keep a password or manager OK, or drop it? (Built: no password; each time a note is opened for printing it is logged with the staff name.)
+32. Return label: it lists the ticked products with their quantities under the chosen type (Free Stock, Display Stock, Send Back To Supplier). Is that right, and what else must it show (for example the supplier address)?
+33. Invoices: VAT is one sixth of the grand total and the VAT invoice shows the subtotal divided by 1.2 (the legacy rule). Still right? Must offer discount and coupon discount be separate columns (built: one Discount column)?

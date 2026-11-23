@@ -258,3 +258,15 @@ model OrderOpen {
 
   @@id([shop, orderId])
 }
+
+// Each time staff open a delivery note for printing (the legacy "Delv. Notes Log": date and who).
+model DeliveryNotePrint {
+  id          String   @id @default(cuid())
+  shop        String
+  orderId     String
+  printedById String
+  printedBy   String
+  printedAt   DateTime @default(now())
+
+  @@index([shop, orderId, printedAt])
+}

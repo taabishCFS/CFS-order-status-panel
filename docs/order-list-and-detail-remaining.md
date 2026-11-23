@@ -14,7 +14,7 @@ Status on 2026-11-23. Goal: the Orders, Orders by Brand and Order Detail screens
 | A4 | **Add To De-allocate list** | Unknown purpose | Same as A3: what it records and who reads it | Q20 (new) |
 | A6 | **Process Order & Chase Up (GO)** | No recipients, wording or flow | How it works for each brand (Actona ordered by hand, Welcome by form or email), supplier email address per brand, order-form and chase-up wording, who may press it | Q29, Q12, Q13 |
 | A7 | **Book Delivery** (type, date, driver, van, drop, AM/PM, Book & Email, Book & Save, Reschedule, history) | Feature parked | Delivery types, drivers, vans, drops per van per day, AM/PM rules, reschedule charge (the legacy rule adds 10% after a confirmed delivery) | Q14, Q15 |
-| A8 | **Header documents**: Save PDF, Exc/Inc VAT invoice, Delivery Note and its log, Resend Inv., Print Label, Print Return Label | No layouts | Sample files of each: invoice with and without VAT, delivery note, delivery label, return label | Q17 |
+| A8 | **Resend Inv.** (the other header documents are built, see progress 2026-11-23) | Button is there but switched off | Sender address, wording, attach file or link (Q30); delivery note statuses and reprint rule (Q31), return label contents (Q32), VAT invoice rules (Q33) to confirm | Q30 to Q33 |
 | A9 | **Services panel: staff password** | Built with signed-in staff instead | Confirm that verified Shopify staff is enough, or ask for an extra confirm step | Q3 |
 | A10 | **Services panel: Update History** | Built, kept in the order history | Confirm the history entry is what staff expect | Q4 |
 | A11 | **Refunds paid from the app?** | Built as a request list only, no money moves | Confirm refunds are still paid in the payment provider, and who acts on the list | Q6 |
@@ -92,4 +92,4 @@ A person needs to try each of these in the admin. These are the quickest way to 
 1. You try section C and report anything that looks wrong.
 2. Send section A to staff (the new questions Q20 to Q28 are already in `staff-questions-order-detail.md`).
 3. B1, B2 (first slice) and B3 are done. B2 still needs A19 to A22 for Collection, Attachment and the Contact email.
-4. As answers arrive, build in this order: A1 (review), A2 to A4 (slice 5), A6 and A14 (Process Order), A8 (documents), A7 (delivery booking last).
+4. As answers arrive, build in this order: A1 (review), A2 to A4 (slice 5), A6 and A14 (Process Order), A8 (Resend Inv.), A7 (delivery booking last).

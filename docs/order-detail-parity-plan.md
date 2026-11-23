@@ -35,7 +35,7 @@ Source: five legacy screenshots (2026-11-20) plus `legacy-feature-inventory.md` 
 5. **Line actions.** Add To Accounts, Add To De-allocate list, Replacement (creates a linked record and an R order number), Add New Product (built 2026-11-23; swap a line through an order edit; answered: the customer is charged the difference as in a Shopify order edit). Replacement still needs staff answers on its order flow.
 6. **Process Order and Chase Up.** Supplier order form email, chase-up stamp. Blocked on staff confirming supplier addresses and wording.
 7. **Book Delivery.** Parked until the delivery booking feature.
-8. **Header documents.** Save PDF, Exc/Inc VAT invoice, delivery note and log, resend invoice, labels. A separate effort (PDF generation, label layouts); needs the invoice and label samples.
+8. **Header documents.** Built 2026-11-23 as printable pages (staff use the browser's Print or Save as PDF): Save PDF, Exc/Inc VAT invoice, delivery note with its log, Print Label, Print Ret. Label. Resend Inv. is a switched-off button until staff answer Q30.
 
 ## Order of work and what I need from you
 

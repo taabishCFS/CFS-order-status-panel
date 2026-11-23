@@ -7,6 +7,7 @@ import { callBackend } from './backend';
 import ConfigurationSection from './ConfigurationSection.jsx';
 import CustomerSection from './CustomerSection.jsx';
 import DeliverySection from './DeliverySection.jsx';
+import DocumentsSection from './DocumentsSection.jsx';
 import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
@@ -116,6 +117,8 @@ export default function OrderDetailPage({ id }) {
           {notice.refresh && <s-button slot="secondary-actions" onClick={reload}>Refresh</s-button>}
         </s-banner>
       )}
+
+      <DocumentsSection id={id} detail={detail} lines={lines} picked={picked} verified={verified} />
 
       <s-section heading="Order">
         <s-stack direction="block" gap="small">
