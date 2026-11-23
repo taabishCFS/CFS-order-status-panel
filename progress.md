@@ -303,3 +303,4 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - The delivery note's company address block is printed as plain lines (the sample shows odd line breaks from the legacy page).
 - Logo fix: the logo showed as a broken image because the page asked for a hosted file. It is now embedded in the page as a data URI (`app/orders/logo.js`, copied from the sample); the `public/documents` folder was removed.
 - Render log "No route matches URL /favicon.ico": harmless, the browser asks for an icon when a document opens in its own tab. Added a quiet `/favicon.ico` route (204) and an empty icon on the printed pages so it stops logging.
+- Logo still broken on the live site: the order's site row (seeded email site, `choicefurnituresuperstore.co.uk/img/brand/Choice-Obsedian.png`) supplied a logo link that does not load, and it overrode the embedded logo. The documents now always use the embedded CFS logo, as the legacy did for every site.

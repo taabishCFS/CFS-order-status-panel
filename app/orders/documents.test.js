@@ -60,6 +60,7 @@ describe("site", () => {
     expect(siteCodeOf([])).toBeNull();
     expect(siteDetails(null).name).toBe("Choice Furniture Superstore");
     expect(siteDetails({ name: "The Furnshop", url: "u", serviceEmail: "e", phone: "p", logoUrl: "l" })).toMatchObject({ name: "The Furnshop", email: "e" });
+    expect(siteDetails({ name: "x", logoUrl: "https://broken/logo.png" }).logoUrl).toMatch(/^data:image\/png;base64,/);
   });
 });
 

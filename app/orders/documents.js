@@ -33,7 +33,7 @@ export const dmy = (iso) => (iso ? String(iso).slice(0, 10).split("-").reverse()
 /** The email-site row (or nothing) turned into the header details; CFS when the site is unknown. */
 export function siteDetails(row) {
   if (!row) return DEFAULT_SITE;
-  return { name: row.name || DEFAULT_SITE.name, url: row.url || DEFAULT_SITE.url, email: row.serviceEmail || DEFAULT_SITE.email, phone: row.phone || DEFAULT_SITE.phone, logoUrl: row.logoUrl || DEFAULT_SITE.logoUrl };
+  return { name: row.name || DEFAULT_SITE.name, url: row.url || DEFAULT_SITE.url, email: row.serviceEmail || DEFAULT_SITE.email, phone: row.phone || DEFAULT_SITE.phone, logoUrl: DEFAULT_SITE.logoUrl }; // the legacy used the one CFS logo for every site; the email-site logo link is not used here
 }
 
 /** "site:TFS" from the tags, or null. */
