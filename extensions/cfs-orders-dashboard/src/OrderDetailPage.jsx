@@ -39,7 +39,7 @@ function MoreTools({ children }) {
   return (
     <s-section heading="More tools">
       <s-stack direction="block" gap="base">
-        <s-text color="subdued">Configuration changes, supplier invoice, tracking and email log.</s-text>
+        <s-text color="subdued">Supplier invoice, tracking and email log.</s-text>
         <s-button onClick={() => setOpen((v) => !v)}>{open ? 'Hide more tools' : 'Show more tools'}</s-button>
       </s-stack>
       {open && <s-stack direction="block" gap="base">{children}</s-stack>}
@@ -193,6 +193,9 @@ export default function OrderDetailPage({ id }) {
         </s-table>
       </s-section>
 
+      <ProductSection id={id} lines={lines} picked={picked} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
+      <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
+
       <StatusSection orderId={orderId} detail={detail} picked={picked} loading={loading} loadFailed={loadFailed} writer={writer} setNotice={setNotice} emails={emails} />
 
       <s-section heading="Totals">
@@ -216,7 +219,6 @@ export default function OrderDetailPage({ id }) {
 
       <ServicesSection id={id} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
 
-      <ProductSection id={id} lines={lines} picked={picked} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
 
       <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
@@ -226,7 +228,6 @@ export default function OrderDetailPage({ id }) {
       <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />
 
       <MoreTools>
-      <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
       <SupplierInvoiceSection id={id} lines={lines} currency={detail.totals.total?.currency ?? 'GBP'} verified={verified} />
       <TrackingSection orderId={orderId} detail={detail} writer={writer} setNotice={setNotice} emails={emails} />
       <EmailsSection emails={emails} canRetry={Boolean(verified)} />

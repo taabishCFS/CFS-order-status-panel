@@ -315,5 +315,5 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Configuration change lines are now hidden on the invoices, Save PDF and delivery note and folded into the product they belong to (matched by the `[cfg:<line id>:vN]` marker in the title), so the product shows its current price. The separate lines stay in Shopify admin. Totals are unchanged.
 
 ## Order Detail page tidied (2026-11-23)
-- Sections reordered into the working flow: Documents, Order (now includes "Saving as"), Customer, Items, Status, Totals, Services, Add New Product, Expected date, Delivery, Payment & Refund, Notes, More tools, History.
-- Rarely used panels (Configuration changes, Supplier invoice, Tracking, Email log) sit behind one "Show more tools" toggle, closed by default. No behaviour changed; tests 171, build OK.
+- Sections reordered into the working flow: Documents, Order (now includes "Saving as"), Customer, Items, Add New Product, Configuration changes, Status, Totals, Services, Expected date, Delivery, Payment & Refund, Notes, More tools, History.
+- Rarely used panels (Supplier invoice, Tracking, Email log) sit behind one "Show more tools" toggle, closed by default. No behaviour changed; tests 171, build OK.
