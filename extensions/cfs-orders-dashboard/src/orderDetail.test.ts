@@ -137,6 +137,22 @@ describe('loadOrderDetail', () => {
     expect(d.lines.map((l) => l.id)).toEqual(['gid://shopify/LineItem/11']);
   });
 
+  it('shows a service charge as a delivery row and keeps it out of the subtotal', async () => {
+    const svc = line({ id: 'gid://shopify/LineItem/13', title: 'Two Man Delivery [svc:two_man]', originalUnitPriceSet: money('20.0'), discountAllocations: [] });
+    const gone = line({ id: 'gid://shopify/LineItem/14', title: 'White Glove [svc:white_glove]', originalUnitPriceSet: money('60.0'), currentQuantity: 0, discountAllocations: [] });
+    const order = { ...baseOrder([line(), svc, gone]), currentSubtotalPriceSet: money('139.99'), shippingLines: { nodes: [{ title: 'Free Door Delivery', originalPriceSet: money('0.0') }] } };
+    const d = await loadOrderDetail(ORDER, asFetch(shopify(order)));
+    expect(d.totals.subtotal).toEqual({ amount: '119.99', currency: 'GBP' });
+    expect(d.breakdown.delivery).toEqual([{ title: 'Free Door Delivery', price: { amount: '0.00', currency: 'GBP' } }, { title: 'Two Man Delivery', price: { amount: '20.00', currency: 'GBP' } }]);
+  });
+
+  it('multiplies a service charge by its quantity and shows no Delivery fallback row when only services exist', async () => {
+    const svc = line({ id: 'gid://shopify/LineItem/13', title: 'Scotland Delivery [svc:scotland]', originalUnitPriceSet: money('15.0'), quantity: 2, currentQuantity: 2, discountAllocations: [] });
+    const d = await loadOrderDetail(ORDER, asFetch(shopify({ ...baseOrder([line(), svc]), currentSubtotalPriceSet: money('149.99') })));
+    expect(d.breakdown.delivery).toEqual([{ title: 'Scotland Delivery', price: { amount: '30.00', currency: 'GBP' } }]);
+    expect(d.totals.subtotal?.amount).toBe('119.99');
+  });
+
   it('shows discount and final price as unavailable when the line quantity was edited', () => {
     const f = shopify(baseOrder([line({ quantity: 3, currentQuantity: 2 })]));
     return loadOrderDetail(ORDER, asFetch(f)).then((d) => {

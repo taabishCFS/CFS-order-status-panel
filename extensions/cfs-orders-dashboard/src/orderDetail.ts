@@ -167,6 +167,18 @@ interface RawApplication {
   value?: { __typename: string; percentage?: number };
 }
 
+const SERVICE = /\s*\[svc:[a-z_]+\]/;
+
+// Delivery service charges are order lines marked [svc:...]. They show as delivery rows in the totals, not as items.
+function serviceCharges(lines: RawLine[]): { title: string; minor: number; currency: string }[] {
+  const out: { title: string; minor: number; currency: string }[] = [];
+  for (const l of lines) {
+    const unit = asMoney(l.originalUnitPriceSet);
+    if (l.currentQuantity > 0 && SERVICE.test(l.title) && unit) out.push({ title: l.title.replace(SERVICE, '').trim(), minor: toMinor(unit.amount) * l.currentQuantity, currency: unit.currency });
+  }
+  return out;
+}
+
 // Splits the order's line discounts by kind: automatic ones are the "offer", code ones are coupons,
 // and manual ones (including price changes made here) are adjustments. Each amount is the sum of the
 // allocations on the lines, added in whole pence.
@@ -213,7 +225,10 @@ export function breakdownOf(o: {
     offer: hasOffer ? fromMinor(offer, currency) : null,
     adjustments: hasAdjustments ? fromMinor(adjustments, currency) : null,
     coupons,
-    delivery: (o.shippingLines?.nodes ?? []).map((s) => ({ title: s.title, price: asMoney(s.originalPriceSet) ?? fromMinor(0, currency) })),
+    delivery: [
+      ...(o.shippingLines?.nodes ?? []).map((s) => ({ title: s.title, price: asMoney(s.originalPriceSet) ?? fromMinor(0, currency) })),
+      ...serviceCharges(o.lineItems.nodes).map((c) => ({ title: c.title, price: fromMinor(c.minor, c.currency) })),
+    ],
     paid: asMoney(o.totalReceivedSet),
     balance: asMoney(o.totalOutstandingSet),
     refunded: asMoney(o.totalRefundedSet),
@@ -244,6 +259,13 @@ function toDetailLine(l: RawLine, apps: RawApplication[] = []): DetailLine {
   return { id: l.id, title: l.title, variantTitle: l.variantTitle, sku: l.sku, vendor: l.vendor, quantity: l.currentQuantity, unit, discount, offer, coupon, final };
 }
 
+// Shopify's subtotal counts service charges as items; the legacy subtotal is products only.
+function withoutServices(subtotal: Money | null, lines: RawLine[]): Money | null {
+  if (!subtotal) return subtotal;
+  const services = serviceCharges(lines).reduce((sum, c) => sum + c.minor, 0);
+  return services ? fromMinor(toMinor(subtotal.amount) - services, subtotal.currency) : subtotal;
+}
+
 export async function loadOrderDetail(orderId: string, fetchFn: typeof fetch = fetch): Promise<OrderDetail> {
   const [{ state, digest }, body] = await Promise.all([
     loadState(orderId, fetchFn),
@@ -257,7 +279,7 @@ export async function loadOrderDetail(orderId: string, fetchFn: typeof fetch = f
     createdAt: o.createdAt,
     lines: (o.lineItems.nodes as RawLine[]).filter((l) => l.currentQuantity > 0 && !/\[svc:[a-z_]+\]/.test(l.title)).map((l) => toDetailLine(l, o.discountApplications?.nodes ?? [])),
     totals: {
-      subtotal: asMoney(o.currentSubtotalPriceSet),
+      subtotal: withoutServices(asMoney(o.currentSubtotalPriceSet), o.lineItems.nodes),
       discounts: asMoney(o.currentTotalDiscountsSet),
       shipping: asMoney(o.currentShippingPriceSet),
       total: asMoney(o.currentTotalPriceSet),
