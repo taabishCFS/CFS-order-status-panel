@@ -302,3 +302,4 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Not available from Shopify, so blank or approximated: the invoice Code column (blank), the delivery note product code (shows the SKU), assigned container and freestock info, boxes and volume. Question added: staff list Q34, PDF question 24 (PDF now 28 questions; mapping updated).
 - The delivery note's company address block is printed as plain lines (the sample shows odd line breaks from the legacy page).
 - Logo fix: the logo showed as a broken image because the page asked for a hosted file. It is now embedded in the page as a data URI (`app/orders/logo.js`, copied from the sample); the `public/documents` folder was removed.
+- Render log "No route matches URL /favicon.ico": harmless, the browser asks for an icon when a document opens in its own tab. Added a quiet `/favicon.ico` route (204) and an empty icon on the printed pages so it stops logging.

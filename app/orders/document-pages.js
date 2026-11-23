@@ -9,7 +9,7 @@ const optionLines = (l) => [l.variantTitle && `Option : ${l.variantTitle}`, ...l
 
 const BAR = `<div class="bar"><button onclick="window.print()">Print / Save as PDF</button></div>`;
 const shell = (title, css, body) =>
-  `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(title)}</title><style>@page{size:A4;margin:10mm}*{box-sizing:border-box}.bar{padding:12px 24px}.bar button{font-size:14px;padding:8px 16px;cursor:pointer}@media print{.bar{display:none}}${css}</style></head><body>${BAR}${body}</body></html>`;
+  `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="data:,"><title>${esc(title)}</title><style>@page{size:A4;margin:10mm}*{box-sizing:border-box}.bar{padding:12px 24px}.bar button{font-size:14px;padding:8px 16px;cursor:pointer}@media print{.bar{display:none}}${css}</style></head><body>${BAR}${body}</body></html>`;
 
 // ----- Invoice (Exc VAT and Inc VAT) -----
 const INVOICE_CSS = `
