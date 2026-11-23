@@ -1,6 +1,6 @@
 # Order list and Order Detail: what is left to match the legacy app
 
-Status on 2026-11-21. Goal: the Orders, Orders by Brand and Order Detail screens work exactly like the legacy CFS admin (`master_adm_book_27`). Question numbers (Q1 to Q28) refer to `docs/staff-questions-order-detail.md`. "Live check" means built and unit tested but not yet tried by a person in the admin.
+Status on 2026-11-23. Goal: the Orders, Orders by Brand and Order Detail screens work exactly like the legacy CFS admin (`master_adm_book_27`). Question numbers (Q1 to Q28) refer to `docs/staff-questions-order-detail.md`. "Live check" means built and unit tested but not yet tried by a person in the admin.
 
 ## A. Needs a staff answer or a sample before it can be built
 
@@ -47,7 +47,7 @@ Status on 2026-11-21. Goal: the Orders, Orders by Brand and Order Detail screens
 |---|---|---|
 | B1 | **By Order "expand row"** | Built 2026-11-21 (Lines button opens a panel above the table); needs a live check. Delivery Date is --- until Book Delivery. |
 | B2 | **Accounts refund list page** | Built 2026-11-23 (list, filters, sort, Transaction Id Save, Claimable, Add Order, Remove, CSV and Xero exports); needs a live check and the migration. Attachment, Email Conf. and Collection wait for A19 to A22. |
-| B3 | **Tidy `docs/order-lists.md`** | It still says Supp. Invoice Paid shows "No" and that exports are not built. |
+| B3 | **Tidy `docs/order-lists.md`** | Done 2026-11-23: now describes the Lines panel, out-of-stock badge, Supp. invoice, Export 2 and 3, Send Bulk Email and the refund list. |
 
 ## C. Built, not yet checked live
 
@@ -91,6 +91,6 @@ A person needs to try each of these in the admin. These are the quickest way to 
 ## Suggested order of work
 
 1. You try section C and report anything that looks wrong.
-2. Send section A to staff (the new questions Q20 to Q24 are already in `staff-questions-order-detail.md`).
-3. I build B1 now, and B2 after A11 is answered.
+2. Send section A to staff (the new questions Q20 to Q28 are already in `staff-questions-order-detail.md`).
+3. B1, B2 (first slice) and B3 are done. B2 still needs A19 to A22 for Collection, Attachment and the Contact email.
 4. As answers arrive, build in this order: A1 (review), A2 to A5 (slice 5), A6 and A14 (Process Order), A8 (documents), A7 (delivery booking last).

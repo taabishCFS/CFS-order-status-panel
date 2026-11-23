@@ -254,3 +254,7 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Not built yet (need staff answers, new questions Q25 to Q28): the Attachment column (file upload), the Email Conf. "Contact" button (legacy "Refund Initiated" email) and the Collection status. Differences: refund reasons show as their label (CSV keeps the code as legacy does); Pay By shows the Shopify payment gateway.
 - Also fixed a calendar-dependent test: `app/email/fixtures.js` gave queued emails the real date while the tests use a fixed "now" of 2026-11-21, so 12 outbox tests failed once the real date passed it. Fixture rows now use a fixed time just before that.
 - Tests: backend 568, status extension 132, dashboard 151, build OK. Not yet tried live. Needs the migration run on deploy.
+
+## Order lists doc tidied and remaining list updated (2026-11-23)
+- `docs/order-lists.md` rewritten to match what is built: Lines expand panel, out-of-stock badge, Supp. invoice Paid or Not paid (it used to say always "No"), Export 2 and 3, Send Bulk Email, Refund Orders List button, the refund migration, and a longer live check. "Not built yet" now lists only Export 1, Process Order, Store Orders filter, status-change emails and the Site/By/Source mapping.
+- `docs/order-list-and-detail-remaining.md`: B1, B2 (first slice) and B3 marked done; status date moved to 2026-11-23; suggested order updated. Documentation only, no code or tests changed.
