@@ -301,3 +301,4 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Code moved to `app/orders/document-pages.js` (pages) and `documents.js` (data and rules). Offer and coupon discounts are now split per line and in the totals (coupon shows its value, e.g. 12%).
 - Not available from Shopify, so blank or approximated: the invoice Code column (blank), the delivery note product code (shows the SKU), assigned container and freestock info, boxes and volume. Question added: staff list Q34, PDF question 24 (PDF now 28 questions; mapping updated).
 - The delivery note's company address block is printed as plain lines (the sample shows odd line breaks from the legacy page).
+- Logo fix: the logo showed as a broken image because the page asked for a hosted file. It is now embedded in the page as a data URI (`app/orders/logo.js`, copied from the sample); the `public/documents` folder was removed.

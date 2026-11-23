@@ -73,7 +73,7 @@ describe("documents", () => {
     expect(exc).toContain("Offer Discount −");
     expect(exc).toContain("Coupon (4%) −");
     expect(exc).toContain("TERMINOLOGY");
-    expect(exc).toContain("/documents/cfs-logo.png");
+    expect(exc).toContain("data:image/png;base64,");
     expect(exc).not.toContain("VAT (20%)");
     expect(exc).toContain("Two Man Delivery");
     const inc = invoiceHtml(doc, site, { vat: true });

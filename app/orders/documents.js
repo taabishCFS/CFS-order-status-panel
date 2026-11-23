@@ -1,6 +1,7 @@
 // The printable order documents of the legacy order screen: Save PDF, Exc VAT and Inc VAT invoices, the delivery note,
 // the shipping label and the return label. Each is a plain HTML page; staff use the browser's Print or Save as PDF.
 // Pure: Shopify's data goes in, HTML comes out.
+import { CFS_LOGO } from "./logo.js";
 import statuses from "../../extensions/cfs-order-status/src/statuses.json";
 import { SERVICES } from "./services.js";
 
@@ -20,7 +21,7 @@ export const COMPANY = {
   companyNo: "11530227",
   vatNo: "GB433397583",
 };
-const DEFAULT_SITE = { name: "Choice Furniture Superstore", url: "https://www.choicefurnituresuperstore.co.uk", email: "customerservice@cfsonline.co.uk", phone: "0116 296 3800", logoUrl: "/documents/cfs-logo.png" };
+const DEFAULT_SITE = { name: "Choice Furniture Superstore", url: "https://www.choicefurnituresuperstore.co.uk", email: "customerservice@cfsonline.co.uk", phone: "0116 296 3800", logoUrl: CFS_LOGO };
 
 export const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 export const gbp = (minor) => `${minor < 0 ? "−" : ""}£${(Math.abs(minor) / 100).toFixed(2)}`;
