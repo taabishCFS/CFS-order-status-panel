@@ -2,7 +2,7 @@
 // download link. Every call returns { ok: false, message } instead of throwing.
 import { callBackendResult } from './backend';
 
-export type ReportKind = 'xero' | 'delivery' | 'outstanding';
+export type ReportKind = 'xero' | 'delivery' | 'outstanding' | 'brandterms';
 export type PayTerms = 'credit' | 'proforma';
 
 export interface ReportInfo {

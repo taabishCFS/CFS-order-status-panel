@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 7 (23 November 2026)
+**Guide version:** 8 (23 November 2026)
 
 ## Before you start
 
@@ -30,9 +30,9 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 11 | Send one email to many customers | Ready, not yet tried |
 | 12 | Change a made-to-order product | Ready |
 | 13 | Download the Xero invoice report and the Delivery report | Ready |
-| 14 | Say which brands are paid on credit or pro-forma | Ready |
+| 14 | Say which brands are paid on credit or pro-forma, one by one or from Excel | Ready (Excel import not yet tried) |
 | 15 | Find every page from the Dashboard | Ready |
-| 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready, not yet tried |
+| 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready |
 
 ---
 
@@ -277,6 +277,8 @@ You get one row per order placed on those dates, ready to import into Xero. VAT 
 
 This shows the products we have not yet paid the supplier for.
 
+![The Outstanding Payments box](guide-images/16-outstanding-payments.jpg)
+
 1. First set each brand to **Credit** or **Pro-forma** on **Brand terms** (see section 14).
 2. On the Reports page, choose **Brands paid on**: Credit or Pro-forma.
 3. Choose **Date from** and **Date to**. These are the dates the orders were placed.
@@ -305,13 +307,30 @@ You get the orders that are ready to deliver: every product is in a delivery-rea
 
 Some suppliers are paid on **credit** (we pay later) and some are paid **pro-forma** (we pay first). The payment reports need to know which is which.
 
+### Setting a few brands
+
 1. Press **Reports**, then **Brand terms**.
-2. Next to each brand, choose **Credit**, **Pro-forma** or **Not set**.
-3. The change is saved straight away. A green message confirms it.
+2. Use the **Search brands** box to find a brand, or use the page numbers.
+3. Next to the brand, choose **Credit**, **Pro-forma** or **Not set**. It is saved straight away, and a green message confirms it.
 
 ![The Brand terms page](guide-images/14-brand-terms.jpg)
 
-**Good to know:** only signed-in staff can change this. A brand appears in the list once it has an order.
+### Setting many brands from Excel
+
+1. Press **Download brand list (CSV)** and click the link. You get a file with two columns, **Brand** and **Terms**. It lists every brand, with the terms already set.
+2. Open it in Excel. In the **Terms** column type **Credit** or **Pro-forma** next to each brand.
+3. Save the file as **CSV**.
+4. Drop the file on the **Import brand terms** box (or click the box and pick the file).
+5. A message tells you how many were saved. If some rows could not be used, the page lists them with their row number so you can fix them.
+
+**Rules for the Terms column:**
+- **Credit** or **Pro-forma** (capitals and the dash do not matter).
+- Leave it **blank** to keep the brand as it is.
+- Type **Clear** to remove a brand's setting.
+- A brand that is not on the list yet is added.
+- Keep the headings **Brand** and **Terms** in the first row. Up to 5,000 brands at a time.
+
+**Good to know:** only signed-in staff can change this. The downloaded list is also the best sample to start from.
 
 ---
 
@@ -348,6 +367,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 23 Nov 2026 | 8 | Brand terms: search, pages, download list and Excel import |
 | 23 Nov 2026 | 7 | Added the Outstanding Payments report |
 | 23 Nov 2026 | 6 | Added the Dashboard page |
 | 23 Nov 2026 | 5 | Added Brand terms (credit or pro-forma per brand) |

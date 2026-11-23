@@ -11,6 +11,8 @@ export const REPORTS = {
   xero: { title: "Xero VAT Invoice Report", needsDates: true, needsTerms: false },
   delivery: { title: "Delivery Report", needsDates: false, needsTerms: false },
   outstanding: { title: "Outstanding Payments", needsDates: true, needsTerms: true },
+  // Not on the Reports page: the Brand terms screen downloads it (the sample and export for the spreadsheet import).
+  brandterms: { title: "Brand terms", needsDates: false, needsTerms: false },
 };
 
 /** Line statuses that still count as "we owe the supplier" (legacy Outstanding Payments), by how the brand is paid. */
@@ -58,6 +60,7 @@ export const reportQuery = ({ range, terms }) => new URLSearchParams({ ...(range
 export function reportFilename(kind, range, terms) {
   if (kind === "xero") return `Xero_Report-${range.from}_to_${range.to}.csv`;
   if (kind === "outstanding") return `${TERMS_LABEL[terms]}_Total-Outstanding-Report-${range.from}_to_${range.to}.csv`;
+  if (kind === "brandterms") return "brand_terms.csv";
   return "delivery_report.csv";
 }
 
@@ -140,3 +143,8 @@ export function outstandingRow(line, ctx) {
 }
 
 export const outstandingCsv = (rows) => buildCsv(OUTSTANDING_HEADERS, rows);
+
+export const BRAND_TERMS_HEADERS = ["Brand", "Terms"];
+
+/** The brand list as a spreadsheet: every brand with Credit, Pro-forma or blank. It is also the sample for the import. */
+export const brandTermsCsv = (rows) => buildCsv(BRAND_TERMS_HEADERS, rows.map((r) => [r.brand, TERMS_LABEL[r.terms] ?? ""]));

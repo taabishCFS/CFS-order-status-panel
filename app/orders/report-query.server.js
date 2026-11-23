@@ -1,7 +1,8 @@
 // Reads the saved order copies for a report and builds its CSV. Reports only read; nothing is changed.
 import statuses from "../../extensions/cfs-order-status/src/statuses.json";
+import { listBrandTerms } from "./brand-terms.server.js";
 import { lookupCosts } from "./export-query.server.js";
-import { DELIVERY_STATUS_IDS, MAX_REPORT_ORDERS, OUTSTANDING_STATUS_IDS, deliveryCsv, outstandingCsv, outstandingRow, xeroCsv } from "./report-rules.js";
+import { DELIVERY_STATUS_IDS, MAX_REPORT_ORDERS, OUTSTANDING_STATUS_IDS, brandTermsCsv, deliveryCsv, outstandingCsv, outstandingRow, xeroCsv } from "./report-rules.js";
 
 const statusLabels = new Map(statuses.map((s) => [s.id, s.label]));
 
@@ -59,6 +60,10 @@ async function buildOutstanding({ db, graphql, shop, range, terms }) {
  * kind "outstanding" needs range and terms ("credit" or "proforma") and `graphql` for item costs.
  */
 export async function buildReport({ db, graphql, shop, kind, range, terms }) {
+  if (kind === "brandterms") {
+    const rows = await listBrandTerms(db, shop);
+    return { csv: brandTermsCsv(rows), count: rows.length, capped: false };
+  }
   if (kind === "outstanding") return buildOutstanding({ db, graphql, shop, range, terms });
   const where =
     kind === "xero"
