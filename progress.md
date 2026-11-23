@@ -313,3 +313,7 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Refund payment question: PDF question 3 now sets out both options (record only, or the system creates the refund in Shopify) with follow-ups on restock, email, delivery/service charges and who may press Refunded. Staff list Q35. Behaviour built so far: record only. PDF regenerated.
 
 - Configuration change lines are now hidden on the invoices, Save PDF and delivery note and folded into the product they belong to (matched by the `[cfg:<line id>:vN]` marker in the title), so the product shows its current price. The separate lines stay in Shopify admin. Totals are unchanged.
+
+## Order Detail page tidied (2026-11-23)
+- Sections reordered into the working flow: Documents, Order (now includes "Saving as"), Customer, Items, Status, Totals, Services, Add New Product, Expected date, Delivery, Payment & Refund, Notes, More tools, History.
+- Rarely used panels (Configuration changes, Supplier invoice, Tracking, Email log) sit behind one "Show more tools" toggle, closed by default. No behaviour changed; tests 171, build OK.

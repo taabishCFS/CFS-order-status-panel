@@ -33,6 +33,20 @@ const TotalRow = ({ label, value, strong }) => (
   </s-stack>
 );
 
+// Rarely used panels sit behind one toggle so the page stays short. Opening it shows them all.
+function MoreTools({ children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <s-section heading="More tools">
+      <s-stack direction="block" gap="base">
+        <s-text color="subdued">Configuration changes, supplier invoice, tracking and email log.</s-text>
+        <s-button onClick={() => setOpen((v) => !v)}>{open ? 'Hide more tools' : 'Show more tools'}</s-button>
+      </s-stack>
+      {open && <s-stack direction="block" gap="base">{children}</s-stack>}
+    </s-section>
+  );
+}
+
 export default function OrderDetailPage({ id }) {
   const orderId = `gid://shopify/Order/${id}`;
   const { detail, customer, loading, loadFailed, notice, setNotice, refresh } = useOrderDetail(orderId);
@@ -131,11 +145,7 @@ export default function OrderDetailPage({ id }) {
           </s-stack>
           {state.instructions && <s-text>Instructions: {state.instructions.text}</s-text>}
         </s-stack>
-      </s-section>
-
-      <CustomerSection id={id} orderId={orderId} detail={detail} customer={customer} writer={writer} verified={verified} reload={reload} setNotice={setNotice} statusLabel={state.order ? labelFor(state.order.statusId) : 'Not set'} />
-
-      <s-section heading="Saving as">
+          <s-divider />
         {verified && <s-text>Verified as {verified.name}</s-text>}
         {writer.staff
           ? <s-text>{writer.staff.name}</s-text>
@@ -144,7 +154,7 @@ export default function OrderDetailPage({ id }) {
           )}
       </s-section>
 
-      <StatusSection orderId={orderId} detail={detail} picked={picked} loading={loading} loadFailed={loadFailed} writer={writer} setNotice={setNotice} emails={emails} />
+      <CustomerSection id={id} orderId={orderId} detail={detail} customer={customer} writer={writer} verified={verified} reload={reload} setNotice={setNotice} statusLabel={state.order ? labelFor(state.order.statusId) : 'Not set'} />
 
       <s-section heading="Items" padding="none">
         <s-table>
@@ -183,18 +193,7 @@ export default function OrderDetailPage({ id }) {
         </s-table>
       </s-section>
 
-      <ProductSection id={id} lines={lines} picked={picked} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
-
-      <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
-
-      <SupplierInvoiceSection id={id} lines={lines} currency={detail.totals.total?.currency ?? 'GBP'} verified={verified} />
-
-      <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
-      <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
-      <RefundSection id={id} detail={detail} writer={writer} verified={verified} setNotice={setNotice} />
-      <TrackingSection orderId={orderId} detail={detail} writer={writer} setNotice={setNotice} emails={emails} />
-      <EmailsSection emails={emails} canRetry={Boolean(verified)} />
-      <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />
+      <StatusSection orderId={orderId} detail={detail} picked={picked} loading={loading} loadFailed={loadFailed} writer={writer} setNotice={setNotice} emails={emails} />
 
       <s-section heading="Totals">
         <s-stack direction="block" gap="small-300">
@@ -216,6 +215,22 @@ export default function OrderDetailPage({ id }) {
       </s-section>
 
       <ServicesSection id={id} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
+
+      <ProductSection id={id} lines={lines} picked={picked} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
+
+      <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+
+      <RefundSection id={id} detail={detail} writer={writer} verified={verified} setNotice={setNotice} />
+
+      <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />
+
+      <MoreTools>
+      <ConfigurationSection id={id} currency={detail.totals.total?.currency ?? 'GBP'} writer={writer} verified={verified} reload={reload} />
+      <SupplierInvoiceSection id={id} lines={lines} currency={detail.totals.total?.currency ?? 'GBP'} verified={verified} />
+      <TrackingSection orderId={orderId} detail={detail} writer={writer} setNotice={setNotice} emails={emails} />
+      <EmailsSection emails={emails} canRetry={Boolean(verified)} />
+      </MoreTools>
 
       <s-section heading={`History (${total})`}>
         {lastOpen !== undefined && <s-text color="subdued">{lastOpen ? `Last opened by ${lastOpen.name} on ${when(lastOpen.at)}` : 'Not opened by anyone before you.'}</s-text>}
