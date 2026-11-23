@@ -5,6 +5,7 @@ import OrderDetailPage from './OrderDetailPage.jsx';
 import OrdersByBrand from './OrdersByBrand.jsx';
 import OrdersByOrder from './OrdersByOrder.jsx';
 import RefundsPage from './RefundsPage.jsx';
+import ReportsPage from './ReportsPage.jsx';
 
 export default async () => {
   render(<App />, document.body);
@@ -29,6 +30,7 @@ function App() {
           <Route path="/orders-by-brand" component={OrdersByBrand} />
           <Route path="/orders/:id" component={OrderDetailPage} />
           <Route path="/refunds" component={RefundsPage} />
+          <Route path="/reports" component={ReportsPage} />
           <Route path="/email-templates" component={EmailTemplatesPage} />
           <Route default component={NotFound} />
         </Router>

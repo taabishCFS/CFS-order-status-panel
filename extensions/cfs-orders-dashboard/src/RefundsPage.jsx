@@ -111,6 +111,7 @@ export default function RefundsPage() {
     <s-page heading="Refundable Orders">
       <s-button slot="secondary-actions" href="/">Orders</s-button>
       <s-button slot="secondary-actions" href="/orders-by-brand">Orders by Brand</s-button>
+      <s-button slot="secondary-actions" href="/reports">Reports</s-button>
       <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
 
       {error && <s-banner tone="critical" heading="Could not load the refund list">{error}</s-banner>}

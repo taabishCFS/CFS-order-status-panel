@@ -67,6 +67,7 @@ export default function OrdersByOrder() {
     <s-page heading="Orders">
       <s-button slot="secondary-actions" href="/orders-by-brand">Orders by Brand</s-button>
       <s-button slot="secondary-actions" href="/refunds">Refund Orders List</s-button>
+      <s-button slot="secondary-actions" href="/reports">Reports</s-button>
       <s-button slot="secondary-actions" href="/email-templates">Email templates</s-button>
       <s-button slot="secondary-actions" onClick={refreshOrderData} loading={refreshing || undefined}>Refresh order data</s-button>
       <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>

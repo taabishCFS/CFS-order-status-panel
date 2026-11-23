@@ -1,0 +1,305 @@
+# CFS Order Panel: Staff Guide
+
+This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
+
+**Guide version:** 4 (23 November 2026)
+
+## Before you start
+
+- **Words in bold** are buttons or labels you will see on the screen.
+- The pictures come from a test order. The names and numbers in them are not real customers.
+- Each feature has a tag:
+  - **Ready:** we have tried it in the live system and it works.
+  - **Ready, not yet tried:** it is finished, but we have not tried it live yet.
+  - **Waiting:** it is switched off until the office tells us how it should work.
+
+## What you can do today
+
+| # | What it does | Tag |
+|---|---|---|
+| 1 | See all orders in one list | Ready |
+| 2 | See orders one product at a time, by brand | Ready |
+| 3 | Open one order and change its status, dates and notes | Ready |
+| 4 | Print invoices, delivery notes and labels | Ready |
+| 5 | Add or swap a product on an order | Ready |
+| 6 | Add delivery charges such as Two Man Delivery | Ready |
+| 7 | Mark a delivery as confirmed, add tracking and instructions | Ready |
+| 8 | Ask for a refund and keep the list of refunds | Ready |
+| 9 | Download spreadsheets | Ready |
+| 10 | Edit the emails customers get | Ready, not yet tried |
+| 11 | Send one email to many customers | Ready, not yet tried |
+| 12 | Change a made-to-order product | Ready |
+| 13 | Download the Xero invoice report and the Delivery report | Ready, not yet tried |
+
+---
+
+## 1. Opening the app
+
+1. Sign in to Shopify.
+2. On the left, click **Apps**, then **cfs-order-status-panel**.
+3. The list of orders opens.
+
+![The Orders list](guide-images/01-orders-list.jpg)
+
+**Buttons at the top right:**
+
+- **Orders by Brand:** the product-by-product list.
+- **Refund Orders List:** the list of refunds for accounts.
+- **Email templates:** the wording of customer emails.
+- **Refresh order data:** updates the lists (see below).
+
+**Good to know**
+
+- If the page shows "Loading" for a long time, wait one minute and reload. The system goes to sleep when nobody uses it and needs a moment to wake up.
+- If you see a message saying you are not verified, reload the page.
+
+**When to press Refresh order data:** only if the lists look out of date. It updates a few orders at a time and tells you how many it did. It is safe to press as often as you like.
+
+---
+
+## 2. The Orders list
+
+**What it is for:** finding an order and seeing how it is going.
+
+**How to use it**
+
+1. **Search:** type any of the order number, name, email, phone or postcode. You can type more than one word.
+2. **Filter:** pick a brand, or pick a start and end date and press **GO**.
+3. **Look inside an order:** press **Lines** at the end of the row. The products in that order open above the list. Press **Open order** to go to the full order, or **Close** to shut it.
+4. **Hide an old order:** tick it and press **Archive selected**. Tick **Archived orders** to see hidden ones, then press **Restore** to bring one back. Nothing is deleted.
+
+![Lines opened on an order](guide-images/02-lines-panel.jpg)
+
+**What the colours and marks mean**
+
+- A **red row** means the customer has only part paid.
+- A **blue row** means a replacement order.
+- A **star** next to a name means the customer has ordered before.
+- **Pay Type** tells you if the order is Fully paid, Partially paid, Awaiting payment or Payment failed. A cancelled order shows Payment failed.
+
+---
+
+## 3. Orders by Brand
+
+**What it is for:** chasing suppliers. One row for each product, not each order.
+
+![Orders by Brand](guide-images/03-orders-by-brand.jpg)
+
+**How to use it**
+
+1. Choose a **Brand**, and an **Order status** if you want one. Finished statuses are hidden until you choose them.
+2. Press **GO**. The line under the filters shows how many lines, orders and units you have.
+3. Use **Find in loaded lines** to search inside the list.
+4. **Change many products at once:** tick the rows, choose a status under **CHANGE STATUS** and press **Save status**. Or pick a date under **Expected date** and press **Save Expt. Date**.
+5. **Send one email to many customers:** tick the rows and press **Send Bulk Email**. Each customer gets one email, even if you ticked several of their products. You can change the subject and message before you send.
+
+**Good to know:** a yellow tag "Out of stock, due on a date" means the product is not in stock yet but a date is known. A red tag means there is no date.
+
+---
+
+## 4. One order: status, dates and notes
+
+Click an order number to open the full order.
+
+![Top of an order](guide-images/04-order-detail-top.jpg)
+
+**Change the status**
+
+1. Go to the **Status** box. Under **Apply to**, choose **Whole order** or **Selected items** (tick the products first in the Items table).
+2. Pick a status and press **Save status**.
+3. Tick **Email the customer** only if they should be told.
+
+![Status and totals](guide-images/07-status-and-totals.jpg)
+
+**Set the expected date**
+
+1. Use the calendar to pick the date. Do not type it, because typing can lose the last digit.
+2. If needed, choose a condition: Normal Order, WAIT FOR ENTIRE ORDER, OK FOR PART DELIVERY, 50% Refund or 75% Refund.
+3. Save.
+
+**Notes and instructions:** type them in the notes boxes and save. They show on the order and on the delivery note.
+
+**History:** every change is recorded with who made it and when. Press **Show older history** to see more.
+
+---
+
+## 5. Printing documents
+
+At the top of the order you will find these buttons (see the picture in section 4):
+
+- **Save PDF:** a copy of the whole order.
+- **Exc VAT Inv.** and **Inc VAT Inv.:** the invoice without or with VAT.
+- **Print Delivery Note:** works only when nothing is owed and the order is not on a 50% or 75% refund. The screen tells you why if it is greyed out. Every print is recorded.
+- **Delvn Notes Log:** shows who printed delivery notes and when.
+- **Print Label:** the delivery label.
+- **Print Ret. Label:** first choose the label type (Free Stock, Display Stock or Send Back To Supplier), tick the products in the Items table, then print.
+- **Resend Inv.:** emails the invoice to the customer. **Waiting:** it stays switched off until the office decides the wording.
+
+**Not ready yet:** the invoice "Code" column and the warehouse and box details are blank. We are waiting to hear where that information should come from.
+
+---
+
+## 6. Adding or swapping a product
+
+![Items and Add New Product](guide-images/05-items-add-product.jpg)
+
+**Add a product**
+
+1. Find **Add New Product**. Type a name or code and press **Search**.
+2. Choose the product and options, then add it.
+3. It is added to the Shopify order at today's price. The customer is charged the difference, just like when you edit an order in Shopify. The customer is not emailed.
+
+**Swap a product:** search for the new product and choose to swap it for the line you want to replace. The old line stays on the order with quantity 0, and the new one is added.
+
+---
+
+## 7. Delivery charges
+
+Find **Update Delivery & Services**.
+
+![Delivery charges](guide-images/08-delivery-services.jpg)
+
+1. Type the amount for the charge (Peace Of Mind, Two Man Delivery, White Glove Premium Delivery, Scotland Delivery, Republic of Ireland Delivery or Postcode PA/IV/KW Delivery). VAT is included in the amount.
+2. Tick **On the order**.
+3. Save. The charge is added to the Shopify order, so the total and balance change.
+4. To remove a charge, untick it and save.
+
+---
+
+## 8. Delivery answers, tracking and extras
+
+![Expected date and Delivery confirmation boxes](guide-images/11-expected-date-delivery.jpg)
+
+Tick the products in the Items table first. The buttons stay grey until you do.
+
+- **Delivery Confirm** and **Delivery Not Confirm:** record what the customer said. Tick **Email the customer** if they should be told.
+- **Edit** under the shipping address: change the contact details. Billing addresses can only be changed in Shopify itself.
+- **Order and delivery instructions:** write them once and they show at the top of the order.
+- **Show more tools:** opens the less-used boxes:
+  - **Supplier Invoice Update:** for each product, the supplier invoice date, number and amount, and whether it is paid.
+  - **Tracking:** type the tracking number. Tick **Email the customer** to send the tracking email.
+  - **Email log:** every email for this order, and whether it was sent. Press **Retry** on any that failed.
+
+---
+
+## 9. Refunds
+
+### Asking for a refund
+
+1. Open the order and find **Payment & Refund**.
+2. Tick **REFUND**.
+3. Choose **Full Refund** (the amount fills in by itself) or **Part Refund** (type the amount).
+4. Write a short note. A note is required.
+5. Save.
+
+![Refund requests on an order](guide-images/06-refund-requests.jpg)
+
+**Important:** this only puts the order on the refund list for accounts. **No money moves.** **Still refundable** shows how much can still be refunded.
+
+### The Refund Orders List
+Open it with **Refund Orders List** at the top of the app.
+
+![The refund list](guide-images/09-refund-list.jpg)
+
+1. Use **PENDING** and **REFUNDED** to choose what you see.
+2. When accounts have paid the customer, type the transaction number in the box, press **Save**, then press **Refunded**. The date is filled in for you.
+3. **Add Order** adds a refund by hand. You must write a note, and it is marked "Manual Add".
+4. **Remove selected:** tick a record and press **Remove selected** to take it off the list (for example a refund added by mistake). The system asks you to confirm. The record is not lost: it is kept, marked as removed with your name, and shows as cancelled on the order.
+5. **Export CSV** downloads the list. **Export Refund By Date** downloads refunds for the dates you chose.
+
+**Waiting:** how the refund is really paid (on the card company's site or from Shopify) is not decided yet. For now the list is a record only. The **Claimable** column is empty until the office tells us what it should show.
+
+---
+
+## 10. Customer emails
+
+**What it is for:** changing what customers read in the emails.
+
+![Email templates](guide-images/10-email-templates.jpg)
+
+1. Press **Email templates** at the top.
+2. Click the email you want. You can edit the words, preview it, and press **Send test**.
+3. Every change is saved as a new version, and you can go back to an older one.
+4. Each shop (CFS, TFS, FURN/eBay, UD, MM) has its own wording and sender.
+
+**Good to know:** while we are testing, emails only go to approved test addresses. Real customers are not emailed until the system is switched to live.
+
+---
+
+## 11. Downloading spreadsheets
+
+A link appears on screen and works for 5 minutes. Click it to download.
+
+| Button | Where | What you get |
+|---|---|---|
+| **Export CSV** | Refund Orders List | The refund list |
+| **Export 2 (chase-up sheet)** | Orders by Brand | One row per product, for chasing suppliers |
+| **Export 3 (ordering sheet)** | Orders by Brand | The sheet used to place supplier orders |
+
+A "---" in the Expected Date column means no date has been set.
+
+---
+
+## 12. Changing a made-to-order product
+
+Some products are made to order. For these, the **Configuration** box on the order shows the options the customer chose.
+
+1. Choose the new options.
+2. Press **Check price** to see how much more or less it will cost.
+3. Type the reason and press **Apply change**. Any price difference is added to the order.
+
+![The Configuration box](guide-images/12-configuration-panel.jpg)
+
+If none of the products on the order were made to order, the box says there is nothing to change.
+
+**If it says "unavailable":** the configuration system is asleep. Wait a minute and reload the page.
+
+---
+
+## 13. Reports
+
+Press **Reports** at the top of any page. Each report has its own box and a download button. A link appears on screen and works for 5 minutes.
+
+### Xero VAT Invoice Report
+
+1. Choose **Date from** and **Date to** (up to one year).
+2. Press **Download Xero VAT Invoice Report**.
+3. Click the link that appears.
+
+You get one row per order placed on those dates, ready to import into Xero. VAT is worked out as one sixth of the order total. Cancelled orders are left out.
+
+### Delivery Report
+
+1. Press **Download Delivery Report**. No dates are needed.
+2. Click the link that appears.
+
+You get the orders that are ready to deliver: every product is in a delivery-ready status and nothing is owed. It shows the customer, address and phone number for the delivery company.
+
+**Good to know:** the depot name ("Choice Furniture") and the drop times (7:30 to 16:00) are copied from the old system. Tell us if they have changed.
+
+---
+
+## Not ready yet
+
+These will be added to this guide as soon as they are built:
+
+- Paying refunds straight from the system
+- Replacement orders, Add To Accounts and De-allocate
+- Process Order and Chase Up (ordering from suppliers)
+- Booking deliveries
+- Review emails
+- Export 1 and the Store Orders filter
+- Automatic emails when a status changes
+- Showing the real Site, Taken By and Source on the list
+- The other reports (outstanding payments, unpaid invoices, margins, the big order report), payment reminders, service issues, returns and credit notes
+
+---
+
+## What changed in this guide
+
+| Date | Version | What changed |
+|---|---|---|
+| 23 Nov 2026 | 4 | Added the Reports page: Xero VAT Invoice Report and Delivery Report |
+| 23 Nov 2026 | 3 | Added pictures for Delivery confirmation and Configuration, and the Remove selected step |
+| 23 Nov 2026 | 2 | Plain-language rewrite, button names checked on screen, pictures added |
+| 23 Nov 2026 | 1 | First version |

@@ -68,3 +68,8 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 33. Invoices: VAT is one sixth of the grand total and the VAT invoice shows the subtotal divided by 1.2 (the legacy rule). Still right? Must offer discount and coupon discount be separate columns (built: one Discount column)?
 34. Invoices and delivery note: where do the product Code, the warehouse code (WHS), the container and vendor info, and the boxes and volume come from now (a Shopify product field, a supplier sheet, other), or should they stay blank? (Built: Code column is blank; the delivery note shows the SKU as the product code and leaves container and box counts blank.)
 35. (Detail for PDF question 3.) How should a refund be paid? Option 1: accounts refund on the payment company's site or in Shopify admin, then press Refunded here and type the transaction number (record only, nothing shows in Shopify). Option 2: pressing Refunded creates the refund in Shopify (shows in admin, lowers Paid, money goes back to the card). If Option 2: restock items? send Shopify's refund email? refund delivery and service charges with their product? who may press Refunded? (Built: Option 1, record only.)
+
+## Added 2026-11-23 (found while testing)
+36. Refund list "Claimable" column (and "Claimable Amt" in the refund CSV): what does it mean, who fills it in, and when? (Built: the column is blank.)
+37. Refund list "Add Order": should an order added by hand be saved as not refunded yet, or as already refunded? (Built: saved as already refunded and labelled "Manual Add".)
+38. VAT on a configuration change: the price difference is added to the order as a line. Should VAT be included in that amount like the product price (20%), or treated differently?
