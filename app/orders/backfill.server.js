@@ -3,7 +3,7 @@ import { fetchOrder } from "./fetch-order.server.js";
 import { mapOrder } from "./map-order.js";
 import { upsertOrder } from "./mirror.server.js";
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 5; // small pages keep each request short (a long one can be cut off by the host as "Failed to fetch")
 
 const LIST_QUERY = `#graphql
   query CfsBackfillOrders($first: Int!, $after: String) {

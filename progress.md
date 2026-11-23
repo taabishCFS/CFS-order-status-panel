@@ -335,3 +335,8 @@ The store has **no** `cfs_status_entry` definition. A direct test write returned
 - Not tested: Archive and Restore, brand filter, exports, typing a date by hand (the date box reformats while typing and drops the last digit; the calendar picker should be used).
 - Configuration price lines (`[cfg:...]`) are now left out of the saved order lines, like service lines, so Orders by Brand, its counts, the Export 2 and 3 sheets and bulk actions no longer list them as products. They stay in Shopify admin and in Order Detail's Items table (without a tick box). Existing orders drop the lines on their next save or after Refresh order data.
 - The Lines panel on the Orders list now hides configuration price lines too (the totals under it are unchanged, so they include the price difference).
+
+## Second live test of the order lists (2026-11-23, after the deploy)
+- Works: brand filter (Duke Beds with a date to 12 Nov gives 0, correct because its only order is 18 Nov), date range through the calendar picker (to 12 Nov gives 12 of 15, inclusive), Archive with its confirm step and Restore (order #1024 archived, listed under Archived orders, restored; it is back in the main list).
+- Still failing: **Refresh order data** shows "Refresh stopped after 0 orders. Failed to fetch" again, with the new error handling deployed, so the request is not reaching the server's error handler (a network-level failure, not a 500). The backfill page size was cut from 25 to 5 orders in case the host cuts off a long request; needs a deploy and a retry. If it still fails, the Render log for the click is needed.
+- Not tested: exports (CSV and the Export 2 and 3 sheets) and the totals check, because the list totals are still stale until the refresh works.
