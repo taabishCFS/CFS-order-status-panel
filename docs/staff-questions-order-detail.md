@@ -73,3 +73,16 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 36. Refund list "Claimable" column (and "Claimable Amt" in the refund CSV): what does it mean, who fills it in, and when? (Built: the column is blank.)
 37. Refund list "Add Order": should an order added by hand be saved as not refunded yet, or as already refunded? (Built: saved as already refunded and labelled "Manual Add".)
 38. VAT on a configuration change: the price difference is added to the order as a line. Should VAT be included in that amount like the product price (20%), or treated differently?
+
+## Added 2026-11-23 (Reports)
+39. Payment reports (Outstanding Payments, Outstanding In-Stock, Unpaid Invoices): where does each item's cost come from now (product field, supplier price sheet, or the supplier invoice amount staff type in)?
+40. Credit or pro-forma: is each brand still treated as a credit-terms or pro-forma supplier, and which brands are which?
+41. Xero invoice report: list every Xero account code used and what decides which one an order gets (brand, product type, payment method or other); is tax type "20% (VAT on Income)" still right, is the "Urban Deco" tracking tag still needed (and for which brands), and what should the Reference column hold?
+42. Which of the old reports do staff still use? (Order Reports, Marketing Sales, Supplier Purchase Orders, Updated Invoices, Outstanding Payments, In-Stock, Unpaid Invoices, Delivery, Balance Paid, Service Issue, Anniversary, Product Sales, Range-wise, Overall.)
+43. Delivery Report: are the depot name "Choice Furniture" and the drop window 7:30 to 16:00 (15 minutes) still right, and does the delivery company need anything else?
+
+### Answers received 2026-11-23 (reports)
+- Q39 (cost): comes from the product data in Shopify: the cost per item, or the supplier cost.
+- Q40 (credit or pro-forma): depends on the brand; it should be stored somewhere in the app per brand.
+- Q41 (Xero): the account code is NOT always 200. It varies with the purchase account and the type of account. Still open: the list of codes and the rule for choosing one; the Urban Deco tag and Reference column.
+- Q39 confirmed: cost = Shopify cost per item. Q41 (a): the Xero code list and rule will come from the user once staff supply it; Xero report keeps code 200 until then.

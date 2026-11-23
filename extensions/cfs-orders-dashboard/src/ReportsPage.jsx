@@ -27,6 +27,7 @@ export default function ReportsPage() {
       <s-button slot="secondary-actions" href="/">Orders</s-button>
       <s-button slot="secondary-actions" href="/orders-by-brand">Orders by Brand</s-button>
       <s-button slot="secondary-actions" href="/refunds">Refund Orders List</s-button>
+      <s-button slot="secondary-actions" href="/brand-terms">Brand terms</s-button>
 
       {staff === null && <s-banner tone="warning">Downloading reports needs a verified Shopify staff sign-in.</s-banner>}
       {notice && (

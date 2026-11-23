@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 4 (23 November 2026)
+**Guide version:** 5 (23 November 2026)
 
 ## Before you start
 
@@ -29,7 +29,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 10 | Edit the emails customers get | Ready, not yet tried |
 | 11 | Send one email to many customers | Ready, not yet tried |
 | 12 | Change a made-to-order product | Ready |
-| 13 | Download the Xero invoice report and the Delivery report | Ready, not yet tried |
+| 13 | Download the Xero invoice report and the Delivery report | Ready |
+| 14 | Say which brands are paid on credit or pro-forma | Ready, not yet tried |
 
 ---
 
@@ -260,6 +261,8 @@ If none of the products on the order were made to order, the box says there is n
 
 Press **Reports** at the top of any page. Each report has its own box and a download button. A link appears on screen and works for 5 minutes.
 
+![The Reports page](guide-images/13-reports.jpg)
+
 ### Xero VAT Invoice Report
 
 1. Choose **Date from** and **Date to** (up to one year).
@@ -276,6 +279,18 @@ You get one row per order placed on those dates, ready to import into Xero. VAT 
 You get the orders that are ready to deliver: every product is in a delivery-ready status and nothing is owed. It shows the customer, address and phone number for the delivery company.
 
 **Good to know:** the depot name ("Choice Furniture") and the drop times (7:30 to 16:00) are copied from the old system. Tell us if they have changed.
+
+---
+
+## 14. Brand terms
+
+Some suppliers are paid on **credit** (we pay later) and some are paid **pro-forma** (we pay first). The payment reports need to know which is which.
+
+1. Press **Reports**, then **Brand terms**.
+2. Next to each brand, choose **Credit**, **Pro-forma** or **Not set**.
+3. The change is saved straight away. A green message confirms it.
+
+**Good to know:** only signed-in staff can change this. A brand appears in the list once it has an order.
 
 ---
 
@@ -299,6 +314,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 23 Nov 2026 | 5 | Added Brand terms (credit or pro-forma per brand) |
 | 23 Nov 2026 | 4 | Added the Reports page: Xero VAT Invoice Report and Delivery Report |
 | 23 Nov 2026 | 3 | Added pictures for Delivery confirmation and Configuration, and the Remove selected step |
 | 23 Nov 2026 | 2 | Plain-language rewrite, button names checked on screen, pictures added |

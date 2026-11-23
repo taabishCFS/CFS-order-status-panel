@@ -270,3 +270,15 @@ model DeliveryNotePrint {
 
   @@index([shop, orderId, printedAt])
 }
+
+// How a brand's supplier is paid: "credit" or "proforma". Set by staff on the Brand terms screen; used by the payment reports.
+model BrandTerms {
+  shop          String
+  brand         String
+  terms         String
+  updatedById   String?
+  updatedByName String?
+  updatedAt     DateTime @updatedAt
+
+  @@id([shop, brand])
+}

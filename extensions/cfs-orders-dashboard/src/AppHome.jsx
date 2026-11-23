@@ -1,5 +1,6 @@
 import { render } from 'preact';
 import { ErrorBoundary, LocationProvider, Route, Router } from 'preact-iso';
+import BrandTermsPage from './BrandTermsPage.jsx';
 import EmailTemplatesPage from './EmailTemplatesPage.jsx';
 import OrderDetailPage from './OrderDetailPage.jsx';
 import OrdersByBrand from './OrdersByBrand.jsx';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/orders/:id" component={OrderDetailPage} />
           <Route path="/refunds" component={RefundsPage} />
           <Route path="/reports" component={ReportsPage} />
+          <Route path="/brand-terms" component={BrandTermsPage} />
           <Route path="/email-templates" component={EmailTemplatesPage} />
           <Route default component={NotFound} />
         </Router>
