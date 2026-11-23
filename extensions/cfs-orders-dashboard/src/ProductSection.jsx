@@ -39,14 +39,15 @@ export default function ProductSection({ id, lines, picked, writer, verified, re
     if (!res.ok) { setBusy(false); setMessage({ tone: 'critical', text: res.message }); return; }
     // Shopify has the change. Record it; if that fails the product is still on the order.
     const recorded = await writer.write((state, meta) => applyProductChange(state, { from: res.from, to: res.to, ...meta }));
-    if (!recorded) setNotice({ tone: 'warning', text: 'The product was changed on the order, but the history entry was not recorded.' });
-    else await reload();
+    if (recorded) await reload();
     setBusy(false);
     setFound(null);
     setChoice('');
     setText('');
     setQty('1');
-    setMessage({ tone: 'success', text: `${res.from ? 'Product replaced' : 'Product added'}: ${res.to}. The order total and balance now include it.` });
+    setMessage(recorded
+      ? { tone: 'success', text: `${res.from ? 'Product replaced' : 'Product added'}: ${res.to}. The order total and balance now include it.` }
+      : { tone: 'warning', text: `The product was changed on the order, but the history entry was not recorded${writer.lastError.current ? `: ${writer.lastError.current}` : ''}.` });
   }
 
   return (

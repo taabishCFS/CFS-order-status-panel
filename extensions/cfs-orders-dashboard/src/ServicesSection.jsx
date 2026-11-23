@@ -30,8 +30,13 @@ export default function ServicesSection({ id, writer, verified, reload, setNotic
     if (res.changed) {
       // Shopify has the change. Record it; if that fails the services are still on the order.
       const recorded = await writer.write((state, meta) => applyServicesChange(state, { changes: historyChanges(res.changes), ...meta }));
-      if (!recorded) setNotice({ tone: 'warning', text: 'The services were changed on the order, but the history entry was not recorded.' });
-      else await reload();
+      if (!recorded) {
+        setBusy(false);
+        await load();
+        setMessage({ tone: 'warning', text: `The services were changed on the order, but the history entry was not recorded${writer.lastError.current ? `: ${writer.lastError.current}` : ''}.` });
+        return;
+      }
+      await reload();
     }
     setBusy(false);
     await load();

@@ -247,3 +247,14 @@ model RefundRequest {
   @@index([shop, orderId])
   @@index([shop, status, createdAt])
 }
+
+// Who opened an order's detail page last (shown on Order Detail). One row per order, replaced on each open.
+model OrderOpen {
+  shop      String
+  orderId   String
+  staffId   String
+  staffName String
+  openedAt  DateTime @default(now())
+
+  @@id([shop, orderId])
+}

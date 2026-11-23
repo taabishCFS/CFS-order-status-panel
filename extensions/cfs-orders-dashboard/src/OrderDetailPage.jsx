@@ -45,6 +45,12 @@ export default function OrderDetailPage({ id }) {
   useEffect(() => {
     callBackend('api/whoami').then((r) => setVerified(r?.staff?.name ? r.staff : null)).catch(() => setVerified(null));
   }, []);
+  // Who had this order open before this staff member; recorded when a verified staff member opens it.
+  const [lastOpen, setLastOpen] = useState(undefined); // undefined: not known, null: nobody before, else { name, at }
+  useEffect(() => {
+    if (!verified) return;
+    callBackend(`api/orders/${id}/opened`, { method: 'POST' }).then((r) => setLastOpen(r?.ok ? r.last : undefined)).catch(() => setLastOpen(undefined));
+  }, [verified?.name, id]);
   const resetOlder = () => setOlder({ entries: [], cursor: null, hasNext: true, loading: false, error: null });
   const writer = useWriter({
     orderId,
@@ -208,6 +214,7 @@ export default function OrderDetailPage({ id }) {
       <ServicesSection id={id} writer={writer} verified={verified} reload={reload} setNotice={setNotice} />
 
       <s-section heading={`History (${total})`}>
+        {lastOpen !== undefined && <s-text color="subdued">{lastOpen ? `Last opened by ${lastOpen.name} on ${when(lastOpen.at)}` : 'Not opened by anyone before you.'}</s-text>}
         <s-button onClick={() => setShowHistory((v) => !v)}>{showHistory ? 'Hide history' : 'Show history'}</s-button>
         {showHistory && <>
         <s-stack direction="block" gap="small">
