@@ -22,10 +22,16 @@ export default function ConfigurationSection({ id, currency, writer, verified, r
   const busy = working !== null;
   const [message, setMessage] = useState(null); // { tone, text }
 
-  async function load() {
+  async function load(retry = true) {
     try {
       const r = await callBackendResult(`api/orders/${id}/configuration`);
-      setData(r.ok ? r.body : { error: r.body?.code ?? r.body?.error ?? `status ${r.status}` });
+      const code = r.body?.code ?? r.body?.error;
+      // The configurator sleeps when idle; its first answer can be "unavailable". Ask once more shortly.
+      if (!r.ok && retry && (code === 'unavailable' || code === 'timeout')) {
+        await new Promise((resolve) => setTimeout(resolve, 6000));
+        return load(false);
+      }
+      setData(r.ok ? r.body : { error: code ?? `status ${r.status}` });
     } catch (e) {
       setData({ error: e.message });
     }
