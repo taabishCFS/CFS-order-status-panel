@@ -133,7 +133,7 @@ export default function OrderDetailPage({ id }) {
         </s-banner>
       )}
 
-      <DocumentsSection id={id} detail={detail} lines={lines} picked={picked} verified={verified} />
+      <DocumentsSection id={id} detail={detail} lines={lines} picked={picked} verified={verified} email={customer && !customer.restricted ? customer.email : undefined} />
 
       <s-section heading="Order">
         <s-stack direction="block" gap="small">

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { StatusState } from '../../cfs-order-status/src/types';
-import { deliveryNoteStatus, loadNoteLog, requestDocument } from './documents';
+import { deliveryNoteStatus, loadNoteLog, requestDocument, resendInvoice } from './documents';
 
 const reply = (status: number, body: unknown) => vi.fn(async () => ({ ok: status < 300, status, json: async () => body })) as unknown as typeof fetch;
 const state = (over: Record<string, unknown> = {}) => ({ schemaVersion: 2, order: null, lines: { L1: { statusId: 4 }, L2: { statusId: 3 } }, history: [], ...over }) as unknown as StatusState;
@@ -46,5 +46,16 @@ describe('loadNoteLog', () => {
   it('returns the log, or the reason it could not be read', async () => {
     expect(await loadNoteLog('5', reply(200, { log: [{ at: '2026-11-22T10:00:00.000Z', by: 'Ann' }] }))).toEqual({ ok: true, log: [{ at: '2026-11-22T10:00:00.000Z', by: 'Ann' }] });
     expect(await loadNoteLog('5', reply(502, { error: 'shopify_unavailable' }))).toMatchObject({ ok: false });
+  });
+});
+
+describe('resendInvoice', () => {
+  const reply = (status: number, body: unknown) => vi.fn(async () => ({ ok: status < 300, status, json: async () => body })) as unknown as typeof fetch;
+  it('gives the recipient when queued', async () => {
+    expect(await resendInvoice('5', 'k', reply(200, { ok: true, recipient: 'a@b.co' }))).toEqual({ ok: true, recipient: 'a@b.co' });
+  });
+  it('explains email off and a missing address', async () => {
+    expect(await resendInvoice('5', 'k', reply(409, { error: 'email_off' }))).toMatchObject({ ok: false, message: expect.stringMatching(/switched off/) });
+    expect(await resendInvoice('5', 'k', reply(422, { error: 'no_recipient' }))).toMatchObject({ ok: false, message: expect.stringMatching(/no customer email/) });
   });
 });

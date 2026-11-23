@@ -1,15 +1,18 @@
 import { useState } from 'preact/hooks';
-import { RETURN_TYPES, deliveryNoteStatus, loadNoteLog, requestDocument } from './documents';
+import { RETURN_TYPES, deliveryNoteStatus, loadNoteLog, requestDocument, resendInvoice } from './documents';
 
 const when = (iso) => new Date(iso).toLocaleString('en-GB');
 
 // The document buttons of the legacy order header: Save PDF, Exc VAT Inv., Inc VAT Inv., Print Delivery Note (with its log),
 // Resend Inv., Print Label, Print Ret. Label. Each opens a printable page in a new tab; use the browser's Print or Save as PDF there.
-export default function DocumentsSection({ id, detail, lines, picked, verified }) {
+export default function DocumentsSection({ id, detail, lines, picked, verified, email }) {
   const [busy, setBusy] = useState(null);
   const [ready, setReady] = useState(null); // { url, label } the link to open
   const [message, setMessage] = useState(null);
   const [returnType, setReturnType] = useState('');
+  const [confirmSend, setConfirmSend] = useState(false);
+  const [sendKey] = useState(() => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+  const [sent, setSent] = useState(null);
   const [log, setLog] = useState(null); // null: closed, else { entries } or { error }
 
   const note = deliveryNoteStatus({ balanceAmount: detail.breakdown.balance?.amount ?? null, state: detail.state, lineIds: lines.map((l) => l.id) });
@@ -22,6 +25,16 @@ export default function DocumentsSection({ id, detail, lines, picked, verified }
     const res = await requestDocument(id, kind, extra);
     setBusy(null);
     if (res.ok) setReady({ url: res.url, label });
+    else setMessage(res.message);
+  }
+
+  async function send() {
+    setBusy('resend');
+    setMessage(null);
+    const res = await resendInvoice(id, sendKey);
+    setBusy(null);
+    setConfirmSend(false);
+    if (res.ok) setSent(`The invoice was queued to ${res.recipient ?? 'the customer'}. See the Email log for whether it was sent.`);
     else setMessage(res.message);
   }
 
@@ -49,11 +62,23 @@ export default function DocumentsSection({ id, detail, lines, picked, verified }
             <s-button disabled={!note.ok || disabled} loading={busy === 'delivery-note' || undefined} onClick={() => open('delivery-note', 'The delivery note')}>Print Delivery Note</s-button>
             <s-link onClick={showLog}>Delv. Notes Log</s-link>
           </s-stack>
-          <s-button disabled onClick={() => {}}>Resend Inv.</s-button>
+          <s-button disabled={disabled || email === null} onClick={() => { setSent(null); setConfirmSend(true); }}>Resend Inv.</s-button>
           <s-button disabled={disabled} loading={busy === 'label' || undefined} onClick={() => open('label', 'The label')}>Print Label</s-button>
         </s-stack>
         {!note.ok && <s-text color="subdued">Delivery note unavailable: {note.reason}</s-text>}
-        <s-text color="subdued">Resend Inv. is not switched on yet: it waits for the sender address and wording to be confirmed.</s-text>
+        {confirmSend && (
+          <s-banner tone="warning" heading="Email the invoice to the customer?">
+            <s-stack direction="block" gap="small">
+              <s-text>It will be sent to {email ?? 'the email address on the order'}. This is a temporary email layout until the wording is confirmed.</s-text>
+              <s-stack direction="inline" gap="small">
+                <s-button variant="primary" loading={busy === 'resend' || undefined} onClick={send}>Send invoice</s-button>
+                <s-button onClick={() => setConfirmSend(false)}>Cancel</s-button>
+              </s-stack>
+            </s-stack>
+          </s-banner>
+        )}
+        {sent && <s-banner tone="success" dismissible onDismiss={() => setSent(null)}>{sent}</s-banner>}
+        {email === null && <s-text color="subdued">Resend Inv. needs a customer email on the order.</s-text>}
         <s-stack direction="inline" gap="small" alignItems="end">
           <s-select label="Return label type" value={returnType} onChange={(e) => setReturnType(e.currentTarget.value)}>
             <s-option value="">Select Label Type</s-option>

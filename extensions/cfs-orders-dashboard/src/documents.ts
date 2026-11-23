@@ -31,6 +31,8 @@ function problem(status: number, body: { error?: string; message?: string } | nu
     case 'no_lines': return 'Tick the items to put on the return label first.';
     case 'bad_type': return 'Choose a return label type.';
     case 'not_found': return 'This order was not found in Shopify.';
+    case 'email_off': return 'Email sending is switched off for this app, so nothing was sent.';
+    case 'no_recipient': return 'This order has no customer email address.';
     case 'shopify_unavailable': return 'Shopify could not be read just now. Try again shortly.';
     default: return `The server answered with status ${status}.`;
   }
@@ -66,6 +68,21 @@ export async function loadNoteLog(orderNumber: string, fetchFn: typeof fetch = f
     const res = await callBackendResult(`api/orders/${orderNumber}/document?log=1`, undefined, fetchFn);
     const body = res.body as { log?: NoteLogEntry[]; error?: string; message?: string } | null;
     return res.ok && body?.log ? { ok: true, log: body.log } : { ok: false, message: problem(res.status, body) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+/** Emails the invoice to the customer (Resend Inv.). The key stops a double click sending it twice. */
+export async function resendInvoice(
+  orderNumber: string,
+  idempotencyKey: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<{ ok: true; recipient: string | null } | { ok: false; message: string }> {
+  try {
+    const res = await callBackendResult(`api/orders/${orderNumber}/resend-invoice`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idempotencyKey }) }, fetchFn);
+    const body = res.body as { ok?: boolean; recipient?: string | null; error?: string; message?: string } | null;
+    return res.ok && body?.ok ? { ok: true, recipient: body.recipient ?? null } : { ok: false, message: problem(res.status, body) };
   } catch (e) {
     return failure(e);
   }
