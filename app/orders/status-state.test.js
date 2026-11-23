@@ -22,6 +22,11 @@ describe("readStatusState", () => {
     });
   });
 
+  it("keeps the expected date and delivery answer of a line that never had a status", () => {
+    const r = readStatusState(JSON.stringify({ lines: {}, expected: { L1: { date: "2026-12-05" } }, delivery: { L2: { outcome: "confirmed" } } }));
+    expect(r.lines.L1).toEqual({ statusId: null, expectedDate: "2026-12-05", delivery: null });
+    expect(r.lines.L2).toEqual({ statusId: null, expectedDate: null, delivery: "confirmed" });
+  });
   it("treats a missing record as empty, not unreadable", () => {
     expect(readStatusState(null)).toEqual({ orderStatusId: null, lines: {}, unreadable: false });
   });

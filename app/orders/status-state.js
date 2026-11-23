@@ -15,7 +15,10 @@ export function readStatusState(value) {
   }
   if (!isObject(state) || !isObject(state.lines)) return empty(true);
   const lines = {};
-  for (const [id, stamp] of Object.entries(state.lines)) {
+  // A line can have an expected date or a delivery answer without ever having had a status, so read every line named anywhere.
+  const ids = new Set([...Object.keys(state.lines), ...Object.keys(isObject(state.expected) ? state.expected : {}), ...Object.keys(isObject(state.delivery) ? state.delivery : {})]);
+  for (const id of ids) {
+    const stamp = state.lines[id];
     const delivery = state.delivery?.[id]?.outcome;
     lines[id] = {
       statusId: int(stamp?.statusId),
