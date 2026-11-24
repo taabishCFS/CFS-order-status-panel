@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 8 (23 November 2026)
+**Guide version:** 9 (24 November 2026)
 
 ## Before you start
 
@@ -30,9 +30,10 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 11 | Send one email to many customers | Ready, not yet tried |
 | 12 | Change a made-to-order product | Ready |
 | 13 | Download the Xero invoice report and the Delivery report | Ready |
-| 14 | Say which brands are paid on credit or pro-forma, one by one or from Excel | Ready (Excel import not yet tried) |
+| 14 | Say which brands are paid on credit or pro-forma, one by one or from Excel | Ready |
 | 15 | Find every page from the Dashboard | Ready |
 | 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready |
+| 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready, not yet tried |
 
 ---
 
@@ -292,6 +293,27 @@ Each row shows the order, brand, product, quantity, **Total Cost** (the Shopify 
 - Delivery Date is blank for now. The new system does not keep one yet.
 - Credit brands count more statuses than pro-forma brands, as in the old system.
 
+### Outstanding In-Stock Items and Unpaid Invoices
+
+These two work like Outstanding Payments, but they cover **every brand** (there is no Credit or Pro-forma choice).
+
+1. On the Reports page, choose **Date from** and **Date to** in the box you want. These are the dates the orders were placed.
+2. Press the **Download** button and click the link.
+
+Each row shows the order, brand, product, quantity, **Total Cost** and status. A product only appears if:
+- it has **come into stock** at some point,
+- its supplier invoice is **not marked paid**,
+- its name does not contain "Clearance", and
+- it is in the right status for that report.
+
+**Outstanding In-Stock Items** is for accounts to see what to pay now. It lists every status except Payment Process, Cancelled and a few others.
+**Unpaid Invoices Report** only lists products in one of these statuses: Order in Progress, In Stock with Supplier, Delayed, Invoice Received, Payment Process, Coming IN, In Stock and Completed.
+
+**Good to know:**
+- A product only counts as "came into stock" once it has been set to **In Stock** in this system. Orders saved before then need **Refresh order data** on the Orders page once, so the dates are filled in.
+- A product set straight to **DHD with Supplier** also counts.
+- A blank Total Cost means the product has no cost in Shopify.
+
 ### Delivery Report
 
 1. Press **Download Delivery Report**. No dates are needed.
@@ -322,6 +344,8 @@ Some suppliers are paid on **credit** (we pay later) and some are paid **pro-for
 3. Save the file as **CSV**.
 4. Drop the file on the **Import brand terms** box (or click the box and pick the file).
 5. A message tells you how many were saved. If some rows could not be used, the page lists them with their row number so you can fix them.
+
+![After an import](guide-images/14b-brand-terms-import.jpg)
 
 **Rules for the Terms column:**
 - **Credit** or **Pro-forma** (capitals and the dash do not matter).
@@ -359,7 +383,7 @@ These will be added to this guide as soon as they are built:
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
 - Showing the real Site, Taken By and Source on the list
-- The other reports (outstanding in-stock, unpaid invoices, margins, the big order report), payment reminders, service issues, returns and credit notes
+- The other reports (margins, the big order report), payment reminders, service issues, returns and credit notes
 
 ---
 
@@ -367,6 +391,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 24 Nov 2026 | 9 | Added the Outstanding In-Stock Items and Unpaid Invoices reports |
 | 23 Nov 2026 | 8 | Brand terms: search, pages, download list and Excel import |
 | 23 Nov 2026 | 7 | Added the Outstanding Payments report |
 | 23 Nov 2026 | 6 | Added the Dashboard page |

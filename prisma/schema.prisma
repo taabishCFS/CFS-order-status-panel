@@ -87,6 +87,7 @@ model OrderLine {
   lineStatusId    Int?
   expectedDate    String?
   deliveryOutcome String?
+  stockedDate     String? // YYYY-MM-DD the line last came into stock (status 4); kept when it moves on
   orderCreatedAt  DateTime @default(now())
   orderArchived   Boolean  @default(false)
 

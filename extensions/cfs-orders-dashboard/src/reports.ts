@@ -2,7 +2,7 @@
 // download link. Every call returns { ok: false, message } instead of throwing.
 import { callBackendResult } from './backend';
 
-export type ReportKind = 'xero' | 'delivery' | 'outstanding' | 'brandterms';
+export type ReportKind = 'xero' | 'delivery' | 'outstanding' | 'instock' | 'unpaid' | 'brandterms';
 export type PayTerms = 'credit' | 'proforma';
 
 export interface ReportInfo {
@@ -27,6 +27,20 @@ export const REPORTS: ReportInfo[] = [
     description: 'Products we have not yet paid the supplier for, for brands paid on credit or pro-forma (set on Brand terms). Shows the Shopify cost per item times the quantity. Items whose supplier invoice is marked paid are left out.',
     needsDates: true,
     needsTerms: true,
+  },
+  {
+    kind: 'instock',
+    title: 'Outstanding In-Stock Items',
+    description: 'Products that have come into stock but whose supplier invoice is not marked paid, so accounts know what to pay now. Covers every brand. Clearance items are left out. Shows the Shopify cost per item times the quantity.',
+    needsDates: true,
+    needsTerms: false,
+  },
+  {
+    kind: 'unpaid',
+    title: 'Unpaid Invoices Report',
+    description: 'Products that have been in stock, are in an order, stock, invoice or payment status, and whose supplier invoice is not marked paid. Covers every brand. Clearance items are left out.',
+    needsDates: true,
+    needsTerms: false,
   },
   {
     kind: 'delivery',

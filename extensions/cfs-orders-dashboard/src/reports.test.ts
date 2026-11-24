@@ -5,7 +5,7 @@ const reply = (status: number, body: unknown) => async () => new Response(JSON.s
 
 describe('REPORTS', () => {
   it('lists the two reports and which one needs dates', () => {
-    expect(REPORTS.map((r) => [r.kind, r.needsDates, r.needsTerms])).toEqual([['xero', true, false], ['outstanding', true, true], ['delivery', false, false]]);
+    expect(REPORTS.map((r) => [r.kind, r.needsDates, r.needsTerms])).toEqual([['xero', true, false], ['outstanding', true, true], ['instock', true, false], ['unpaid', true, false], ['delivery', false, false]]);
   });
 });
 

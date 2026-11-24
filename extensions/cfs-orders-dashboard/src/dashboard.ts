@@ -23,7 +23,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     heading: 'Money',
     items: [
       { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },
-      { href: '/reports', title: 'Reports', description: 'Download the Xero invoice report, Outstanding Payments and the Delivery Report.', icon: 'chart-vertical' },
+      { href: '/reports', title: 'Reports', description: 'Download the Xero invoice report, the supplier payment reports and the Delivery Report.', icon: 'chart-vertical' },
     ],
   },
   {

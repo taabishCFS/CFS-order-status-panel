@@ -11,6 +11,8 @@ export const REPORTS = {
   xero: { title: "Xero VAT Invoice Report", needsDates: true, needsTerms: false },
   delivery: { title: "Delivery Report", needsDates: false, needsTerms: false },
   outstanding: { title: "Outstanding Payments", needsDates: true, needsTerms: true },
+  instock: { title: "Outstanding In-Stock Items", needsDates: true, needsTerms: false },
+  unpaid: { title: "Unpaid Invoices Report", needsDates: true, needsTerms: false },
   // Not on the Reports page: the Brand terms screen downloads it (the sample and export for the spreadsheet import).
   brandterms: { title: "Brand terms", needsDates: false, needsTerms: false },
 };
@@ -60,6 +62,7 @@ export const reportQuery = ({ range, terms }) => new URLSearchParams({ ...(range
 export function reportFilename(kind, range, terms) {
   if (kind === "xero") return `Xero_Report-${range.from}_to_${range.to}.csv`;
   if (kind === "outstanding") return `${TERMS_LABEL[terms]}_Total-Outstanding-Report-${range.from}_to_${range.to}.csv`;
+  if (Object.hasOwn(STOCK_REPORTS, kind)) return `${STOCK_REPORTS[kind].file}-${range.from}_to_${range.to}.csv`;
   if (kind === "brandterms") return "brand_terms.csv";
   return "delivery_report.csv";
 }
@@ -148,3 +151,29 @@ export const BRAND_TERMS_HEADERS = ["Brand", "Terms"];
 
 /** The brand list as a spreadsheet: every brand with Credit, Pro-forma or blank. It is also the sample for the import. */
 export const brandTermsCsv = (rows) => buildCsv(BRAND_TERMS_HEADERS, rows.map((r) => [r.brand, TERMS_LABEL[r.terms] ?? ""]));
+
+/**
+ * The two supplier-payment sheets that share one layout (legacy "Outstanding In-Stock Items" and "Unpaid Invoices Report").
+ * Both list product lines that have been in stock, whose supplier invoice is not marked paid, are not "Clearance" items, and were
+ * ordered in the date range. They differ only in which line statuses count.
+ * - instock: every status except 1, 9, 32, 34, 35 and 50.
+ * - unpaid: only 3, 35, 10, 12, 1, 14, 4 and 6.
+ * "Has been in stock" means the line has a stock date (it came into In Stock, status 4) or is now DHD with Supplier (status 36).
+ */
+export const STOCK_REPORTS = {
+  instock: { statusFilter: { notIn: [1, 9, 32, 34, 35, 50] }, file: "Total-Outstanding-After-Instock-Report" },
+  unpaid: { statusFilter: { in: [3, 35, 10, 12, 1, 14, 4, 6] }, file: "Total-Outstanding-Report" },
+};
+export const DHD_WITH_SUPPLIER = 36;
+
+export const STOCK_HEADERS = ["Order No.", "Order Date", "Brand", "Item", "Qty", "Total Cost", "Item Status"];
+
+/** One row of the in-stock or unpaid sheet. ctx = { orderName, orderCreatedAt, statusLabel, costMinor }. Cost is the Shopify cost per item times the quantity, blank if none. */
+export function stockRow(line, ctx) {
+  return [
+    String(ctx.orderName).replace(/^#/, ""), ukDate(ctx.orderCreatedAt), line.vendor?.trim() || "Unmapped", line.title, line.quantity,
+    ctx.costMinor == null ? "" : money(ctx.costMinor * line.quantity), ctx.statusLabel ?? "",
+  ];
+}
+
+export const stockCsv = (rows) => buildCsv(STOCK_HEADERS, rows);

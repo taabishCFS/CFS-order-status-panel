@@ -61,7 +61,31 @@ declare module './src/useStaff.js' {
 }
 
 //@ts-ignore
+declare module './src/Pager.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/orderList.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/brandTerms.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/brandTermsImport.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/reports.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
@@ -277,18 +301,6 @@ declare module './src/listApi.ts' {
 }
 
 //@ts-ignore
-declare module './src/Pager.jsx' {
-  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
-  const globalThis: { shopify: typeof shopify };
-}
-
-//@ts-ignore
-declare module './src/orderList.ts' {
-  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
-  const globalThis: { shopify: typeof shopify };
-}
-
-//@ts-ignore
 declare module './src/ExpandedOrder.jsx' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
@@ -302,12 +314,6 @@ declare module './src/orderExpand.ts' {
 
 //@ts-ignore
 declare module './src/refundList.ts' {
-  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
-  const globalThis: { shopify: typeof shopify };
-}
-
-//@ts-ignore
-declare module './src/reports.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }

@@ -1,7 +1,7 @@
 import db from "../db.server";
 import { verifyExportLink } from "../orders/export-link.server";
 import { buildReport } from "../orders/report-query.server";
-import { REPORTS, parseReportParams, reportFilename } from "../orders/report-rules";
+import { REPORTS, STOCK_REPORTS, parseReportParams, reportFilename } from "../orders/report-rules";
 import { unauthenticated } from "../shopify.server";
 
 const refuse = (status, text) => new Response(text, { status, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } });
@@ -17,7 +17,7 @@ export const loader = async ({ request }) => {
   const params = parseReportParams(kind, (name) => query.get(name));
   if (!params) return refuse(400, "Unknown report.");
 
-  const graphql = kind === "outstanding" ? (await unauthenticated.admin(link.shop)).admin.graphql : undefined;
+  const graphql = kind === "outstanding" || Object.hasOwn(STOCK_REPORTS, kind) ? (await unauthenticated.admin(link.shop)).admin.graphql : undefined;
   const result = await buildReport({ db, graphql, shop: link.shop, kind, range: params.range, terms: params.terms });
   return new Response(result.csv, {
     headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="${reportFilename(kind, params.range, params.terms)}"`, "cache-control": "no-store" },

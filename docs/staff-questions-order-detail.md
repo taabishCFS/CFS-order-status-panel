@@ -75,8 +75,8 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 38. VAT on a configuration change: the price difference is added to the order as a line. Should VAT be included in that amount like the product price (20%), or treated differently?
 
 ## Added 2026-11-23 (Reports)
-39. Payment reports (Outstanding Payments, Outstanding In-Stock, Unpaid Invoices): where does each item's cost come from now (product field, supplier price sheet, or the supplier invoice amount staff type in)?
-40. Credit or pro-forma: is each brand still treated as a credit-terms or pro-forma supplier, and which brands are which?
+39. ANSWERED: payment report item cost = Shopify cost per item.
+40. ANSWERED: credit or pro-forma is set per brand and stored in the app (Brand terms page, Excel import). Staff still need to fill it in.
 41. Xero invoice report: list every Xero account code used and what decides which one an order gets (brand, product type, payment method or other); is tax type "20% (VAT on Income)" still right, is the "Urban Deco" tracking tag still needed (and for which brands), and what should the Reference column hold?
 42. Which of the old reports do staff still use? (Order Reports, Marketing Sales, Supplier Purchase Orders, Updated Invoices, Outstanding Payments, In-Stock, Unpaid Invoices, Delivery, Balance Paid, Service Issue, Anniversary, Product Sales, Range-wise, Overall.)
 43. Delivery Report: are the depot name "Choice Furniture" and the drop window 7:30 to 16:00 (15 minutes) still right, and does the delivery company need anything else?
@@ -86,3 +86,7 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 - Q40 (credit or pro-forma): depends on the brand; it should be stored somewhere in the app per brand.
 - Q41 (Xero): the account code is NOT always 200. It varies with the purchase account and the type of account. Still open: the list of codes and the rule for choosing one; the Urban Deco tag and Reference column.
 - Q39 confirmed: cost = Shopify cost per item. Q41 (a): the Xero code list and rule will come from the user once staff supply it; Xero report keeps code 200 until then.
+44. Delivery Date on the Outstanding Payments report: what did the old column show (arrival date or customer delivery date), and where should it come from now? (Built: blank.)
+45. Cost per item in Shopify: who fills in the cost of every product (or imports it), and from what file? (Payment reports show a blank cost where there is none.)
+46. In-Stock and Unpaid Invoices reports: the old In-Stock report skipped a fixed list of about 20 brands and orders before a cut-off. Which brands or orders should the new reports leave out?
+47. Supplier payment reports: is an item set straight to "DHD with Supplier" (status 36) to count as in stock, and should "Clearance" items stay hidden? (Built: status 36 counts, Clearance hidden.)
