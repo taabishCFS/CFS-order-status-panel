@@ -27,6 +27,7 @@ export function deliveryNoteStatus(input: { balanceAmount: string | null; state:
 function problem(status: number, body: { error?: string; message?: string } | null): string {
   switch (body?.error) {
     case 'staff_not_verified': return 'Only a verified staff member can print documents.';
+    case 'no_permission': return 'You do not have permission to print delivery notes. Ask a manager.';
     case 'not_allowed': return body.message ?? 'The delivery note cannot be printed for this order.';
     case 'no_lines': return 'Tick the items to put on the return label first.';
     case 'bad_type': return 'Choose a return label type.';

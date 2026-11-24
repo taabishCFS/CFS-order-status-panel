@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 14 (28 November 2026)
+**Guide version:** 15 (29 November 2026)
 
 ## Before you start
 
@@ -37,7 +37,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 18 | Keep a list of free stock (goods we already own), fill it from Excel, correct or delete items | Ready |
 | 19 | Give free stock to an order's item instead of buying it again, and take it back | Ready |
 | 20 | Keep a list of stock arriving in containers, with expected dates and freight, and give it to an order's item | Ready |
-| 21 | Keep a list of goods to send back to the supplier, and display pieces, and mark them collected | Ready, not yet tried |
+| 21 | Keep a list of goods to send back to the supplier, and display pieces, and mark them collected | Ready |
+| 22 | Choose which staff can change delivery charges, work the refund list and print delivery notes | Ready, not yet tried |
 
 ---
 
@@ -461,6 +462,29 @@ SBTS and Display items can also be given to an order's item from the order page,
 
 ---
 
+## 19. Permissions
+
+Some actions are restricted to the staff you choose. The old system asked for a password; here each person has a tick-list instead, so nobody shares a password.
+
+The restricted actions are:
+- **Change delivery and service charges** (the Delivery & services box on an order).
+- **Work the refund list** (Refunded, Save, Add Order and Remove on the Refund Orders List).
+- **Print delivery notes**.
+- **Manage permissions** (open this page and change what others can do).
+
+### Setting it up
+Open it from the **Dashboard**: click the **Permissions** card.
+
+1. Everyone appears on the list after opening the app once.
+2. **Until someone is given Manage permissions, nobody is restricted** and everyone can do everything. Tick **Manage permissions** for yourself first. From then on each person can only do what is ticked for them.
+3. Tick the actions for each person. Each tick saves straight away.
+
+If someone without a tick tries a restricted action, they see a message asking them to speak to a manager.
+
+There must always be at least one manager; the page will not let you remove the last one.
+
+---
+
 ## Not ready yet
 
 These will be added to this guide as soon as they are built:
@@ -481,6 +505,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 29 Nov 2026 | 15 | Added the Permissions page: choose who can change delivery charges, work refunds and print delivery notes |
 | 28 Nov 2026 | 14 | Added the SBTS / Display page: send-back-to-supplier and display items, mark collected, remove |
 | 27 Nov 2026 | 13 | Added the Containers page: container stock, expected dates, freight, and giving it to an order's item |
 | 26 Nov 2026 | 12 | Give free stock to an order's item, and take it back |

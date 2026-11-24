@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 let admin;
 let svc;
+let allowed = true;
+vi.mock("../staff/permissions.server", () => ({ can: async () => allowed }));
 vi.mock("../shopify.server", () => ({ authenticate: { admin: (...a) => admin(...a) } }));
 vi.mock("../db.server", () => ({ default: { marker: "db" } }));
 vi.mock("../orders/refund-list.server", () => ({
@@ -19,6 +21,7 @@ const post = (body) => new Request("https://app.test/api/refunds", { method: "PO
 const manual = { action: "add", clientKey: "k1", reason: "DelayRefund", type: "full", orderName: "1001", amount: "50.00", notes: "Phoned in" };
 
 beforeEach(() => {
+  allowed = true;
   admin = async () => ({ session: session(), cors: (r) => r });
   svc = {
     list: vi.fn(async () => ({ rows: [], total: 0, page: 1, pageCount: 1, capped: false, view: "pending" })),
@@ -81,5 +84,15 @@ describe("POST /api/refunds", () => {
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: "staff_not_verified" });
     expect(svc.remove).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/refunds permission", () => {
+  it("refuses staff without the refunds permission and changes nothing", async () => {
+    allowed = false;
+    const res = await route.action({ request: post({ action: "add", ...manual }) });
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toBe("no_permission");
+    expect(svc.add).not.toHaveBeenCalled();
   });
 });

@@ -1,7 +1,9 @@
 import { SERVICES, planServiceChanges, readServicesInput, serviceChanges } from "../orders/services";
 import { applyServices, readServices } from "../orders/services.server";
 import { authenticate } from "../shopify.server";
+import { can } from "../staff/permissions.server";
 import { staffFromSession } from "../staff/staff.server";
+import db from "../db.server";
 
 const ID = /^\d{1,20}$/;
 
@@ -27,6 +29,7 @@ export const action = async ({ request, params }) => {
 
   const staff = staffFromSession(session);
   if (!staff) return json({ error: "staff_not_verified" }, 403);
+  if (!(await can(db, session.shop, staff, "delivery_charges"))) return json({ error: "no_permission" }, 403);
   if (!ID.test(params.id ?? "")) return json({ error: "bad_request" }, 400);
 
   let body;

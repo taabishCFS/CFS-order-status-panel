@@ -398,3 +398,18 @@ model ContainerFreight {
 
   @@index([shop, containerNo])
 }
+
+// Staff who have opened the app, and which restricted actions each may do. Until someone has "manage_permissions", nobody is restricted.
+model StaffMember {
+  id         String   @id @default(cuid())
+  shop       String
+  staffId    String
+  name       String
+  keys       String[] @default([])
+  lastSeenAt DateTime @default(now())
+  updatedBy  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([shop, staffId])
+}

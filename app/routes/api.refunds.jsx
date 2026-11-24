@@ -2,6 +2,7 @@ import db from "../db.server";
 import { parseRefundListParams, readManualInput, readRefundAction } from "../orders/refund-list";
 import { addManualRefund, listRefunds, markRefunded, removeRefunds, setClaimable } from "../orders/refund-list.server";
 import { authenticate } from "../shopify.server";
+import { can } from "../staff/permissions.server";
 import { staffFromSession } from "../staff/staff.server";
 
 const STATUS = { no_order: 404, no_request: 404, already_refunded: 409, not_applicable: 422 };
@@ -21,6 +22,7 @@ export const action = async ({ request }) => {
 
   const staff = staffFromSession(session);
   if (!staff) return json({ error: "staff_not_verified" }, 403);
+  if (!(await can(db, session.shop, staff, "refunds"))) return json({ error: "no_permission" }, 403);
 
   let body;
   try {

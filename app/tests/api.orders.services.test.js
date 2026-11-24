@@ -3,6 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 let admin;
 let svc;
 vi.mock("../shopify.server", () => ({ authenticate: { admin: (...a) => admin(...a) } }));
+vi.mock("../db.server", () => ({ default: {} }));
+let allowed = true;
+vi.mock("../staff/permissions.server", () => ({ can: async () => allowed }));
 vi.mock("../orders/services.server", () => ({ readServices: (...a) => svc.read(...a), applyServices: (...a) => svc.apply(...a) }));
 
 const route = await import("../routes/api.orders.$id.services.jsx");
@@ -67,5 +70,19 @@ describe("POST /api/orders/:id/services", () => {
     expect((await route.action({ request: post({ services: { two_man: "60" } }), params: { id: "x" } })).status).toBe(400);
     expect((await route.action({ request: new Request("https://app.test/x", { method: "PUT" }), params: { id: "5" } })).status).toBe(405);
     expect(svc.apply).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/orders/:id/services permission", () => {
+  it("refuses staff without the delivery charges permission before reading Shopify", async () => {
+    allowed = false;
+    try {
+      const res = await route.action({ request: new Request("https://app.test/api/orders/5/services", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ services: {} }) }), params: { id: "5" } });
+      expect(res.status).toBe(403);
+      expect((await res.json()).error).toBe("no_permission");
+      expect(svc.read).not.toHaveBeenCalled();
+    } finally {
+      allowed = true;
+    }
   });
 });

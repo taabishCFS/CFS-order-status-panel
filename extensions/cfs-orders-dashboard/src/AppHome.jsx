@@ -11,6 +11,7 @@ import ReportsPage from './ReportsPage.jsx';
 import StockPage from './StockPage.jsx';
 import ContainersPage from './ContainersPage.jsx';
 import SbtsPage from './SbtsPage.jsx';
+import PermissionsPage from './PermissionsPage.jsx';
 
 export default async () => {
   render(<App />, document.body);
@@ -40,6 +41,7 @@ function App() {
           <Route path="/stock" component={StockPage} />
           <Route path="/containers" component={ContainersPage} />
           <Route path="/sbts" component={SbtsPage} />
+          <Route path="/permissions" component={PermissionsPage} />
           <Route path="/brand-terms" component={BrandTermsPage} />
           <Route path="/email-templates" component={EmailTemplatesPage} />
           <Route default component={NotFound} />

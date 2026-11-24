@@ -25,6 +25,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/stock', title: 'Stock', description: 'Free stock we already own, so it can be given to an order instead of buying again.', icon: 'inventory' },
       { href: '/containers', title: 'Containers', description: 'Stock arriving in containers, the expected dates and the freight paid, ready to give to an order.', icon: 'delivery' },
       { href: '/sbts', title: 'SBTS / Display', description: 'Goods to send back to the supplier, and showroom display pieces. Mark them collected.', icon: 'return' },
+      { href: '/permissions', title: 'Permissions', description: 'Choose which staff can change delivery charges, work refunds and print delivery notes.', icon: 'lock' },
     ],
   },
   {

@@ -41,6 +41,7 @@ export const historyChanges = (changes: ServiceChange[]): { label: string; from:
 function problem(status: number, body: { error?: string; message?: string } | null): string {
   switch (body?.error) {
     case 'staff_not_verified': return 'Only a verified staff member can change delivery and services.';
+    case 'no_permission': return 'You do not have permission to change delivery and service charges. Ask a manager.';
     case 'bad_amount': return 'Enter each amount in pounds and pence, like 60.00, above zero.';
     case 'shopify_unavailable': return 'Shopify could not be read just now. Try again shortly.';
     case 'shopify_rejected': return `Shopify did not accept the change: ${body.message ?? 'no reason given'}`;

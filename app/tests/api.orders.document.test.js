@@ -4,6 +4,9 @@ let admin;
 let docs;
 vi.mock("../shopify.server", () => ({ authenticate: { admin: (...a) => admin(...a) }, unauthenticated: { admin: async () => ({ admin: { graphql: "gql" } }) } }));
 vi.mock("../db.server", () => ({ default: {} }));
+let allowed = true;
+vi.mock("../staff/permissions.server", () => ({ can: async () => allowed }));
+
 vi.mock("../orders/documents.server", () => ({ loadDocument: (...a) => docs.load(...a), logDeliveryNote: (...a) => docs.log(...a), deliveryNoteLog: (...a) => docs.list(...a) }));
 
 process.env.SHOPIFY_API_SECRET = "secret";
@@ -53,6 +56,18 @@ describe("GET /api/orders/:id/document", () => {
     expect((await api.loader({ request: get("kind=return-label&type=Free_Stock"), params: { id: "5" } })).status).toBe(400);
     expect((await api.loader({ request: get("kind=return-label&lineIds=gid://shopify/LineItem/1&type=Nope"), params: { id: "5" } })).status).toBe(400);
     expect((await api.loader({ request: get("kind=return-label&lineIds=gid://shopify/LineItem/1&type=Free_Stock"), params: { id: "5" } })).status).toBe(200);
+  });
+  it("refuses the delivery note to staff without that permission, and logs nothing", async () => {
+    allowed = false;
+    try {
+      const res = await api.loader({ request: get("kind=delivery-note"), params: { id: "5" } });
+      expect(res.status).toBe(403);
+      expect((await res.json()).error).toBe("no_permission");
+      expect(docs.log).not.toHaveBeenCalled();
+      expect((await api.loader({ request: get("kind=inc-vat"), params: { id: "5" } })).status).toBe(200);
+    } finally {
+      allowed = true;
+    }
   });
   it("lists the delivery notes log", async () => {
     expect(await (await api.loader({ request: get("log=1"), params: { id: "5" } })).json()).toEqual({ log: [{ at: "2026-11-22T10:00:00.000Z", by: "Ann" }] });

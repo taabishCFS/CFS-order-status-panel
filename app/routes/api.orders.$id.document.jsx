@@ -3,6 +3,7 @@ import { KINDS, RETURN_TYPES, deliveryNoteAllowed } from "../orders/documents";
 import { deliveryNoteLog, loadDocument, logDeliveryNote } from "../orders/documents.server";
 import { signExportLink } from "../orders/export-link.server";
 import { authenticate } from "../shopify.server";
+import { can } from "../staff/permissions.server";
 import { staffFromSession } from "../staff/staff.server";
 
 const ID = /^\d{1,20}$/;
@@ -36,6 +37,7 @@ export const loader = async ({ request, params }) => {
       query.set("type", type);
     }
     if (kind === "delivery-note") {
+      if (!(await can(db, session.shop, staff, "delivery_notes"))) return json({ error: "no_permission", message: "You do not have permission to print delivery notes." }, 403);
       const found = await loadDocument(admin.graphql, db, { shop: session.shop, orderId });
       if (!found) return json({ error: "not_found" }, 404);
       const allowed = deliveryNoteAllowed(found.doc);

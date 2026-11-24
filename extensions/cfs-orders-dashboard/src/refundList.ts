@@ -101,6 +101,7 @@ export const historySummary = (r: { amountMinor: number; reason: string; transac
 
 const EXPLAIN: Record<string, string> = {
   staff_not_verified: 'Only a verified staff member can change the refund list.',
+  no_permission: 'You do not have permission to work the refund list. Ask a manager.',
   bad_transaction_id: 'Enter the transaction ID from the payment provider.',
   already_refunded: 'This request already has a transaction ID.',
   no_request: 'That refund request is no longer on the list. Refresh the page.',
