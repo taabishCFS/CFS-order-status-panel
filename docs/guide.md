@@ -26,14 +26,14 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 7 | Mark a delivery as confirmed, add tracking and instructions | Ready |
 | 8 | Ask for a refund and keep the list of refunds | Ready |
 | 9 | Download spreadsheets | Ready |
-| 10 | Edit the emails customers get | Ready, not yet tried |
-| 11 | Send one email to many customers | Ready, not yet tried |
+| 10 | Edit the emails customers get | Ready |
+| 11 | Send one email to many customers | Ready |
 | 12 | Change a made-to-order product | Ready |
 | 13 | Download the Xero invoice report and the Delivery report | Ready |
 | 14 | Say which brands are paid on credit or pro-forma, one by one or from Excel | Ready |
 | 15 | Find every page from the Dashboard | Ready |
 | 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready |
-| 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready, not yet tried |
+| 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready |
 
 ---
 
