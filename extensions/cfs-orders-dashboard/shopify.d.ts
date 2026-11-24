@@ -187,6 +187,12 @@ declare module './src/TrackingSection.jsx' {
 }
 
 //@ts-ignore
+declare module './src/StockAllocationSection.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/SupplierInvoiceSection.jsx' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
@@ -260,6 +266,12 @@ declare module './src/productChange.ts' {
 
 //@ts-ignore
 declare module './src/services.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/stockAllocation.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }

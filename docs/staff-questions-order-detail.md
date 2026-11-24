@@ -93,3 +93,4 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 48. Free stock item types: the old list has types such as "freeStock" and "SBTS". What is each for, and should all be kept?
 49. Free stock: who adds items today (cancelled or returned orders, or spreadsheet), and what do Status, Collection and Credit/FOC mean?
 50. Container stock and freight: how is a container's freight shared across its items, and are clearance container items sold on separate orders?
+51. Container stock: the old import converts the dollar cost to pounds at a fixed rate (0.81 when none is set). What rate should we use, and where does it change? Also, which date format do the container spreadsheets use (the old system read dates as month first)? (Built: 0.81 and day-first dates.)

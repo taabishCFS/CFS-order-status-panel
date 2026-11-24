@@ -332,3 +332,68 @@ model FreeStockAllocation {
   @@index([shop, lineId])
   @@index([freeStockId])
 }
+
+// Stock arriving in containers. qty is what is left to give out; addedQty is what arrived. costMinor is pounds, costDollarMinor the dollar price it came from.
+model ContainerStock {
+  id              String   @id @default(cuid())
+  shop            String
+  seq             Int      @default(autoincrement())
+  sku             String?
+  itemVendor      String
+  containerRange  String?
+  containerNo     String
+  productName     String
+  productCode     String
+  warehouseCode   String?
+  costDollarMinor Int?
+  costMinor       Int?
+  priceMinor      Int?
+  delvCostMinor   Int?
+  addedQty        Int
+  qty             Int
+  totalCbm        Float?
+  expectedDate    DateTime?
+  addedById       String?
+  addedByName     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  allocations     ContainerAllocation[]
+
+  @@index([shop, containerNo])
+  @@index([shop, productCode])
+  @@index([shop, qty])
+}
+
+// Container stock given to an order line. Creating one lowers ContainerStock.qty; removing one puts it back. The database refuses to delete stock that has one.
+model ContainerAllocation {
+  id               String         @id @default(cuid())
+  shop             String
+  containerStockId String
+  containerStock   ContainerStock @relation(fields: [containerStockId], references: [id], onDelete: Restrict)
+  orderId          String
+  orderName        String
+  lineId           String
+  qty              Int
+  unitCostMinor    Int?
+  addedById        String?
+  addedByName      String?
+  createdAt        DateTime       @default(now())
+
+  @@index([shop, orderId])
+  @@index([shop, lineId])
+  @@index([containerStockId])
+}
+
+// Freight paid for one container from one vendor. Several entries for the same container add up.
+model ContainerFreight {
+  id           String   @id @default(cuid())
+  shop         String
+  itemVendor   String
+  containerNo  String
+  freightMinor Int
+  addedById    String?
+  addedByName  String?
+  createdAt    DateTime @default(now())
+
+  @@index([shop, containerNo])
+}

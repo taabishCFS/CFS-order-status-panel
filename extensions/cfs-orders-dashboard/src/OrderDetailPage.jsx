@@ -231,6 +231,7 @@ export default function OrderDetailPage({ id }) {
       <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <StockAllocationSection id={id} lines={lines} verified={verified} />
+      <StockAllocationSection id={id} lines={lines} verified={verified} kind="container" />
 
 
       <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />

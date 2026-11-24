@@ -3,6 +3,8 @@ import statuses from "../../extensions/cfs-order-status/src/statuses.json";
 import { listBrandTerms } from "./brand-terms.server.js";
 import { freeStockCsv, freeStockSampleCsv } from "./free-stock-rules.js";
 import { allFreeStock } from "./free-stock.server.js";
+import { containerCsv, containerSampleCsv } from "./container-stock-rules.js";
+import { allContainerStock } from "./container-stock.server.js";
 import { lookupCosts } from "./export-query.server.js";
 import {
   DELIVERY_STATUS_IDS, DHD_WITH_SUPPLIER, MAX_REPORT_ORDERS, OUTSTANDING_STATUS_IDS, STOCK_REPORTS, brandTermsCsv, deliveryCsv, outstandingCsv, outstandingRow, stockCsv, stockRow, xeroCsv,
@@ -108,6 +110,11 @@ export async function buildReport({ db, graphql, shop, kind, range, terms }) {
   if (kind === "freestock") {
     const rows = await allFreeStock(db, shop);
     return { csv: freeStockCsv(rows), count: rows.length, capped: false };
+  }
+  if (kind === "containersample") return { csv: containerSampleCsv(), count: 1, capped: false };
+  if (kind === "containers") {
+    const rows = await allContainerStock(db, shop);
+    return { csv: containerCsv(rows), count: rows.length, capped: false };
   }
   if (kind === "outstanding") return buildOutstanding({ db, graphql, shop, range, terms });
   if (Object.hasOwn(STOCK_REPORTS, kind)) return buildStockReport({ db, graphql, shop, range, kind });

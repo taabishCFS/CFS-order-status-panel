@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 12 (26 November 2026)
+**Guide version:** 13 (27 November 2026)
 
 ## Before you start
 
@@ -35,7 +35,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready |
 | 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready |
 | 18 | Keep a list of free stock (goods we already own), fill it from Excel, correct or delete items | Ready |
-| 19 | Give free stock to an order's item instead of buying it again, and take it back | Ready, not yet tried |
+| 19 | Give free stock to an order's item instead of buying it again, and take it back | Ready |
+| 20 | Keep a list of stock arriving in containers, with expected dates and freight, and give it to an order's item | Ready, not yet tried |
 
 ---
 
@@ -410,6 +411,31 @@ Type in the search box (brand, product, code, order number or warehouse code). U
 
 ---
 
+## 17. Containers
+
+Some stock arrives from vendors in **containers**. The **Containers** page keeps that list, shows what is still on the water, and records the freight paid. Open it from the **Dashboard**: click the **Containers** card.
+
+### Adding one item
+1. In **Add a container item**, type the **Item vendor**, **Container no.**, **Product code** and **Quantity**.
+2. Add the **Expected date** (day first, like 31/12/2026), the **cost in dollars**, price, delivery cost and total CBM if you have them.
+3. Press **Add to containers**.
+
+The cost in pounds is worked out from the dollar cost at 0.81, as the old system did. Until the expected date passes, an item shows as **On the water**; after it, **Arrived**.
+
+### Adding many items from Excel
+Press **Download sample (CSV)**, replace the example row, save as CSV and drop it into the box. Item Vendor, Container No, Product Code and a quantity are needed on every row. If you leave **Qty** or **Added Qty** blank, it copies the other. **Importing always adds new rows**, so do not import a list you downloaded from the page.
+
+### Freight
+Under **Freight**, type the vendor, the container number and the amount paid, then press **Record freight**. Payments for the same vendor and container add up, and the total shows beside each item in that container. Freight is **not** shared out between the items yet.
+
+### Giving container stock to an order
+On an order, a box called **Allocate from containers** appears when a container holds an item with the **same product code**. It works like free stock: choose **How many**, press **Give to this item**, or **Take back** to undo it. It shows the container number and whether the stock is on the water or has arrived. You cannot give more than the order asked for, or more than is left.
+
+### Correcting, deleting and finding
+Use **Edit** to correct an item (set the quantity left to **0** to mark it used up) or **Delete** to remove it; an item given to an order cannot be deleted until you take it back. Use the search box, and **Show** to switch between **In stock**, **On the water**, **Used up** and **All**. **Download container list (CSV)** gives you everything.
+
+---
+
 ## Not ready yet
 
 These will be added to this guide as soon as they are built:
@@ -430,6 +456,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 27 Nov 2026 | 13 | Added the Containers page: container stock, expected dates, freight, and giving it to an order's item |
 | 26 Nov 2026 | 12 | Give free stock to an order's item, and take it back |
 | 25 Nov 2026 | 11 | Stock page: edit and delete an item |
 | 25 Nov 2026 | 10 | Added the Stock page: free stock list, add one, import from Excel |

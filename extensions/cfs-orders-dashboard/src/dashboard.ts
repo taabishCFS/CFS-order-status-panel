@@ -23,6 +23,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     heading: 'Stock',
     items: [
       { href: '/stock', title: 'Stock', description: 'Free stock we already own, so it can be given to an order instead of buying again.', icon: 'inventory' },
+      { href: '/containers', title: 'Containers', description: 'Stock arriving in containers, the expected dates and the freight paid, ready to give to an order.', icon: 'delivery' },
     ],
   },
   {
