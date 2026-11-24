@@ -1,5 +1,5 @@
 import db from "../db.server";
-import { PERMISSIONS, listStaff, permissionsFor, setStaffPermissions } from "../staff/permissions.server";
+import { PERMISSIONS, listStaff, permissionsFor, recordStaff, setStaffPermissions } from "../staff/permissions.server";
 import { authenticate } from "../shopify.server";
 import { staffFromSession } from "../staff/staff.server";
 
@@ -11,6 +11,7 @@ export const loader = async ({ request }) => {
   const { session, cors } = await authenticate.admin(request);
   const staff = staffFromSession(session);
   if (!staff) return cors(Response.json({ error: "staff_not_verified" }, { status: 403 }));
+  await recordStaff(db, session.shop, staff).catch(() => null);
   const mine = await permissionsFor(db, session.shop, staff);
   const list = mine.canManage ? await listStaff(db, session.shop) : [];
   return cors(Response.json({ me: { id: staff.id, name: staff.name, ...mine }, permissions: PERMISSIONS, staff: list }));
