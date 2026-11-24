@@ -90,3 +90,6 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 45. Cost per item in Shopify: who fills in the cost of every product (or imports it), and from what file? (Payment reports show a blank cost where there is none.)
 46. In-Stock and Unpaid Invoices reports: the old In-Stock report skipped a fixed list of about 20 brands and orders before a cut-off. Which brands or orders should the new reports leave out?
 47. Supplier payment reports: is an item set straight to "DHD with Supplier" (status 36) to count as in stock, and should "Clearance" items stay hidden? (Built: status 36 counts, Clearance hidden.)
+48. Free stock item types: the old list has types such as "freeStock" and "SBTS". What is each for, and should all be kept?
+49. Free stock: who adds items today (cancelled or returned orders, or spreadsheet), and what do Status, Collection and Credit/FOC mean?
+50. Container stock and freight: how is a container's freight shared across its items, and are clearance container items sold on separate orders?

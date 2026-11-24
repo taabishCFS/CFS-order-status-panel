@@ -283,3 +283,31 @@ model BrandTerms {
 
   @@id([shop, brand])
 }
+
+// Free stock: items we already own (cancelled or returned goods and the like) that can be given to an order instead of buying again.
+// qty is what is still available; 0 means used up. Blank warehouseCode shows as "FSS" + seq.
+model FreeStock {
+  id            String   @id @default(cuid())
+  shop          String
+  seq           Int      @default(autoincrement())
+  itemType      String   @default("freeStock")
+  sourceOrder   String?
+  brand         String
+  productName   String
+  productCode   String
+  qty           Int
+  costMinor     Int?
+  warehouseCode String?
+  rma           String?
+  remarks       String?
+  creditFoc     String?
+  status        String?
+  collection    String?
+  addedById     String?
+  addedByName   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([shop, itemType, qty])
+  @@index([shop, brand, productCode])
+}

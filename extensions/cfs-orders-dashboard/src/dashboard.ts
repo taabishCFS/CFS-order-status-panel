@@ -20,6 +20,12 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     ],
   },
   {
+    heading: 'Stock',
+    items: [
+      { href: '/stock', title: 'Stock', description: 'Free stock we already own, so it can be given to an order instead of buying again.', icon: 'inventory' },
+    ],
+  },
+  {
     heading: 'Money',
     items: [
       { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },

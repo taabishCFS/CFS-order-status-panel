@@ -15,6 +15,9 @@ export const REPORTS = {
   unpaid: { title: "Unpaid Invoices Report", needsDates: true, needsTerms: false },
   // Not on the Reports page: the Brand terms screen downloads it (the sample and export for the spreadsheet import).
   brandterms: { title: "Brand terms", needsDates: false, needsTerms: false },
+  // Not on the Reports page either: the Stock screen downloads these (the stock list, and a sample to fill in for the import).
+  freestock: { title: "Free stock", needsDates: false, needsTerms: false },
+  freestocksample: { title: "Free stock sample", needsDates: false, needsTerms: false },
 };
 
 /** Line statuses that still count as "we owe the supplier" (legacy Outstanding Payments), by how the brand is paid. */
@@ -64,6 +67,8 @@ export function reportFilename(kind, range, terms) {
   if (kind === "outstanding") return `${TERMS_LABEL[terms]}_Total-Outstanding-Report-${range.from}_to_${range.to}.csv`;
   if (Object.hasOwn(STOCK_REPORTS, kind)) return `${STOCK_REPORTS[kind].file}-${range.from}_to_${range.to}.csv`;
   if (kind === "brandterms") return "brand_terms.csv";
+  if (kind === "freestock") return "free_stock.csv";
+  if (kind === "freestocksample") return "free_stock_sample.csv";
   return "delivery_report.csv";
 }
 

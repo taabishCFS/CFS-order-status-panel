@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 9 (24 November 2026)
+**Guide version:** 10 (25 November 2026)
 
 ## Before you start
 
@@ -34,6 +34,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 15 | Find every page from the Dashboard | Ready |
 | 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready |
 | 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready |
+| 18 | Keep a list of free stock (goods we already own) and fill it from Excel | Ready, not yet tried |
 
 ---
 
@@ -360,7 +361,7 @@ Some suppliers are paid on **credit** (we pay later) and some are paid **pro-for
 
 ## 15. The Dashboard
 
-The Dashboard is a page with one big card for every part of the app, grouped as **Orders**, **Money** and **Settings**. Each card says in a sentence what the page is for.
+The Dashboard is a page with one big card for every part of the app, grouped as **Orders**, **Stock**, **Money** and **Settings**. Each card says in a sentence what the page is for.
 
 ![The Dashboard](guide-images/15-dashboard.jpg)
 
@@ -368,6 +369,28 @@ The Dashboard is a page with one big card for every part of the app, grouped as 
 2. Click the card you want.
 
 If you ever feel lost, press **Dashboard** and start again.
+
+---
+
+## 16. Stock
+
+**Free stock** is goods we already own, for example from a cancelled or returned order. Keeping a list of it means we can give it to another order instead of buying it again. (Giving stock to an order is the next step and is not built yet. For now this page only keeps the list.)
+
+Open it from the **Dashboard**: click the **Stock** card.
+
+### Adding one item
+1. In **Add free stock**, type the **Brand**, **Product code** and **Quantity**. The product name, cost, source order and remarks are optional.
+2. Press **Add to stock**.
+
+### Adding many items from Excel
+1. Press **Download sample (CSV)** and click the link.
+2. Open it in Excel and replace the example row with your stock. Brand, Qty and Product Code are needed on every row.
+3. Save it as CSV and drop it into the box.
+
+You will see how many rows were added and why any were skipped. **Importing always adds new rows**, so do not import a list you downloaded from the page. If you leave Warehouse Code blank, the item is given a code such as FSS12.
+
+### Finding stock
+Type in the search box (brand, product, code, order number or warehouse code). Use **Show** to switch between **In stock**, **Used up** and **All**. **Download stock list (CSV)** gives you everything.
 
 ---
 
@@ -391,6 +414,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 25 Nov 2026 | 10 | Added the Stock page: free stock list, add one, import from Excel |
 | 24 Nov 2026 | 9 | Added the Outstanding In-Stock Items and Unpaid Invoices reports |
 | 23 Nov 2026 | 8 | Brand terms: search, pages, download list and Excel import |
 | 23 Nov 2026 | 7 | Added the Outstanding Payments report |
