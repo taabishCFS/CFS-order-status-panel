@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { FREE_STOCK_HEADERS, freeStockCsv, freeStockSampleCsv, normaliseFreeStock, parseCostMinor, warehouseCodeOf } from "./free-stock-rules.js";
-import { MAX_IMPORT_ROWS, addFreeStock, allFreeStock, importFreeStock, listFreeStock } from "./free-stock.server.js";
+import { MAX_IMPORT_ROWS, addFreeStock, allFreeStock, deleteFreeStock, importFreeStock, listFreeStock, updateFreeStock } from "./free-stock.server.js";
 import { buildReport } from "./report-query.server.js";
 import { parseReportParams, reportFilename } from "./report-rules.js";
 
@@ -62,6 +62,8 @@ function fakeDb(rows = []) {
       findMany: vi.fn(async (a) => { calls.find = [...(calls.find ?? []), a]; return a.distinct ? [{ itemType: "freeStock" }, { itemType: "SBTS" }] : rows; }),
       create: vi.fn(async (a) => { calls.create = a; return { id: "new1" }; }),
       createMany: vi.fn(async (a) => { calls.createMany = [...(calls.createMany ?? []), a]; }),
+      updateMany: vi.fn(async (a) => { calls.update = a; return { count: rows.length ? 1 : 0 }; }),
+      deleteMany: vi.fn(async (a) => { calls.remove = a; return { count: rows.length ? 1 : 0 }; }),
     },
   };
 }
@@ -135,5 +137,28 @@ describe("the stock downloads", () => {
   it("the sample download needs no database", async () => {
     const r = await buildReport({ db: {}, shop: "s", kind: "freestocksample" });
     expect(r.csv.startsWith(FREE_STOCK_HEADERS.join(","))).toBe(true);
+  });
+});
+
+describe("updateFreeStock and deleteFreeStock", () => {
+  it("replaces the record's fields, only inside this shop, and allows quantity 0 (used up)", async () => {
+    const db = fakeDb([stored(1)]);
+    expect(await updateFreeStock(db, "s", "f1", { ...good, qty: "0", warehouseCode: "BAY-2", status: "Held" })).toEqual({ ok: true });
+    expect(db.calls.update.where).toEqual({ id: "f1", shop: "s" });
+    expect(db.calls.update.data).toMatchObject({ qty: 0, warehouseCode: "BAY-2", status: "Held", costMinor: 12550 });
+  });
+  it("refuses a bad correction with the reason, and says when the record is gone", async () => {
+    const db = fakeDb([stored(1)]);
+    expect(await updateFreeStock(db, "s", "f1", { ...good, brand: "" })).toMatchObject({ ok: false, error: "bad_request", message: expect.stringContaining("brand") });
+    expect(await updateFreeStock(db, "s", "", good)).toMatchObject({ ok: false, error: "bad_request" });
+    expect(await updateFreeStock(fakeDb([]), "s", "gone", good)).toEqual({ ok: false, error: "not_found" });
+    expect(normaliseFreeStock({ ...good, qty: "0" }).ok).toBe(false); // adding still needs 1 or more
+  });
+  it("deletes inside this shop, and says when the record is gone", async () => {
+    const db = fakeDb([stored(1)]);
+    expect(await deleteFreeStock(db, "s", "f1")).toEqual({ ok: true });
+    expect(db.calls.remove.where).toEqual({ id: "f1", shop: "s" });
+    expect(await deleteFreeStock(fakeDb([]), "s", "gone")).toEqual({ ok: false, error: "not_found" });
+    expect(await deleteFreeStock(db, "s", undefined)).toEqual({ ok: false, error: "not_found" });
   });
 });

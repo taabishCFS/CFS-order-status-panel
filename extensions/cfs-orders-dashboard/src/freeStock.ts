@@ -49,6 +49,7 @@ const EXPLAIN: Record<string, string> = {
   staff_not_verified: 'Only a verified staff member can change stock.',
   too_many_rows: 'Please import at most 5000 rows at a time.',
   bad_request: 'That stock item could not be used.',
+  not_found: 'That stock item no longer exists. Reload the page.',
 };
 const explain = (status: number, body: { error?: string; message?: string } | null) => body?.message || (body?.error && EXPLAIN[body.error]) || `The server answered with status ${status}.`;
 const failure = (e: unknown) => ({ ok: false as const, message: e instanceof Error ? e.message : String(e) });
@@ -81,14 +82,52 @@ export async function addFreeStock(item: FreeStockInput, fetchFn: typeof fetch =
   }
 }
 
+/** Every field of a stock record as the edit form holds it (all text). */
+export interface FreeStockEdit extends FreeStockInput {
+  itemType: string;
+  warehouseCode: string;
+  rma: string;
+  creditFoc: string;
+  status: string;
+  collection: string;
+}
+
+/** The edit form's starting values for a listed item. */
+export const editFrom = (it: FreeStockItem): FreeStockEdit => ({
+  itemType: it.itemType, brand: it.brand, productName: it.productName, productCode: it.productCode, qty: String(it.qty), cost: it.cost,
+  sourceOrder: it.sourceOrder, warehouseCode: it.warehouseCode, rma: it.rma, remarks: it.remarks, creditFoc: it.creditFoc, status: it.status, collection: it.collection,
+});
+
+/** Correct a stock record. Quantity 0 marks it used up. */
+export async function updateFreeStock(id: string, item: FreeStockEdit, fetchFn: typeof fetch = fetch): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    const res = await callBackendResult('/api/free-stock', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id, item }) }, fetchFn);
+    const body = res.body as { error?: string; message?: string } | null;
+    return res.ok ? { ok: true } : { ok: false, message: explain(res.status, body) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+/** Delete a stock record for good. */
+export async function deleteFreeStock(id: string, fetchFn: typeof fetch = fetch): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    const res = await callBackendResult('/api/free-stock', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id, remove: true }) }, fetchFn);
+    const body = res.body as { error?: string; message?: string } | null;
+    return res.ok ? { ok: true } : { ok: false, message: explain(res.status, body) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
 /** A blank form. */
 export const emptyInput = (): FreeStockInput => ({ brand: '', productName: '', productCode: '', qty: '1', cost: '', sourceOrder: '', remarks: '' });
 
 /** What is wrong with the form, or null when it can be saved. A quick check before asking the server. */
-export function inputProblem(i: FreeStockInput): string | null {
+export function inputProblem(i: FreeStockInput, minQty = 1): string | null {
   if (!i.brand.trim()) return 'Enter the brand.';
   if (!i.productCode.trim()) return 'Enter the product code.';
-  if (!/^\d+$/.test(i.qty.trim()) || Number(i.qty) < 1) return 'The quantity must be a whole number, 1 or more.';
+  if (!/^\d+$/.test(i.qty.trim()) || Number(i.qty) < minQty) return `The quantity must be a whole number, ${minQty} or more.`;
   if (i.cost.trim() && !/^[£\s]*\d[\d,]*(\.\d{1,2})?\s*$/.test(i.cost)) return 'The cost must be an amount like 12.50.';
   return null;
 }

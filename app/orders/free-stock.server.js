@@ -51,6 +51,25 @@ export async function addFreeStock(db, shop, input, staff) {
 }
 
 /**
+ * Correct a stock record: every field is replaced by the form's values (quantity 0 marks it used up).
+ * Returns { ok: true }, { ok: false, error: "bad_request", message } or { ok: false, error: "not_found" }.
+ */
+export async function updateFreeStock(db, shop, id, input) {
+  if (typeof id !== "string" || !id) return { ok: false, error: "bad_request", message: "That stock item could not be found." };
+  const row = normaliseFreeStock(input, { minQty: 0 });
+  if (!row.ok) return { ok: false, error: "bad_request", message: row.reason };
+  const done = await db.freeStock.updateMany({ where: { id, shop }, data: row.data });
+  return done.count > 0 ? { ok: true } : { ok: false, error: "not_found" };
+}
+
+/** Delete a stock record. Returns { ok: true } or { ok: false, error: "not_found" }. */
+export async function deleteFreeStock(db, shop, id) {
+  if (typeof id !== "string" || !id) return { ok: false, error: "not_found" };
+  const done = await db.freeStock.deleteMany({ where: { id, shop } });
+  return done.count > 0 ? { ok: true } : { ok: false, error: "not_found" };
+}
+
+/**
  * Add a whole spreadsheet of rows ({ line, ...fields }). Rows that are not understood are skipped and the rest still go in.
  * Importing always adds new records. Returns { ok: true, added, rejected: [{ line, reason }] (first 50), rejectedCount } or { ok: false, error }.
  */

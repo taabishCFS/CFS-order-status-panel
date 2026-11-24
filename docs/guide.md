@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 10 (25 November 2026)
+**Guide version:** 11 (25 November 2026)
 
 ## Before you start
 
@@ -34,7 +34,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 15 | Find every page from the Dashboard | Ready |
 | 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready |
 | 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready |
-| 18 | Keep a list of free stock (goods we already own) and fill it from Excel | Ready, not yet tried |
+| 18 | Keep a list of free stock (goods we already own), fill it from Excel, correct or delete items | Ready |
 
 ---
 
@@ -389,6 +389,10 @@ Open it from the **Dashboard**: click the **Stock** card.
 
 You will see how many rows were added and why any were skipped. **Importing always adds new rows**, so do not import a list you downloaded from the page. If you leave Warehouse Code blank, the item is given a code such as FSS12.
 
+### Correcting or deleting an item
+- Press **Edit** on an item, change what is wrong and press **Save changes**. Set the quantity to **0** to mark an item as used up.
+- Press **Delete**, then **Yes, delete**, to remove an item for good. This cannot be undone. If you imported the wrong file, delete the extra rows one by one.
+
 ### Finding stock
 Type in the search box (brand, product, code, order number or warehouse code). Use **Show** to switch between **In stock**, **Used up** and **All**. **Download stock list (CSV)** gives you everything.
 
@@ -414,6 +418,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 25 Nov 2026 | 11 | Stock page: edit and delete an item |
 | 25 Nov 2026 | 10 | Added the Stock page: free stock list, add one, import from Excel |
 | 24 Nov 2026 | 9 | Added the Outstanding In-Stock Items and Unpaid Invoices reports |
 | 23 Nov 2026 | 8 | Brand terms: search, pages, download list and Excel import |

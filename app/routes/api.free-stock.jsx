@@ -1,5 +1,5 @@
 import db from "../db.server";
-import { VIEWS, addFreeStock, importFreeStock, listFreeStock } from "../orders/free-stock.server";
+import { VIEWS, addFreeStock, deleteFreeStock, importFreeStock, listFreeStock, updateFreeStock } from "../orders/free-stock.server";
 import { authenticate } from "../shopify.server";
 import { staffFromSession } from "../staff/staff.server";
 
@@ -13,7 +13,8 @@ export const loader = async ({ request }) => {
   return json(cors, await listFreeStock(db, session.shop, { search: q.get("search") ?? "", view, itemType: q.get("type") ?? "", page: q.get("page") ?? 1 }));
 };
 
-// POST { item: { brand, productCode, qty, ... } } adds one record. POST { rows: [{ line, ... }] } imports a spreadsheet. Verified staff only.
+// POST { item: { brand, productCode, qty, ... } } adds one record. POST { id, item } corrects a record. POST { id, remove: true } deletes it.
+// POST { rows: [{ line, ... }] } imports a spreadsheet. Verified staff only.
 export const action = async ({ request }) => {
   const { session, cors } = await authenticate.admin(request);
   if (request.method !== "POST") return json(cors, { error: "method_not_allowed" }, 405);
@@ -28,6 +29,11 @@ export const action = async ({ request }) => {
   if (Array.isArray(body?.rows)) {
     const imported = await importFreeStock(db, session.shop, body.rows, staff);
     return imported.ok ? json(cors, imported) : json(cors, { error: imported.error }, 400);
+  }
+  if (typeof body?.id === "string") {
+    const done = body.remove === true ? await deleteFreeStock(db, session.shop, body.id) : await updateFreeStock(db, session.shop, body.id, body.item);
+    if (done.ok) return json(cors, { ok: true });
+    return json(cors, { error: done.error, message: done.message }, done.error === "not_found" ? 404 : 400);
   }
   const added = await addFreeStock(db, session.shop, body?.item, staff);
   return added.ok ? json(cors, { ok: true, id: added.id }) : json(cors, { error: added.error, message: added.message }, 400);

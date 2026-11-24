@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addFreeStock, emptyInput, inputProblem, loadFreeStock } from './freeStock';
+import { addFreeStock, deleteFreeStock, editFrom, emptyInput, inputProblem, loadFreeStock, updateFreeStock, type FreeStockItem } from './freeStock';
 import { importFreeStock, importSummary, parseFreeStockCsv } from './freeStockImport';
 
 const reply = (status: number, body: unknown) => async () => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -75,5 +75,30 @@ describe('importFreeStock', () => {
   it('summarises in a sentence', () => {
     expect(importSummary({ added: 5, rejected: [], rejectedCount: 0 })).toBe('Import finished: 5 added.');
     expect(importSummary({ added: 5, rejected: [], rejectedCount: 2 })).toBe('Import finished: 5 added, 2 skipped.');
+  });
+});
+
+describe('edit and delete', () => {
+  const item: FreeStockItem = { id: 'f1', itemType: 'freeStock', sourceOrder: '1038', brand: 'Actona', productName: 'Bed', qty: 3, productCode: 'A1', warehouseCode: 'FSS1', rma: '', remarks: 'boxed', cost: '125.50', creditFoc: '', status: '', collection: '', addedByName: 'Sam' };
+  it('starts the edit form from the listed item, with the quantity as text', () => {
+    expect(editFrom(item)).toMatchObject({ brand: 'Actona', qty: '3', cost: '125.50', warehouseCode: 'FSS1', remarks: 'boxed' });
+  });
+  it('lets a correction use quantity 0 but not a new item', () => {
+    expect(inputProblem({ ...editFrom(item), qty: '0' }, 0)).toBeNull();
+    expect(inputProblem({ ...editFrom(item), qty: '0' })).toMatch(/1 or more/);
+    expect(inputProblem({ ...editFrom(item), qty: '-1' }, 0)).toMatch(/0 or more/);
+  });
+  it('sends the id with the new values, or with remove: true', async () => {
+    const bodies: unknown[] = [];
+    const record = (status: number, body: unknown) => async (_url: RequestInfo | URL, init?: RequestInit) => { bodies.push(JSON.parse(String(init?.body))); return reply(status, body)(); };
+    expect(await updateFreeStock('f1', editFrom(item), record(200, { ok: true }) as typeof fetch)).toEqual({ ok: true });
+    expect(await deleteFreeStock('f1', record(200, { ok: true }) as typeof fetch)).toEqual({ ok: true });
+    expect(bodies[0]).toMatchObject({ id: 'f1', item: { brand: 'Actona', qty: '3' } });
+    expect(bodies[1]).toEqual({ id: 'f1', remove: true });
+  });
+  it('explains a failure, including a record that is already gone', async () => {
+    expect(await updateFreeStock('f1', editFrom(item), reply(400, { error: 'bad_request', message: 'The brand is empty.' }) as typeof fetch)).toEqual({ ok: false, message: 'The brand is empty.' });
+    expect(await deleteFreeStock('f1', reply(404, { error: 'not_found' }) as typeof fetch)).toEqual({ ok: false, message: 'That stock item no longer exists. Reload the page.' });
+    expect(await deleteFreeStock('f1', reply(403, { error: 'staff_not_verified' }) as typeof fetch)).toEqual({ ok: false, message: 'Only a verified staff member can change stock.' });
   });
 });

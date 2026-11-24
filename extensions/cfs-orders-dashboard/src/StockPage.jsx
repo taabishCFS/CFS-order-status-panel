@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { useStaff } from './useStaff';
 import Pager from './Pager.jsx';
 import { rangeText } from './orderList';
-import { VIEW_OPTIONS, addFreeStock, emptyInput, inputProblem, loadFreeStock } from './freeStock';
+import { VIEW_OPTIONS, addFreeStock, deleteFreeStock, editFrom, emptyInput, inputProblem, loadFreeStock, updateFreeStock } from './freeStock';
 import { MAX_IMPORT_BYTES, importFreeStock, importSummary, parseFreeStockCsv } from './freeStockImport';
 import { loadReportLink } from './reports';
 
@@ -21,6 +21,8 @@ export default function StockPage() {
   const [type, setType] = useState('');
   const [page, setPage] = useState(1);
   const [form, setForm] = useState(emptyInput());
+  const [editing, setEditing] = useState(null); // { id, form } for the card being corrected
+  const [deleting, setDeleting] = useState(null); // id of the card waiting for "Yes, delete"
   const staff = useStaff(); // undefined while checking, null when nobody can be verified
   const dropZone = useRef(null);
   const timer = useRef(null);
@@ -52,6 +54,30 @@ export default function StockPage() {
     setView('available');
     setPage(1);
     load({ view: 'available', page: 1 });
+  }
+
+  const setEdit = (name) => (e) => setEditing((c) => ({ ...c, form: { ...c.form, [name]: e.currentTarget.value } }));
+
+  async function saveEdit() {
+    const problem = inputProblem(editing.form, 0);
+    if (problem) { setNotice({ tone: 'critical', text: problem }); return; }
+    setBusy(editing.id);
+    const res = await updateFreeStock(editing.id, editing.form);
+    setBusy(null);
+    if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
+    setNotice({ tone: 'success', text: `Saved ${editing.form.productCode} (${editing.form.brand}).` });
+    setEditing(null);
+    load();
+  }
+
+  async function remove(it) {
+    setBusy(it.id);
+    const res = await deleteFreeStock(it.id);
+    setBusy(null);
+    setDeleting(null);
+    if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
+    setNotice({ tone: 'success', text: `Deleted ${it.productCode} (${it.brand}).` });
+    load();
   }
 
   async function download(kind, text) {
@@ -162,7 +188,32 @@ export default function StockPage() {
             {data && data.pageCount > 1 && <Pager page={data.page} pageCount={data.pageCount} all={false} onPage={setPage} />}
           </s-stack>
           {data && items.length === 0 && <s-text>{search.trim() ? 'Nothing matches that search.' : view === 'available' ? 'No free stock yet. Add some above.' : 'Nothing to show.'}</s-text>}
-          {items.map((it) => (
+          {items.map((it) => (editing?.id === it.id ? (
+            <s-box key={it.id} padding="base" borderWidth="base" borderRadius="base">
+              <s-stack gap="base">
+                <s-text type="strong">Correct this item</s-text>
+                <s-grid gridTemplateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap="base">
+                  <s-text-field label="Brand" value={editing.form.brand} onInput={setEdit('brand')} />
+                  <s-text-field label="Product code" value={editing.form.productCode} onInput={setEdit('productCode')} />
+                  <s-text-field label="Product name" value={editing.form.productName} onInput={setEdit('productName')} />
+                  <s-text-field label="Quantity in stock (0 = used up)" value={editing.form.qty} onInput={setEdit('qty')} />
+                  <s-text-field label="Cost each" value={editing.form.cost} onInput={setEdit('cost')} />
+                  <s-text-field label="Source order no." value={editing.form.sourceOrder} onInput={setEdit('sourceOrder')} />
+                  <s-text-field label="Warehouse code" value={editing.form.warehouseCode} onInput={setEdit('warehouseCode')} />
+                  <s-text-field label="RMA" value={editing.form.rma} onInput={setEdit('rma')} />
+                  <s-text-field label="Item type" value={editing.form.itemType} onInput={setEdit('itemType')} />
+                  <s-text-field label="Credit / FOC" value={editing.form.creditFoc} onInput={setEdit('creditFoc')} />
+                  <s-text-field label="Status" value={editing.form.status} onInput={setEdit('status')} />
+                  <s-text-field label="Collection" value={editing.form.collection} onInput={setEdit('collection')} />
+                </s-grid>
+                <s-text-field label="Remarks" value={editing.form.remarks} onInput={setEdit('remarks')} />
+                <s-stack direction="inline" gap="base">
+                  <s-button variant="primary" onClick={saveEdit} loading={busy === it.id || undefined}>Save changes</s-button>
+                  <s-button onClick={() => setEditing(null)}>Cancel</s-button>
+                </s-stack>
+              </s-stack>
+            </s-box>
+          ) : (
             <s-box key={it.id} padding="base" borderWidth="base" borderRadius="base">
               <s-stack gap="small-200">
                 <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
@@ -173,9 +224,21 @@ export default function StockPage() {
                 {(it.sourceOrder || it.rma || it.remarks) && (
                   <s-text color="subdued">{[it.sourceOrder && `From order ${it.sourceOrder}`, it.rma && `RMA ${it.rma}`, it.remarks].filter(Boolean).join(' · ')}</s-text>
                 )}
+                {deleting === it.id ? (
+                  <s-stack direction="inline" gap="base" alignItems="center">
+                    <s-text>Delete this item for good?</s-text>
+                    <s-button tone="critical" onClick={() => remove(it)} loading={busy === it.id || undefined}>Yes, delete</s-button>
+                    <s-button onClick={() => setDeleting(null)}>Cancel</s-button>
+                  </s-stack>
+                ) : (
+                  <s-stack direction="inline" gap="small-200">
+                    <s-button disabled={!canWrite || undefined} onClick={() => { setDeleting(null); setEditing({ id: it.id, form: editFrom(it) }); }}>Edit</s-button>
+                    <s-button tone="critical" disabled={!canWrite || undefined} onClick={() => { setEditing(null); setDeleting(it.id); }}>Delete</s-button>
+                  </s-stack>
+                )}
               </s-stack>
             </s-box>
-          ))}
+          )))}
         </s-stack>
       </s-section>
     </s-page>

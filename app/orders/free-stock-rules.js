@@ -18,15 +18,16 @@ const clean = (value, max) => String(value ?? "").trim().slice(0, max);
 
 /**
  * One free-stock row from a form or spreadsheet: { ok: true, data } ready to save, or { ok: false, reason }.
- * Needs a brand, a product code and a whole-number quantity of at least 1. A blank item type means "freeStock".
+ * Needs a brand, a product code and a whole-number quantity of at least `minQty` (1 when adding; 0 when correcting a record, which marks it used up).
+ * A blank item type means "freeStock".
  */
-export function normaliseFreeStock(raw) {
+export function normaliseFreeStock(raw, { minQty = 1 } = {}) {
   const brand = clean(raw?.brand, LIMITS.brand);
   const productCode = clean(raw?.productCode, LIMITS.productCode);
   if (!brand) return { ok: false, reason: "The brand is empty." };
   if (!productCode) return { ok: false, reason: `The product code is empty (${brand}).` };
   const qtyText = String(raw?.qty ?? "").trim();
-  if (!/^\d+$/.test(qtyText) || Number(qtyText) < 1 || Number(qtyText) > MAX_QTY) return { ok: false, reason: `The quantity "${qtyText.slice(0, 20)}" for ${productCode} must be a whole number from 1 to ${MAX_QTY}.` };
+  if (!/^\d+$/.test(qtyText) || Number(qtyText) < minQty || Number(qtyText) > MAX_QTY) return { ok: false, reason: `The quantity "${qtyText.slice(0, 20)}" for ${productCode} must be a whole number from ${minQty} to ${MAX_QTY}.` };
   const costMinor = parseCostMinor(raw?.cost);
   if (costMinor === "bad") return { ok: false, reason: `The cost "${String(raw.cost).slice(0, 20)}" for ${productCode} is not an amount like 12.50.` };
   const orNull = (v, max) => clean(v, max) || null;
