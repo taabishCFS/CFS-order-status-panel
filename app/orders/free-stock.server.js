@@ -1,4 +1,5 @@
 // Free stock records: list, add one, import many. Allocating stock to an order comes in a later step.
+import { allocationsByStock } from "./free-stock-allocation.server.js";
 import { freeStockRow, normaliseFreeStock } from "./free-stock-rules.js";
 
 export const FREE_STOCK_PAGE_SIZE = 50;
@@ -8,9 +9,9 @@ const CHUNK = 400;
 const MAX_REPORTED = 50;
 export const MAX_EXPORT_ROWS = 50000;
 
-const shape = (r) => {
+const shape = (r, allocatedTo = []) => {
   const [itemType, sourceOrder, brand, productName, qty, productCode, warehouseCode, rma, remarks, cost, creditFoc, status, collection] = freeStockRow(r);
-  return { id: r.id, itemType, sourceOrder, brand, productName, qty, productCode, warehouseCode, rma, remarks, cost, creditFoc, status, collection, addedByName: r.addedByName ?? null, createdAt: r.createdAt };
+  return { id: r.id, itemType, sourceOrder, brand, productName, qty, productCode, warehouseCode, rma, remarks, cost, creditFoc, status, collection, addedByName: r.addedByName ?? null, createdAt: r.createdAt, allocatedTo };
 };
 
 /**
@@ -34,7 +35,8 @@ export async function listFreeStock(db, shop, { search = "", view = "available",
   const pageCount = Math.max(1, Math.ceil(total / FREE_STOCK_PAGE_SIZE));
   const at = Math.min(Math.max(1, Number.parseInt(page, 10) || 1), pageCount);
   const rows = await db.freeStock.findMany({ where, orderBy: [{ createdAt: "desc" }, { id: "asc" }], skip: (at - 1) * FREE_STOCK_PAGE_SIZE, take: FREE_STOCK_PAGE_SIZE });
-  return { items: rows.map(shape), total, page: at, pageCount, itemTypes: types.map((t) => t.itemType).sort() };
+  const given = await allocationsByStock(db, shop, rows.map((r) => r.id));
+  return { items: rows.map((r) => shape(r, given[r.id])), total, page: at, pageCount, itemTypes: types.map((t) => t.itemType).sort() };
 }
 
 /** Every stock record for the spreadsheet download, newest first. */
@@ -62,11 +64,20 @@ export async function updateFreeStock(db, shop, id, input) {
   return done.count > 0 ? { ok: true } : { ok: false, error: "not_found" };
 }
 
-/** Delete a stock record. Returns { ok: true } or { ok: false, error: "not_found" }. */
+/**
+ * Delete a stock record. Returns { ok: true }, { ok: false, error: "not_found" } or { ok: false, error: "allocated" }
+ * (it has been given to an order: take those allocations back first).
+ */
 export async function deleteFreeStock(db, shop, id) {
   if (typeof id !== "string" || !id) return { ok: false, error: "not_found" };
-  const done = await db.freeStock.deleteMany({ where: { id, shop } });
-  return done.count > 0 ? { ok: true } : { ok: false, error: "not_found" };
+  if ((await db.freeStockAllocation.count({ where: { shop, freeStockId: id } })) > 0) return { ok: false, error: "allocated" };
+  try {
+    const done = await db.freeStock.deleteMany({ where: { id, shop } });
+    return done.count > 0 ? { ok: true } : { ok: false, error: "not_found" };
+  } catch (error) {
+    if (error?.code === "P2003") return { ok: false, error: "allocated" }; // given out a moment ago: the database refuses
+    throw error;
+  }
 }
 
 /**

@@ -307,7 +307,28 @@ model FreeStock {
   addedByName   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  allocations   FreeStockAllocation[]
 
   @@index([shop, itemType, qty])
   @@index([shop, brand, productCode])
+}
+
+// Free stock given to an order line. Creating one lowers FreeStock.qty; removing one puts it back. The database refuses to delete stock that has one.
+model FreeStockAllocation {
+  id            String    @id @default(cuid())
+  shop          String
+  freeStockId   String
+  freeStock     FreeStock @relation(fields: [freeStockId], references: [id], onDelete: Restrict)
+  orderId       String
+  orderName     String
+  lineId        String
+  qty           Int
+  unitCostMinor Int?
+  addedById     String?
+  addedByName   String?
+  createdAt     DateTime  @default(now())
+
+  @@index([shop, orderId])
+  @@index([shop, lineId])
+  @@index([freeStockId])
 }

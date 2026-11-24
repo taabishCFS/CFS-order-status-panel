@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 11 (25 November 2026)
+**Guide version:** 12 (26 November 2026)
 
 ## Before you start
 
@@ -35,6 +35,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 16 | Download the Outstanding Payments report (what we owe suppliers) | Ready |
 | 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready |
 | 18 | Keep a list of free stock (goods we already own), fill it from Excel, correct or delete items | Ready |
+| 19 | Give free stock to an order's item instead of buying it again, and take it back | Ready, not yet tried |
 
 ---
 
@@ -374,7 +375,7 @@ If you ever feel lost, press **Dashboard** and start again.
 
 ## 16. Stock
 
-**Free stock** is goods we already own, for example from a cancelled or returned order. Keeping a list of it means we can give it to another order instead of buying it again. (Giving stock to an order is the next step and is not built yet. For now this page only keeps the list.)
+**Free stock** is goods we already own, for example from a cancelled or returned order. Keeping a list of it means we can give it to another order instead of buying it again. You keep the list on this page, then give stock to an order from the order's own page (see **Giving free stock to an order** below).
 
 Open it from the **Dashboard**: click the **Stock** card.
 
@@ -392,6 +393,17 @@ You will see how many rows were added and why any were skipped. **Importing alwa
 ### Correcting or deleting an item
 - Press **Edit** on an item, change what is wrong and press **Save changes**. Set the quantity to **0** to mark an item as used up.
 - Press **Delete**, then **Yes, delete**, to remove an item for good. This cannot be undone. If you imported the wrong file, delete the extra rows one by one.
+
+### Giving free stock to an order
+1. Open the order and find the **Allocate from stock** box. It lists each item on the order that has free stock with the **same product code**.
+2. Type **How many** and press **Give to this item**. The stock list goes down by that amount straight away.
+3. To undo it, press **Take back**. The stock goes back on the list.
+
+Good to know:
+- You cannot give an item more than the order asked for, or more than is in stock. If two people try for the last one, the second is told it is gone.
+- Giving stock does **not** change the item's status. Set that yourself as usual.
+- On the Stock page, each item shows which orders it was given to. An item that has been given to an order **cannot be deleted** until you take it back.
+- If nothing matches, the box says so. Free stock is matched by product code, so check the code on the Stock page.
 
 ### Finding stock
 Type in the search box (brand, product, code, order number or warehouse code). Use **Show** to switch between **In stock**, **Used up** and **All**. **Download stock list (CSV)** gives you everything.
@@ -418,6 +430,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 26 Nov 2026 | 12 | Give free stock to an order's item, and take it back |
 | 25 Nov 2026 | 11 | Stock page: edit and delete an item |
 | 25 Nov 2026 | 10 | Added the Stock page: free stock list, add one, import from Excel |
 | 24 Nov 2026 | 9 | Added the Outstanding In-Stock Items and Unpaid Invoices reports |

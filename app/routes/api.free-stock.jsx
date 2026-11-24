@@ -33,7 +33,7 @@ export const action = async ({ request }) => {
   if (typeof body?.id === "string") {
     const done = body.remove === true ? await deleteFreeStock(db, session.shop, body.id) : await updateFreeStock(db, session.shop, body.id, body.item);
     if (done.ok) return json(cors, { ok: true });
-    return json(cors, { error: done.error, message: done.message }, done.error === "not_found" ? 404 : 400);
+    return json(cors, { error: done.error, message: done.message }, done.error === "not_found" ? 404 : done.error === "allocated" ? 409 : 400);
   }
   const added = await addFreeStock(db, session.shop, body?.item, staff);
   return added.ok ? json(cors, { ok: true, id: added.id }) : json(cors, { error: added.error, message: added.message }, 400);

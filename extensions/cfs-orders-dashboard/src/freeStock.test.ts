@@ -79,7 +79,7 @@ describe('importFreeStock', () => {
 });
 
 describe('edit and delete', () => {
-  const item: FreeStockItem = { id: 'f1', itemType: 'freeStock', sourceOrder: '1038', brand: 'Actona', productName: 'Bed', qty: 3, productCode: 'A1', warehouseCode: 'FSS1', rma: '', remarks: 'boxed', cost: '125.50', creditFoc: '', status: '', collection: '', addedByName: 'Sam' };
+  const item: FreeStockItem = { id: 'f1', itemType: 'freeStock', sourceOrder: '1038', brand: 'Actona', productName: 'Bed', qty: 3, productCode: 'A1', warehouseCode: 'FSS1', rma: '', remarks: 'boxed', cost: '125.50', creditFoc: '', status: '', collection: '', addedByName: 'Sam', allocatedTo: [] };
   it('starts the edit form from the listed item, with the quantity as text', () => {
     expect(editFrom(item)).toMatchObject({ brand: 'Actona', qty: '3', cost: '125.50', warehouseCode: 'FSS1', remarks: 'boxed' });
   });

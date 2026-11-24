@@ -16,6 +16,7 @@ import ProductSection from './ProductSection.jsx';
 import ServicesSection from './ServicesSection.jsx';
 import StatusSection from './StatusSection.jsx';
 import TrackingSection from './TrackingSection.jsx';
+import StockAllocationSection from './StockAllocationSection.jsx';
 import SupplierInvoiceSection from './SupplierInvoiceSection.jsx';
 import { useEmails } from './useEmails';
 import { useOrderDetail } from './useOrderDetail';
@@ -229,6 +230,7 @@ export default function OrderDetailPage({ id }) {
 
       <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <StockAllocationSection id={id} lines={lines} verified={verified} />
 
 
       <NotesSection key={detail.state.instructions?.at ?? 'none'} detail={detail} writer={writer} />

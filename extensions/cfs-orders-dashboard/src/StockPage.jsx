@@ -224,6 +224,7 @@ export default function StockPage() {
                 {(it.sourceOrder || it.rma || it.remarks) && (
                   <s-text color="subdued">{[it.sourceOrder && `From order ${it.sourceOrder}`, it.rma && `RMA ${it.rma}`, it.remarks].filter(Boolean).join(' · ')}</s-text>
                 )}
+                {it.allocatedTo?.length > 0 && <s-text color="subdued">Given to: {it.allocatedTo.join(', ')}</s-text>}
                 {deleting === it.id ? (
                   <s-stack direction="inline" gap="base" alignItems="center">
                     <s-text>Delete this item for good?</s-text>

@@ -19,6 +19,7 @@ export interface FreeStockItem {
   status: string;
   collection: string;
   addedByName: string | null;
+  allocatedTo: string[]; // orders it was given to, e.g. "#1038 x2"
 }
 
 export interface FreeStockPage {
@@ -50,6 +51,7 @@ const EXPLAIN: Record<string, string> = {
   too_many_rows: 'Please import at most 5000 rows at a time.',
   bad_request: 'That stock item could not be used.',
   not_found: 'That stock item no longer exists. Reload the page.',
+  allocated: 'This item has been given to an order, so it cannot be deleted. Take it back from the order first.',
 };
 const explain = (status: number, body: { error?: string; message?: string } | null) => body?.message || (body?.error && EXPLAIN[body.error]) || `The server answered with status ${status}.`;
 const failure = (e: unknown) => ({ ok: false as const, message: e instanceof Error ? e.message : String(e) });

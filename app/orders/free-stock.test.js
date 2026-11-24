@@ -53,10 +53,14 @@ describe("free stock spreadsheets", () => {
   });
 });
 
-function fakeDb(rows = []) {
+function fakeDb(rows = [], allocated = []) {
   const calls = {};
   return {
     calls,
+    freeStockAllocation: {
+      findMany: vi.fn(async () => allocated),
+      count: vi.fn(async () => allocated.length),
+    },
     freeStock: {
       count: vi.fn(async (a) => { calls.count = a; return rows.length; }),
       findMany: vi.fn(async (a) => { calls.find = [...(calls.find ?? []), a]; return a.distinct ? [{ itemType: "freeStock" }, { itemType: "SBTS" }] : rows; }),
