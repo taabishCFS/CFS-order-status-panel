@@ -2,7 +2,7 @@
 import statuses from "../../extensions/cfs-order-status/src/statuses.json";
 import { listBrandTerms } from "./brand-terms.server.js";
 import { freeStockCsv, freeStockSampleCsv } from "./free-stock-rules.js";
-import { allFreeStock } from "./free-stock.server.js";
+import { allFreeStock, allOtherStock } from "./free-stock.server.js";
 import { containerCsv, containerSampleCsv } from "./container-stock-rules.js";
 import { allContainerStock } from "./container-stock.server.js";
 import { lookupCosts } from "./export-query.server.js";
@@ -109,6 +109,10 @@ export async function buildReport({ db, graphql, shop, kind, range, terms }) {
   if (kind === "freestocksample") return { csv: freeStockSampleCsv(), count: 1, capped: false };
   if (kind === "freestock") {
     const rows = await allFreeStock(db, shop);
+    return { csv: freeStockCsv(rows), count: rows.length, capped: false };
+  }
+  if (kind === "sbtsstock") {
+    const rows = await allOtherStock(db, shop);
     return { csv: freeStockCsv(rows), count: rows.length, capped: false };
   }
   if (kind === "containersample") return { csv: containerSampleCsv(), count: 1, capped: false };

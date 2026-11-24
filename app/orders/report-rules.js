@@ -18,6 +18,7 @@ export const REPORTS = {
   // Not on the Reports page either: the Stock screen downloads these (the stock list, and a sample to fill in for the import).
   freestock: { title: "Free stock", needsDates: false, needsTerms: false },
   freestocksample: { title: "Free stock sample", needsDates: false, needsTerms: false },
+  sbtsstock: { title: "SBTS and display stock", needsDates: false, needsTerms: false },
   containers: { title: "Container stock", needsDates: false, needsTerms: false },
   containersample: { title: "Container stock sample", needsDates: false, needsTerms: false },
 };
@@ -71,6 +72,7 @@ export function reportFilename(kind, range, terms) {
   if (kind === "brandterms") return "brand_terms.csv";
   if (kind === "freestock") return "free_stock.csv";
   if (kind === "freestocksample") return "free_stock_sample.csv";
+  if (kind === "sbtsstock") return "sbts_display_stock.csv";
   if (kind === "containers") return "container_stock.csv";
   if (kind === "containersample") return "container_stock_sample.csv";
   return "delivery_report.csv";

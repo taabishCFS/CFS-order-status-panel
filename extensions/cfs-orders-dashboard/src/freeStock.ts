@@ -20,6 +20,7 @@ export interface FreeStockItem {
   collection: string;
   addedByName: string | null;
   allocatedTo: string[]; // orders it was given to, e.g. "#1038 x2"
+  collected?: boolean; // send-back-to-supplier items: the supplier has collected it
 }
 
 export interface FreeStockPage {
@@ -28,9 +29,11 @@ export interface FreeStockPage {
   page: number;
   pageCount: number;
   itemTypes: string[];
+  brands?: string[];
 }
 
 export interface FreeStockInput {
+  itemType?: string; // blank means free stock
   brand: string;
   productName: string;
   productCode: string;
@@ -57,13 +60,15 @@ const explain = (status: number, body: { error?: string; message?: string } | nu
 const failure = (e: unknown) => ({ ok: false as const, message: e instanceof Error ? e.message : String(e) });
 
 export async function loadFreeStock(
-  params: { search?: string; view?: StockView; type?: string; page?: number },
+  params: { search?: string; view?: StockView; type?: string; group?: 'free' | 'other'; brand?: string; page?: number },
   fetchFn: typeof fetch = fetch,
 ): Promise<{ ok: true; data: FreeStockPage } | { ok: false; message: string }> {
   const q = new URLSearchParams();
   if (params.search?.trim()) q.set('search', params.search.trim());
   if (params.view) q.set('view', params.view);
   if (params.type) q.set('type', params.type);
+  if (params.group) q.set('group', params.group);
+  if (params.brand) q.set('brand', params.brand);
   if (params.page && params.page > 1) q.set('page', String(params.page));
   try {
     const res = await callBackendResult(`/api/free-stock${q.toString() ? `?${q}` : ''}`, undefined, fetchFn);
@@ -133,3 +138,37 @@ export function inputProblem(i: FreeStockInput, minQty = 1): string | null {
   if (i.cost.trim() && !/^[£\s]*\d[\d,]*(\.\d{1,2})?\s*$/.test(i.cost)) return 'The cost must be an amount like 12.50.';
   return null;
 }
+
+/** The two kinds of non-free stock the SBTS / Display screen holds. */
+export const SBTS_TYPES: { value: string; label: string }[] = [
+  { value: 'SBTS', label: 'Send Back To Supplier' },
+  { value: 'Display', label: 'Display' },
+];
+
+/** What the screen calls a stock type: "SBTS" reads "Send Back To Supplier". */
+export const typeLabel = (type: string): string => SBTS_TYPES.find((t) => t.value === type)?.label ?? type;
+
+/** Mark items collected by the supplier (true) or put them back as not collected (false). Returns how many changed. */
+export async function markCollected(ids: string[], collected: boolean, fetchFn: typeof fetch = fetch): Promise<{ ok: true; changed: number } | { ok: false; message: string }> {
+  try {
+    const res = await callBackendResult('/api/free-stock', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids, collected }) }, fetchFn);
+    const body = res.body as { changed?: number; error?: string; message?: string } | null;
+    return res.ok && typeof body?.changed === 'number' ? { ok: true, changed: body.changed } : { ok: false, message: explain(res.status, body) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+/** Remove several items at once. Items given to an order are kept; `kept` says how many. */
+export async function removeMany(ids: string[], fetchFn: typeof fetch = fetch): Promise<{ ok: true; removed: number; kept: number } | { ok: false; message: string }> {
+  try {
+    const res = await callBackendResult('/api/free-stock', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids, removeMany: true }) }, fetchFn);
+    const body = res.body as { removed?: number; kept?: number; error?: string; message?: string } | null;
+    return res.ok && typeof body?.removed === 'number' ? { ok: true, removed: body.removed, kept: body.kept ?? 0 } : { ok: false, message: explain(res.status, body) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+/** A sentence for what a bulk remove did. */
+export const removedText = (removed: number, kept: number): string => `Removed ${removed} item${removed === 1 ? '' : 's'}.${kept ? ` ${kept} given to an order ${kept === 1 ? 'was' : 'were'} kept: take ${kept === 1 ? 'it' : 'them'} back from the order first.` : ''}`;

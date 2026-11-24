@@ -93,4 +93,23 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 48. Free stock item types: the old list has types such as "freeStock" and "SBTS". What is each for, and should all be kept?
 49. Free stock: who adds items today (cancelled or returned orders, or spreadsheet), and what do Status, Collection and Credit/FOC mean?
 50. Container stock and freight: how is a container's freight shared across its items, and are clearance container items sold on separate orders?
-51. Container stock: the old import converts the dollar cost to pounds at a fixed rate (0.81 when none is set). What rate should we use, and where does it change? Also, which date format do the container spreadsheets use (the old system read dates as month first)? (Built: 0.81 and day-first dates.)
+
+### Answers received 2026-11-24 (first list of 42 answered; see the guide and progress.md)
+- Parked: Q5, Q8, Q9, Q12, Q41 (ignore for now). Left for later and re-listed below: Q30, Q33, Q39, Q42.
+- Decisions: refunds are always done by hand on the payment provider and the screenshot is attached in the panel (stored in Shopify Files); no money moves from the panel. Delivery partners: CFS, TNT, Pallet, Panther, Graham Scotland, Graham Devon, Prebook, Kinetic Logistics, Fur Deco. Drivers, vans, drops and delivery slots get an import/entry settings page.
+
+### Open questions 51 onward (the earlier 51, on the dollar rate, is now question 64) (asked 2026-11-24)
+51. Mark buttons: On the old bulk Book Delivery page there are four Mark buttons: TNT, PALLET, SGK and FURDECO. What does each one do to the ticked orders? Is SGK Graham Scotland or Kinetic Logistics? Do Panther, Prebook, Graham Devon and Kinetic Logistics need their own Mark button?
+52. Maxpro CSV: The old page has "Upload Maxpro CSV" (a file with 10 columns). What is this file, who produces it, and what should happen to the orders in it?
+53. Partners other than CFS: For TNT, Pallet, Panther, Graham, Prebook, Kinetic and Fur Deco, is a date all that is needed, or do some need a tracking number, reference or notes?
+54. Delivery rules: How many drops does a van do per day, and what are the morning and afternoon rules? What are the delivery slots (for example 8am to 12pm)? (We will add a page to import or type in the drivers, vans, drops and slots, so we only need the rules.)
+55. Reschedule: When staff press Reschedule on a booked delivery, what must they record (for example a reason), and should the customer be emailed?
+56. Process Order, brands that order by hand: Which brands should NOT get an order email because staff order from them by hand or on the supplier's website (for example Actona)? For the others we will email the order form.
+57. Supplier details: Which email address should each supplier's order form go to, should anyone be copied, and which address should it be sent from? (Staff can type the supplier emails into the app; we only need to know the sending address and who is copied.)
+58. Who can do what: Please list the staff allowed to (a) change delivery charges, (b) press Refunded and Save on the refund list, and (c) print the delivery note. Should they also have to type an extra password or PIN, or is being on the list enough?
+59. Replacement orders: When staff press Replacement, should the new R order contain only the ticked items or the whole order? Should it start as a draft for staff to check, and should it be free of charge?
+60. Review emails: Which link should the review email send customers to (for example Trustpilot or Google), and what should the email say? (We will start from the old wording.)
+61. Xero account codes: Please list every Xero account code used and what decides which one an order gets (brand, product type or payment method). Is the tax type "20% (VAT on Income)" still right? Does the old "Urban Deco" tracking tag still matter?
+62. Delivery Date on Outstanding Payments: What did the old "Delivery Date" column show (the date the goods arrived, or the date the customer will get them)? Today the new report leaves it blank.
+63. Container freight: How is a container's freight cost shared across the items in it (by item, by volume, or not at all), and are container "clearance" items sold on separate orders from normal stock? (Today we only show the freight beside each item.)
+64. Container cost and dates: What dollar-to-pound rate should container costs use, and where does it change? Do container spreadsheets write dates day first (31/12/2026) or month first? (We use 0.81 and day first.)

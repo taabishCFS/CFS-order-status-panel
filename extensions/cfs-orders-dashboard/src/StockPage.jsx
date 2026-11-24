@@ -28,7 +28,7 @@ export default function StockPage() {
   const timer = useRef(null);
 
   const load = useCallback(async (next = {}) => {
-    const q = { search, view, type, page, ...next };
+    const q = { search, view, type, group: 'free', page, ...next };
     const res = await loadFreeStock(q);
     if (res.ok) { setData(res.data); setError(null); } else setError(res.message);
   }, [search, view, type, page]);

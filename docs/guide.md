@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 13 (27 November 2026)
+**Guide version:** 14 (28 November 2026)
 
 ## Before you start
 
@@ -36,7 +36,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 17 | Download the Outstanding In-Stock Items and Unpaid Invoices reports | Ready |
 | 18 | Keep a list of free stock (goods we already own), fill it from Excel, correct or delete items | Ready |
 | 19 | Give free stock to an order's item instead of buying it again, and take it back | Ready |
-| 20 | Keep a list of stock arriving in containers, with expected dates and freight, and give it to an order's item | Ready, not yet tried |
+| 20 | Keep a list of stock arriving in containers, with expected dates and freight, and give it to an order's item | Ready |
+| 21 | Keep a list of goods to send back to the supplier, and display pieces, and mark them collected | Ready, not yet tried |
 
 ---
 
@@ -436,6 +437,30 @@ Use **Edit** to correct an item (set the quantity left to **0** to mark it used 
 
 ---
 
+## 18. SBTS / Display
+
+Two kinds of stock are kept apart from free stock:
+- **Send Back To Supplier (SBTS):** cancelled or returned goods that can be sent back to the supplier.
+- **Display:** showroom pieces.
+
+Open it from the **Dashboard**: click the **SBTS / Display** card. The **Stock** page now lists free stock only; SBTS and Display items live here.
+
+### Adding an item
+In **Add an item**, choose the **Type**, then type the **Brand**, **Product code** and **Quantity** (name, cost, source order and remarks are optional). Press **Add item**.
+
+### Marking items collected, or removing them
+Tick the items (or **Select all on this page**), then press:
+- **Mark collected** when the supplier has taken them. They show a green **Collected** label.
+- **Remove from collected** to undo that.
+- **Remove**, then **Yes, remove**, to delete them for good. Items that were given to an order are kept; take them back from the order first.
+
+### Finding items
+Use the search box, and the **Brand**, **Type** and **Show** lists. **Download list (CSV)** gives you every SBTS and Display item.
+
+SBTS and Display items can also be given to an order's item from the order page, in the same **Allocate from stock** box as free stock, when the product code matches.
+
+---
+
 ## Not ready yet
 
 These will be added to this guide as soon as they are built:
@@ -456,6 +481,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 28 Nov 2026 | 14 | Added the SBTS / Display page: send-back-to-supplier and display items, mark collected, remove |
 | 27 Nov 2026 | 13 | Added the Containers page: container stock, expected dates, freight, and giving it to an order's item |
 | 26 Nov 2026 | 12 | Give free stock to an order's item, and take it back |
 | 25 Nov 2026 | 11 | Stock page: edit and delete an item |

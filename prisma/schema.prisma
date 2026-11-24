@@ -303,6 +303,7 @@ model FreeStock {
   creditFoc     String?
   status        String?
   collection    String?
+  isCollected   Boolean  @default(false)
   addedById     String?
   addedByName   String?
   createdAt     DateTime @default(now())
