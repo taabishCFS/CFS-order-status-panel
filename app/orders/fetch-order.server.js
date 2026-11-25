@@ -2,7 +2,7 @@
 const MONEY = "shopMoney { amount currencyCode }";
 const LINES = `lineItems(first: 100, after: $after) {
   nodes {
-    id title variantTitle sku vendor quantity
+    id title variantTitle sku vendor quantity currentQuantity
     product { id }
     variant { id }
     originalUnitPriceSet { ${MONEY} }

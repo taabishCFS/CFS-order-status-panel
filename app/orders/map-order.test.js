@@ -14,6 +14,17 @@ describe("mapOrder service and configuration lines", () => {
   });
 });
 
+describe("mapOrder removed lines", () => {
+  it("leaves out lines removed in an order edit (current quantity 0)", () => {
+    const o = gqlOrder();
+    o.lineItems.nodes.push(gqlLine(90, { currentQuantity: 0 }), gqlLine(91, { currentQuantity: 1 }));
+    const { lines } = mapOrder("s.myshopify.com", o);
+    const ids = lines.map((l) => l.lineId);
+    expect(ids).not.toContain("gid://shopify/LineItem/90");
+    expect(ids).toContain("gid://shopify/LineItem/91");
+  });
+});
+
 describe("mapOrder after an order edit", () => {
   it("uses the current amounts, not the ones the order was placed at", () => {
     const { order } = mapOrder("s.myshopify.com", gqlOrder({ currentTotalPriceSet: money("293.0"), currentSubtotalPriceSet: money("273.0"), currentShippingPriceSet: money("20.0"), currentTotalDiscountsSet: money("0.0") }));

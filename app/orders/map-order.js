@@ -32,7 +32,8 @@ export function mapOrder(shop, o) {
   const createdAt = new Date(o.createdAt);
   // Delivery service charges (Update Delivery & Services) are custom lines marked [svc:...], and configuration price differences
   // are custom lines marked [cfg:...]; neither is a product, so neither is a line on the order lists.
-  const lineNodes = (o.lineItems?.nodes ?? []).filter((l) => !/\[(svc:[a-z_]+|cfg:\d+:v\d+)\]/.test(l.title ?? ""));
+  // Lines removed in an order edit stay on the Shopify order with a current quantity of 0; they are not on the order any more.
+  const lineNodes = (o.lineItems?.nodes ?? []).filter((l) => l.currentQuantity !== 0 && !/\[(svc:[a-z_]+|cfg:\d+:v\d+)\]/.test(l.title ?? ""));
   const brandOf = (l) => l.vendor?.trim() || "Unmapped";
   const order = {
     shop,
