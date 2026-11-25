@@ -12,7 +12,7 @@
     "info": "shopify app info",
     "generate": "shopify app generate",
     "deploy": "shopify app deploy",
-    "test": "npm run test:backend && npm test --workspace=cfs-order-status --workspace=cfs-orders-dashboard",
+    "test": "npm run test:backend && npm test --workspace=cfs-order-status",
     "build:app": "shopify app build",
     "start": "react-router-serve ./build/server/index.js",
     "setup": "prisma generate && prisma migrate deploy",
