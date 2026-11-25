@@ -12,8 +12,8 @@ export interface BookingRow {
   lineStatusId: number | null; postcode: string; deliveryType: string; deliveryDate: string | null; drop: number | null; amPm: '' | 'AM' | 'PM'; prebook: boolean; emailed: boolean;
 }
 export interface BookingPage { rows: BookingRow[]; vans: { id: string; name: string }[] }
-export type MarkKey = 'TNT' | 'PALLET' | 'SGK' | 'FURDECO';
-export const MARK_BUTTONS: { key: MarkKey; label: string }[] = [{ key: 'TNT', label: 'TNT' }, { key: 'PALLET', label: 'PALLET' }, { key: 'SGK', label: 'SGK' }, { key: 'FURDECO', label: 'FURDECO' }];
+export type MarkKey = 'TNT' | 'PALLET' | 'FURDECO';
+export const MARK_BUTTONS: { key: MarkKey; label: string }[] = [{ key: 'TNT', label: 'TNT' }, { key: 'PALLET', label: 'PALLET' }, { key: 'FURDECO', label: 'FURDECO' }];
 export const MAX_DROP = 16;
 export const PREBOOK = 'prebook';
 

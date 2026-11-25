@@ -42,7 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
-| 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/SGK/FurDeco or book them onto a van with drops and times, email the customers | Ready, not yet tried |
+| 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready, not yet tried |
 | 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
 | 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
 
@@ -551,7 +551,7 @@ Open it from the **Dashboard**: **Book Delivery** in the **Delivery** group. It 
 
 **Upload Maxpro CSV.** Choose the Maxpro file and press **Load**. The order numbers in the first column are put into the search for you.
 
-**Mark.** Tick lines and press **TNT**, **PALLET**, **SGK** or **FURDECO**, then confirm. Those lines leave the list and are recorded as going by that carrier (SGK = Graham Scotland).
+**Mark.** Tick lines and press **TNT**, **PALLET** or **FURDECO**, then confirm. Those lines leave the list and are recorded as going by that carrier.
 
 **Book Delivery / Collection.** Tick lines, press the button and confirm. You go to the **Delivery Booking** page:
 1. Choose the **Delivery date** and the **Van** (or **Prebook** for a provisional date).
@@ -597,7 +597,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
-| 4 Dec 2026 | 22 | New Book Delivery page (list, search, brand filter, Maxpro CSV, Mark TNT/Pallet/SGK/FurDeco) and Delivery Booking page (date, van, drops, AM/PM, email the customers, reschedule), like the old system |
+| 4 Dec 2026 | 22 | New Book Delivery page (list, search, brand filter, Maxpro CSV, Mark TNT/Pallet/FurDeco) and Delivery Booking page (date, van, drops, AM/PM, email the customers, reschedule), like the old system |
 | 3 Dec 2026 | 21 | Van Management is now a table like the old system (driver, co-driver and mobile numbers, with ADD NEW, INACTIVE, ACTIVE and DELETE), and there is a new Driver Management page |
 | 2 Dec 2026 | 20 | The delivery box now looks like the old system: a delivery partner, Driver, VAN, Drop and Delivery slot (All Day, AM, PM) in one row, with BOOK & EMAIL, BOOK & SAVE and RESCHEDULE; the slot list was removed from Van Management |
 | 1 Dec 2026 | 19 | Added Van Management and the Delivery Booking box on an order (book, duplicate-drop warning, PM rule, reschedule with a customer email) |

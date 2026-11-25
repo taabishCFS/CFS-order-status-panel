@@ -13,7 +13,7 @@ const STATUS = { no_lines: 404, not_booked: 409, unknown_van: 422, duplicate: 40
 const dmy = (iso) => iso.split("-").reverse().join("/");
 
 // GET ?q=&brand=&page=: the Book Delivery list (lines ready to book) and the brands for the filter.
-// POST { action: mark | load | book | reschedule, ... }: Mark TNT/Pallet/SGK/FurDeco, load the Delivery Booking page, book (and email the customers), reschedule.
+// POST { action: mark | load | book | reschedule, ... }: Mark TNT/Pallet/FurDeco, load the Delivery Booking page, book (and email the customers), reschedule.
 // Everything except GET needs a verified staff member with the Book Delivery permission.
 // This loader also answers the browser's OPTIONS preflight.
 export const loader = async ({ request }) => {

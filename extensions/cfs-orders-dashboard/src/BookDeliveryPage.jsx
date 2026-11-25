@@ -10,7 +10,7 @@ import { MARK_BUTTONS, carryLines, loadBookable, markLines, ordersFromMaxproCsv 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const MAX_CSV_BYTES = 2 * 1024 * 1024;
 
-// Book Delivery, laid out like the old system: search, Mark TNT / PALLET / SGK / FURDECO, upload a Maxpro CSV, then tick lines and
+// Book Delivery, laid out like the old system: search, Mark TNT / PALLET / FURDECO, upload a Maxpro CSV, then tick lines and
 // press "Book Delivery / Collection" to go to the Delivery Booking page. Plus a brand filter.
 export default function BookDeliveryPage() {
   const { route } = useLocation();

@@ -5,7 +5,7 @@ export const BOOKABLE_STATUSES = [4, 14, 31, 33, 43, 44, 45, 46, 47, 48, 49, 69,
 /** An order is only listed when every line is bookable or one of these (completed, cancelled, deleted, failed, awaiting approval or payment). */
 export const IGNORED_STATUSES = [6, 7, 9, 32, 58, 50];
 /** The Mark buttons: which carrier each one gives the ticked lines. */
-export const MARKS = { TNT: "TNT", PALLET: "Pallet", SGK: "Graham Scotland", FURDECO: "Fur Deco" };
+export const MARKS = { TNT: "TNT", PALLET: "Pallet", FURDECO: "Fur Deco" };
 export const PAGE_SIZE = 100;
 export const MAX_LINES = 500;
 export const MAX_DROP = 16;
