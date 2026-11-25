@@ -481,12 +481,6 @@ declare module './src/bulkDelivery.ts' {
 }
 
 //@ts-ignore
-declare module './src/markCompleted.ts' {
-  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
-  const globalThis: { shopify: typeof shopify };
-}
-
-//@ts-ignore
 declare module './src/bookedDelivery.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };

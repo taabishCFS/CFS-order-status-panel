@@ -1,0 +1,110 @@
+[
+  {
+    "code": "DelayRefund",
+    "label": "Delay Refund"
+  },
+  {
+    "code": "50_75percRefundDuetoDelayed",
+    "label": "50%/75% Refund Due to Delayed"
+  },
+  {
+    "code": "BoughtError_DuplicateOrder_Overcharged_WrongOrder",
+    "label": "Bought Error/ Duplicate Order / Overcharged / Wrong Order"
+  },
+  {
+    "code": "Change_In_Item",
+    "label": "Change In item"
+  },
+  {
+    "code": "Change_of_Mind",
+    "label": "Change of Mind"
+  },
+  {
+    "code": "ChangeMindBeforeDelivery",
+    "label": "Change Of Mind Before Delivery"
+  },
+  {
+    "code": "ChangeMindAfterDelivery",
+    "label": "Change Of Mind After Delivery"
+  },
+  {
+    "code": "CompensationDiscount_Incorrect_Colour_Size",
+    "label": "Compensation Discount (Incorrect Colour/Size)"
+  },
+  {
+    "code": "DamagedFullRefund",
+    "label": "Damaged Full Refund"
+  },
+  {
+    "code": "DamagedFullRefundFreeStock",
+    "label": "Damaged Full Refund - Free Stock"
+  },
+  {
+    "code": "DamagedPartRefund",
+    "label": "Damaged Part Refund"
+  },
+  {
+    "code": "DelayedFullRefund",
+    "label": "Delayed Full Refund"
+  },
+  {
+    "code": "DelayedFullRefundFreeStock",
+    "label": "Delayed Full Refund- Free Stock"
+  },
+  {
+    "code": "DelayedPartRefund",
+    "label": "Delayed Part Refund"
+  },
+  {
+    "code": "DeliveryDiscount",
+    "label": "Delivery Discount"
+  },
+  {
+    "code": "Discontinued",
+    "label": "Discontinued"
+  },
+  {
+    "code": "FoundElsewhereCheaper",
+    "label": "Found Elsewhere Cheaper"
+  },
+  {
+    "code": "IncorrectAdsFullRefund",
+    "label": "Incorrect Ads Full Refund"
+  },
+  {
+    "code": "IncorrectAdsFullRefundFreeStock",
+    "label": "Incorrect Ads Full Refund - Free Stock"
+  },
+  {
+    "code": "IncorrectAdsPartRefund",
+    "label": "Incorrect Ads Part Refund"
+  },
+  {
+    "code": "ItemNotFound",
+    "label": "Item Not Found"
+  },
+  {
+    "code": "ManufacturingDefectFullRefund",
+    "label": "Manufacturing Defect - Full Refund"
+  },
+  {
+    "code": "ManufacturingDefectPartRefund",
+    "label": "Manufacturing Defect - Part Refund"
+  },
+  {
+    "code": "PriceMatch",
+    "label": "Price Match"
+  },
+  {
+    "code": "VoucherDiscount",
+    "label": "Voucher Discount"
+  },
+  {
+    "code": "WrongDeliveredFullRefund",
+    "label": "Wrong Delivered Full Refund"
+  },
+  {
+    "code": "WrongDeliveredPartRefund",
+    "label": "Wrong Delivered Part Refund"
+  }
+]
