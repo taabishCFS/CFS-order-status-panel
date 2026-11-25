@@ -5,6 +5,9 @@ import { useStaff } from './useStaff';
 import { bulkExpectedDate } from './bulk';
 import Pager from './Pager.jsx';
 import { formatDate, rangeText, statusTone, toggleAll, toggleOne } from './orderList';
+import SummaryStrip from './SummaryStrip.jsx';
+import EmptyState from './EmptyState.jsx';
+import { dateTone } from './listTone';
 import { callProcess, loadChase, loadChaseExport, processText } from './supplierChase';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
@@ -109,8 +112,13 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
 
       <s-section>
         <s-stack gap="base">
+          <SummaryStrip stats={[
+            { label: kind === 'lapsed' ? 'Lines lapsed' : 'Lines to chase', value: data?.summary.lines, tone: kind === 'lapsed' && data?.summary.lines ? 'critical' : undefined, note: 'overdue' },
+            { label: 'Orders', value: data?.summary.orders },
+            { label: 'Selected', value: picked.size, tone: picked.size ? 'info' : undefined, note: 'ticked' },
+          ]} />
           <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
-            <s-text>{data ? rangeText(data.page, 50, data.total, false) : 'Loading...'} · {picked.size} selected</s-text>
+            <s-text color="subdued">{data ? rangeText(data.page, 50, data.total, false) : 'Loading...'}</s-text>
             {data && data.pageCount > 1 && <Pager page={data.page} pageCount={data.pageCount} all={false} onPage={(page) => setApplied((a) => ({ ...a, page }))} />}
           </s-stack>
           <s-stack direction="inline" gap="base" alignItems="end">
@@ -151,7 +159,7 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
                     <s-text color="subdued">{[r.brand, r.variantTitle].filter(Boolean).join(' · ')}</s-text>
                   </s-stack>
                 </s-table-cell>
-                <s-table-cell>{dmy(r.expectedDate)}</s-table-cell>
+                <s-table-cell><s-text tone={dateTone(r.expectedDate, todayIso())}>{dmy(r.expectedDate)}</s-text></s-table-cell>
                 {kind === 'chaseup' && (
                   <s-table-cell>
                     <s-date-field label="New date" labelAccessibilityVisibility="exclusive" value={r.expectedDate ?? ''} disabled={busy !== null || undefined} onChange={(e) => saveDate(r, e.currentTarget.value)} />
@@ -167,7 +175,7 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
             ))}
           </s-table-body>
         </s-table>
-        {!loading && rows.length === 0 && !error && <s-box padding="base"><s-text>No lines match.</s-text></s-box>}
+        {!loading && rows.length === 0 && !error && <EmptyState title={kind === 'lapsed' ? 'Nothing has lapsed' : 'Nothing to chase'} hint={kind === 'lapsed' ? 'No line is past its expected date. Try a date range.' : 'No line is due in the next three days. Choose a date range to look further ahead.'} />}
       </s-section>
       {loading && !data && <s-spinner accessibilityLabel="Loading lines" />}
     </s-page>

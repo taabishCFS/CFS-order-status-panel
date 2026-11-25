@@ -139,6 +139,12 @@ declare module './src/dashboard.ts' {
 }
 
 //@ts-ignore
+declare module './src/dashboardCounts.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/emailTemplates.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };

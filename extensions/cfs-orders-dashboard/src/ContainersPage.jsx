@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import EmptyState from './EmptyState.jsx';
 import { useStaff } from './useStaff';
 import Pager from './Pager.jsx';
 import { rangeText } from './orderList';
@@ -207,7 +208,7 @@ export default function ContainersPage() {
             <s-text>{data === null ? 'Loading...' : rangeText(data.page, PAGE_SIZE, data.total, false)}</s-text>
             {data && data.pageCount > 1 && <Pager page={data.page} pageCount={data.pageCount} all={false} onPage={setPage} />}
           </s-stack>
-          {data && items.length === 0 && <s-text>{search.trim() ? 'Nothing matches that search.' : view === 'available' ? 'No container stock yet. Add some above.' : 'Nothing to show.'}</s-text>}
+          {data && items.length === 0 && <EmptyState title="Nothing to show" hint={search.trim() ? 'Nothing matches that search.' : view === 'available' ? 'No container stock yet. Add some above.' : 'Nothing to show.'} />}
           {items.map((it) => (editing?.id === it.id ? (
             <s-box key={it.id} padding="base" borderWidth="base" borderRadius="base">
               <s-stack gap="base">

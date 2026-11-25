@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import EmptyState from './EmptyState.jsx';
 import { useStaff } from './useStaff';
 import Pager from './Pager.jsx';
 import { rangeText } from './orderList';
@@ -158,7 +159,7 @@ export default function SbtsPage() {
             </s-stack>
           )}
 
-          {data && items.length === 0 && <s-text>{search.trim() || brand || type ? 'Nothing matches those filters.' : view === 'available' ? 'No SBTS or display items yet. Add some above.' : 'Nothing to show.'}</s-text>}
+          {data && items.length === 0 && <EmptyState title="Nothing to show" hint={search.trim() || brand || type ? 'Nothing matches those filters.' : view === 'available' ? 'No SBTS or display items yet. Add some above.' : 'Nothing to show.'} />}
           {items.map((it) => (
             <s-box key={it.id} padding="base" borderWidth="base" borderRadius="base">
               <s-stack gap="small-200">

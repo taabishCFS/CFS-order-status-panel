@@ -6,6 +6,8 @@ import { bulkChangeStatus, bulkExpectedDate, groupByOrder } from './bulk';
 import { DEFAULT_MESSAGE, DEFAULT_SUBJECT, callBulkEmail } from './bulkEmail';
 import { loadBrands, loadExportLink, loadLineList } from './listApi';
 import Pager from './Pager.jsx';
+import SummaryStrip from './SummaryStrip.jsx';
+import EmptyState from './EmptyState.jsx';
 import ProcessOrderButton from './ProcessOrderButton.jsx';
 import { formatDate, formatMoney, lineTitle, matchesFind, rangeText, statusTone, stockBadge, toggleAll, toggleOne } from './orderList';
 
@@ -150,7 +152,7 @@ export default function OrdersByBrand() {
           {data && <Pager page={data.page} pageCount={data.pageCount} all={applied.all} onPage={goPage} onAll={() => setApplied((a) => ({ ...a, all: true, page: 1 }))} />}
           <s-search-field label="Find in loaded lines" placeholder="Order, product or code" value={find} onInput={(e) => setFind(e.currentTarget.value)} />
         </s-stack>
-        <s-text color="subdued">{summary.lines} lines · {summary.orders} orders · {summary.units} units · {picked.size} selected</s-text>
+        <SummaryStrip stats={[{ label: 'Lines', value: summary.lines }, { label: 'Orders', value: summary.orders }, { label: 'Units', value: summary.units }, { label: 'Selected', value: picked.size, tone: picked.size ? 'info' : undefined, note: 'ticked' }]} />
         <s-stack direction="inline" gap="small" alignItems="center">
           <s-button disabled={exporting !== null || undefined} loading={exporting === 2 || undefined} onClick={() => download(2)}>Export 2 (chase-up sheet)</s-button>
           <s-button disabled={exporting !== null || undefined} loading={exporting === 3 || undefined} onClick={() => download(3)}>Export 3 (ordering sheet)</s-button>
@@ -259,7 +261,7 @@ export default function OrdersByBrand() {
             ))}
           </s-table-body>
         </s-table>
-        {!loading && rows.length === 0 && !error && <s-box padding="base"><s-text>No lines match.</s-text></s-box>}
+        {!loading && rows.length === 0 && !error && <EmptyState title="No lines match" hint="Change the brand, status or dates and press GO." />}
       </s-section>
       {loading && !data && <s-spinner accessibilityLabel="Loading lines" />}
     </s-page>

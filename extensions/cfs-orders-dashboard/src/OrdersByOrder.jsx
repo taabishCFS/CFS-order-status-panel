@@ -4,6 +4,7 @@ import { archiveOrders, loadBrands, loadOrderList } from './listApi';
 import { runBackfill } from './mirrorSync';
 import ExpandedOrder from './ExpandedOrder.jsx';
 import Pager from './Pager.jsx';
+import EmptyState from './EmptyState.jsx';
 import ProcessOrderButton from './ProcessOrderButton.jsx';
 import { formatDate, formatMoney, gatewayLabel, payTypeLabel, rangeText, statusTone } from './orderList';
 
@@ -169,7 +170,7 @@ export default function OrdersByOrder() {
             })}
           </s-table-body>
         </s-table>
-        {!loading && rows.length === 0 && !error && <s-box padding="base"><s-text>No orders match.</s-text></s-box>}
+        {!loading && rows.length === 0 && !error && <EmptyState title="No orders match" hint="Change the filters and press GO, or clear the search." />}
       </s-section>
       {loading && !data && <s-spinner accessibilityLabel="Loading orders" />}
     </s-page>
