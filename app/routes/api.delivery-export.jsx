@@ -1,11 +1,12 @@
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
+import { MAX_EXPORT_ORDERS } from "../delivery/maxpro-rules";
 import { signExportLink } from "../orders/export-link.server";
 import { authenticate } from "../shopify.server";
 import { staffFromSession } from "../staff/staff.server";
 
 const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Europe/London" });
 
-// GET ?kind=booked&from=&to=&brand=&q=[&lines=a,b] | ?kind=picklist|driversheet&date=&van=: a signed, five-minute download link.
+// GET ?kind=booked&from=&to=&brand=&q=[&lines=a,b] | ?kind=picklist|driversheet&date=&van= | ?kind=maxpro-order|maxpro-product&ids=1,2: a signed, five-minute download link.
 // The file itself is served by /exports/delivery, which a plain browser tab can open.
 export const loader = async ({ request }) => {
   const { session, cors } = await authenticate.admin(request);
@@ -29,6 +30,10 @@ export const loader = async ({ request }) => {
     const van = search.get("van");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || !van) return json({ error: "bad_request" }, 400);
     query = new URLSearchParams({ date, van }).toString();
+  } else if (kind === "maxpro-order" || kind === "maxpro-product") {
+    const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
+    if (ids.length === 0 || ids.length > MAX_EXPORT_ORDERS) return json({ error: "bad_request" }, 400);
+    query = new URLSearchParams({ ids: ids.join(",") }).toString();
   } else {
     return json({ error: "bad_request" }, 400);
   }

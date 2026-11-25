@@ -1,6 +1,8 @@
 import db from "../db.server";
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
 import { listBooked, onlyLines } from "../delivery/booked-delivery.server";
+import { maxproRowsFor } from "../delivery/maxpro.server";
+import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
 import { verifyExportLink } from "../orders/export-link.server";
 
@@ -8,7 +10,7 @@ const refuse = (status, text) => new Response(text, { status, headers: { "conten
 const file = (csv, filename) =>
   new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="${filename.replace(/"/g, "")}"`, "cache-control": "no-store" } });
 
-// GET ?t=<signed link>: a Delivery Booked CSV, or one run's Pick List or Driver Sheet. The link (made by /api/delivery-export) is the proof.
+// GET ?t=<signed link>: a Delivery Booked CSV, one run's Pick List or Driver Sheet, or a Maxpro file. The link (made by /api/delivery-export) is the proof.
 export const loader = async ({ request }) => {
   const link = verifyExportLink(new URL(request.url).searchParams.get("t"), process.env.SHOPIFY_API_SECRET);
   if (!link.ok) return refuse(403, link.reason === "expired" ? "This download link has expired. Go back to the app and press the export button again." : "This download link is not valid.");
@@ -28,6 +30,12 @@ export const loader = async ({ request }) => {
     const run = runs.find((r) => r.vanId === query.get("van"));
     if (!run) return refuse(404, "Nothing to export.");
     return link.kind === "delivery-picklist" ? file(pickListCsv(run), sheetFileName(run, "picklist")) : file(driverSheetCsv(run), sheetFileName(run, "driversheet"));
+  }
+  if (link.kind === "delivery-maxpro-order" || link.kind === "delivery-maxpro-product") {
+    const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)).map((x) => `gid://shopify/Order/${x}`);
+    const rows = await maxproRowsFor(db, link.shop, ids);
+    if (rows.length === 0) return refuse(404, "Nothing to export. The orders may have been booked or changed since the list was loaded.");
+    return link.kind === "delivery-maxpro-order" ? file(orderWiseCsv(rows), "MaxPro_Orderwise.csv") : file(productWiseCsv(rows), "MaxPro_Productwise.csv");
   }
   return refuse(400, "Unknown export.");
 };

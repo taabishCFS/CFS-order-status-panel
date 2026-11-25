@@ -1,6 +1,6 @@
 // Pure rules for the accounts refund list (legacy Refund Orders List): reading the filters, the database filter and sort,
 // the paid amount, and the three CSV files. No database access here.
-import REASONS from "../../extensions/cfs-orders-dashboard/src/refundReasons.json";
+import REASONS from "../ui/refundReasons.json";
 import { buildCsv } from "./export-rules.js";
 
 export const PAGE_SIZE = 50;

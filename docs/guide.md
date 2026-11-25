@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 25 (5 December 2026)
+**Guide version:** 26 (6 December 2026)
 
 ## Before you start
 
@@ -42,6 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
+| 30 | Delivery Report CSV (Max) page (Maxpro): paid orders still to deliver, brand filter, White Glove list, Send Bulk Email, Order Wise and Product Wise files | Ready, not yet tried |
 | 29 | Delivery Booked page: every booked delivery by day, van and driver in drop order; change drops, reschedule, download the day, a Pick List or a Driver Sheet | Ready, not yet tried |
 | 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready, not yet tried |
 | 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
@@ -560,9 +561,22 @@ Open it from the **Dashboard**: **Book Delivery** in the **Delivery** group. It 
 3. Press **EMAIL DELIVERY BOOKING** and confirm. To book without telling the customers, press **BOOK DELIVERY** instead. The lines are booked (the van's driver is added) and **each customer gets one email** listing their items, date and time, or the pre-booked email if you chose Prebook. The **eMail?** column then shows Yes.
 - If another order already has that van and drop on that day, a yellow warning names it. Press **Book anyway** or change the drop.
 - **RESCHEDULE** clears the booking on the ticked lines (no email, as in the old system); they go back on the Book Delivery list.
-- Not on these pages yet: the Box column, the green download icon (Maxpro export) and the PRINT button.
+- Not on these pages yet: the Box column and the PRINT button. The Maxpro file now has its own page (next section).
 
 Booking, marking and rescheduling need the **Book and reschedule deliveries** permission.
+
+### Delivery Report CSV (Max) page (Maxpro)
+Open it from the **Dashboard**: **Delivery Report CSV (Max)** in the **Delivery** group. It is the old Maxpro page. Use it to make the files you send to Maxpro, which plans the routes.
+
+**What is listed.** Every order that is paid up (nothing owing) and has at least one item ready to go out (In Stock, Coming IN, Allocated From Stock, Collection and Exchange types, and so on). An order is **left out** if it is already booked for a date or sent by a carrier (TNT, Pallet and so on), or if any item on it is cancelled, deleted, failed or waiting for payment. Orders with the **White Glove** service are kept off the normal list: press **White Glove Orders** to see them, and **Back to all orders** to return.
+
+**The columns** are the ones Maxpro expects: date, order number, the two address lines, the Choice Furniture distribution centre, the drop window (7:30 to 16:00), the 15 minute drop, the client name and phone number, the dates, a coloured label for each item's status and the brands (for example "Actona | Zed |"). **Capacity** and **Volume** are empty, as they were in the old file.
+
+**Finding orders.** Type in **Find order / customer** (order number, name, email, phone or postcode) and press **Search**. The **Brand / vendor** box shows only orders that have an item from that brand. The page shows 100 orders at a time; **All** shows up to 2,000.
+
+**Export Order Wise** and **Export Product Wise.** Tick the orders, press the button and open the link that appears (it works for 5 minutes). You get `MaxPro_Orderwise.csv` (one row for each order, with a Brands column) or `MaxPro_Productwise.csv` (one row for each item still to be delivered). You can tick up to 500 orders for one file.
+
+**Send Bulk Email.** Tick orders and press the button. The box shows who will be emailed and the message, which you can change (it starts as a short delivery update). Each customer gets **one** email covering all their ticked orders, and each order's **Emails** section shows the result. While email is in test mode, only addresses on the allowed list receive it.
 
 ### Delivery Booked page
 Open it from the **Dashboard**: **Delivery Booked** in the **Delivery** group. It is the old "Delivery Booking History" page.
@@ -606,7 +620,7 @@ These will be added to this guide as soon as they are built:
 
 - Paying refunds straight from the system
 - Replacement orders, Add To Accounts and De-allocate
-- The bulk Book Delivery page, Delivery Booked and the other delivery lists, the Maxpro file
+- The other delivery lists (Supplier Collection, Completed, Failed, On Hold, the carrier pages), Area Management, and loading the Maxpro return file into Delivery Booking
 - Review emails
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
@@ -619,6 +633,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 26 | New Delivery Report CSV (Max) page: paid orders still to deliver with the Maxpro columns, search, brand filter, White Glove list, Send Bulk Email and the Order Wise and Product Wise files |
 | 5 Dec 2026 | 25 | Delivery Booked page: MARK COMPLETED button (sets Completed on the ticked lines, with an option to email the customers) |
 | 5 Dec 2026 | 24 | Delivery Booking page: new BOOK DELIVERY button (books without emailing the customers) and wider Drop and Time boxes so the choice can be seen |
 | 5 Dec 2026 | 23 | New Delivery Booked page (runs by day, van and driver, drop order, New Drop with the order in the way moving down, reschedule, Pick List, Driver Sheet and CSV downloads). A booked drop that is already taken now moves the other orders down |

@@ -1,5 +1,5 @@
 // Pure rules for refund requests: staff ask for a refund on an order, and a list collects them. Nothing here moves money.
-import REASONS from "../../extensions/cfs-orders-dashboard/src/refundReasons.json";
+import REASONS from "../ui/refundReasons.json";
 
 const REASON_CODES = new Set(REASONS.map((r) => r.code));
 const LINE_ID = /^gid:\/\/shopify\/LineItem\/\d{1,20}$/;
