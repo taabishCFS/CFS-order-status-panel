@@ -1,0 +1,2 @@
+ALTER TABLE "Van" ADD COLUMN "driverId" TEXT,
+ADD COLUMN "coDriverId" TEXT;

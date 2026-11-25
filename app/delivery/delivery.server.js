@@ -14,7 +14,7 @@ export async function listFleet(db, shop) {
   ]);
   return {
     drivers: drivers.map((d) => ({ id: d.id, name: d.name, extra: d.phone ?? "", active: d.active })),
-    vans: vans.map((v) => ({ id: v.id, name: v.name, extra: v.reg ?? "", active: v.active })),
+    vans: vans.map((v) => ({ id: v.id, name: v.name, extra: v.reg ?? "", driverId: v.driverId ?? null, coDriverId: v.coDriverId ?? null, active: v.active })),
     slots: slots.map((s) => ({ id: s.id, name: s.label, extra: "", active: s.active })),
   };
 }
@@ -28,6 +28,13 @@ export async function saveFleetItem(db, shop, input) {
     const clash = await model.findFirst({ where: { shop, [nameField]: input.name, ...(input.op === "rename" ? { id: { not: input.id } } : {}) } });
     if (clash) return { ok: false, code: "duplicate_name" };
     const data = { [nameField]: input.name, ...(extraField ? { [extraField]: input.extra || null } : {}) };
+    if (input.kind === "van") {
+      for (const key of ["driverId", "coDriverId"]) {
+        const id = input[key] ?? null;
+        if (id && !(await db.driver.findFirst({ where: { shop, id } }))) return { ok: false, code: "unknown_driver" };
+        data[key] = id;
+      }
+    }
     if (input.op === "add") return { ok: true, item: await model.create({ data: { shop, ...data } }) };
     const found = await model.findFirst({ where: { shop, id: input.id } });
     if (!found) return { ok: false, code: "not_found" };
@@ -37,6 +44,28 @@ export async function saveFleetItem(db, shop, input) {
   if (!found) return { ok: false, code: "not_found" };
   await model.update({ where: { id: input.id }, data: { active: input.op === "restore" } });
   return { ok: true };
+}
+
+/** Activate, deactivate or delete several vans or drivers. Anything used by a booking (or, for a driver, a van) is kept: delete skips it and says so. */
+export async function bulkFleet(db, shop, { kind, action, ids }) {
+  const model = db[MODEL[kind]];
+  const found = await model.findMany({ where: { shop, id: { in: ids } } });
+  if (found.length === 0) return { ok: false, code: "not_found" };
+  const hit = found.map((f) => f.id);
+  if (action !== "delete") {
+    await model.updateMany({ where: { shop, id: { in: hit } }, data: { active: action === "activate" } });
+    return { ok: true, changed: hit.length, blocked: [] };
+  }
+  const field = kind === "van" ? "vanId" : "driverId";
+  const booked = await db.deliveryBooking.findMany({ where: { shop, [field]: { in: hit } } });
+  const used = new Set(booked.map((b) => b[field]));
+  if (kind === "driver") {
+    const vans = await db.van.findMany({ where: { shop } });
+    for (const v of vans) for (const d of [v.driverId, v.coDriverId]) if (d && hit.includes(d)) used.add(d);
+  }
+  const free = hit.filter((id) => !used.has(id));
+  if (free.length > 0) await model.deleteMany({ where: { shop, id: { in: free } } });
+  return { ok: true, changed: free.length, blocked: found.filter((f) => used.has(f.id)).map((f) => f.name) };
 }
 
 const bookingView = (b, names) => ({

@@ -2,7 +2,7 @@
 // Every call returns { ok: false, message } instead of throwing.
 import { callBackendResult } from './backend';
 
-export interface FleetItem { id: string; name: string; extra: string; active: boolean }
+export interface FleetItem { id: string; name: string; extra: string; active: boolean; driverId?: string | null; coDriverId?: string | null }
 export interface Fleet { drivers: FleetItem[]; vans: FleetItem[]; slots: FleetItem[] }
 export type FleetKind = 'driver' | 'van' | 'slot';
 export interface Booking { lineId: string; partner: string; date: string; vanId: string | null; vanName: string; driverId: string | null; driverName: string; drop: number | null; amPm: string | null; bookedByName: string }
@@ -53,7 +53,7 @@ export async function loadFleet(fetchFn: typeof fetch = fetch): Promise<Result<F
   }
 }
 
-export async function changeFleet(change: { kind: FleetKind; op: 'add' | 'rename' | 'deactivate' | 'restore'; id?: string; name?: string; extra?: string }, fetchFn: typeof fetch = fetch): Promise<Result<Fleet>> {
+export async function changeFleet(change: { kind: FleetKind; op: 'add' | 'rename' | 'deactivate' | 'restore'; id?: string; name?: string; extra?: string; driverId?: string; coDriverId?: string }, fetchFn: typeof fetch = fetch): Promise<Result<Fleet>> {
   try {
     const res = await callBackendResult('/api/fleet', post(change), fetchFn);
     const b = res.body as ({ fleet?: Fleet } & Body) | null;
@@ -61,6 +61,28 @@ export async function changeFleet(change: { kind: FleetKind; op: 'add' | 'rename
   } catch (e) {
     return failure(e);
   }
+}
+
+export type BulkAction = 'activate' | 'deactivate' | 'delete';
+export interface BulkResult { fleet: Fleet; changed: number; blocked: string[] }
+
+/** Switch several vans or drivers on or off, or delete them. Ones still in use are kept and named in `blocked`. */
+export async function bulkFleetChange(kind: 'van' | 'driver', action: BulkAction, ids: string[], fetchFn: typeof fetch = fetch): Promise<Result<BulkResult>> {
+  try {
+    const res = await callBackendResult('/api/fleet', post({ kind, bulk: true, action, ids }), fetchFn);
+    const b = res.body as ({ fleet?: Fleet; changed?: number; blocked?: string[] } & Body) | null;
+    return res.ok && b?.fleet ? { ok: true, data: { fleet: b.fleet, changed: b.changed ?? 0, blocked: b.blocked ?? [] } } : { ok: false, message: explain(res.status, b) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+/** The sentence shown after a bulk change. */
+export function bulkText(kind: 'van' | 'driver', action: BulkAction, r: { changed: number; blocked: string[] }): string {
+  const noun = `${kind}${r.changed === 1 ? '' : 's'}`;
+  const verb = action === 'delete' ? 'Deleted' : action === 'activate' ? 'Made active:' : 'Made inactive:';
+  const base = r.changed > 0 ? `${verb} ${r.changed} ${noun}.` : `Nothing was ${action === 'delete' ? 'deleted' : 'changed'}.`;
+  return r.blocked.length > 0 ? `${base} ${r.blocked.join(', ')} ${r.blocked.length === 1 ? 'is' : 'are'} in use, so ${r.blocked.length === 1 ? 'it was' : 'they were'} kept. Make ${r.blocked.length === 1 ? 'it' : 'them'} inactive instead.` : base;
 }
 
 export async function loadOrderDelivery(id: string, fetchFn: typeof fetch = fetch): Promise<Result<OrderDelivery>> {

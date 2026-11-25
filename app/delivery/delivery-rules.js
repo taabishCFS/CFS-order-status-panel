@@ -28,10 +28,21 @@ export function readFleetInput(body) {
     if (!name) return { error: "bad_request" };
     const extra = typeof body.extra === "string" ? body.extra.trim().slice(0, 100) : "";
     if (op === "rename" && typeof body.id !== "string") return { error: "bad_request" };
-    return { value: { kind, op, id: body.id, name, extra } };
+    const optId = (v) => (typeof v === "string" && v ? v : null);
+    return { value: { kind, op, id: body.id, name, extra, ...(kind === "van" ? { driverId: optId(body.driverId), coDriverId: optId(body.coDriverId) } : {}) } };
   }
   if (typeof body.id !== "string" || !body.id) return { error: "bad_request" };
   return { value: { kind, op, id: body.id } };
+}
+
+/** Reads a change to several vans or drivers at once: { kind, action: activate | deactivate | delete, ids }. */
+export function readBulkFleet(body) {
+  if (!isObject(body)) return { error: "bad_request" };
+  const { kind, action } = body;
+  if (!["driver", "van"].includes(kind) || !["activate", "deactivate", "delete"].includes(action)) return { error: "bad_request" };
+  const ids = Array.isArray(body.ids) ? [...new Set(body.ids.filter((x) => typeof x === "string" && x))] : [];
+  if (ids.length === 0 || ids.length > 200) return { error: "bad_request" };
+  return { value: { kind, action, ids } };
 }
 
 /** Reads a booking request. action: check | book | reschedule. Returns { value } or { error }. */

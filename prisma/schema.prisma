@@ -458,6 +458,8 @@ model Van {
   shop      String
   name      String
   reg       String?
+  driverId  String?  // the van's usual driver and co-driver (rows of Driver)
+  coDriverId String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
 

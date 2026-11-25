@@ -80,7 +80,7 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
           {PARTNERS.map((p) => <s-option key={p} value={p}>{p}</s-option>)}
         </s-select>
 
-        <s-grid gridTemplateColumns={own ? 'repeat(auto-fit, minmax(150px, 1fr))' : '1fr'} gap="base">
+        <s-grid gridTemplateColumns={own ? 'minmax(180px, 1.4fr) repeat(4, minmax(0, 1fr))' : '1fr'} gap="base">
           <s-date-field label="Delivery date" value={form.date} onChange={(e) => set({ date: e.currentTarget.value })} />
           {own && (
             <>

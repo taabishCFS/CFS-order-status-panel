@@ -3,7 +3,7 @@ import { DASHBOARD_GROUPS, dashboardLinks } from './dashboard';
 
 describe('dashboard', () => {
   it('links to every screen of the app once', () => {
-    expect(dashboardLinks().sort()).toEqual(['/', '/brand-terms', '/containers', '/date-lapsed', '/email-templates', '/orders-by-brand', '/permissions', '/refunds', '/reports', '/sbts', '/stock', '/supplier-chaseup', '/suppliers', '/van-management']);
+    expect(dashboardLinks().sort()).toEqual(['/', '/brand-terms', '/containers', '/date-lapsed', '/driver-management', '/email-templates', '/orders-by-brand', '/permissions', '/refunds', '/reports', '/sbts', '/stock', '/supplier-chaseup', '/suppliers', '/van-management']);
     expect(new Set(dashboardLinks()).size).toBe(dashboardLinks().length);
   });
   it('gives every card a title, a plain description and an icon, and every group a heading', () => {

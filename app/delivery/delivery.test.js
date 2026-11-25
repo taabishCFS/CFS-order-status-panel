@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { pmFollowers, readBookingRequest, readFleetInput, validDate } from "./delivery-rules.js";
-import { bookDelivery, duplicateOrders, listFleet, orderDelivery, rescheduleDelivery, saveFleetItem } from "./delivery.server.js";
+import { pmFollowers, readBookingRequest, readBulkFleet, readFleetInput, validDate } from "./delivery-rules.js";
+import { bookDelivery, bulkFleet, duplicateOrders, listFleet, orderDelivery, rescheduleDelivery, saveFleetItem } from "./delivery.server.js";
 
 const SHOP = "s.myshopify.com";
 const actor = { id: "9", name: "Sam" };
@@ -56,7 +56,8 @@ describe("reading requests", () => {
     expect(validDate("2/12/2026")).toBe(false);
   });
   it("reads fleet changes", () => {
-    expect(readFleetInput({ kind: "van", op: "add", name: " Van 1 ", extra: "AB12" })).toEqual({ value: { kind: "van", op: "add", id: undefined, name: "Van 1", extra: "AB12" } });
+    expect(readFleetInput({ kind: "van", op: "add", name: " Van 1 ", extra: "AB12" })).toEqual({ value: { kind: "van", op: "add", id: undefined, name: "Van 1", extra: "AB12", driverId: null, coDriverId: null } });
+    expect(readFleetInput({ kind: "driver", op: "add", name: "Dan", extra: "07" }).value).toEqual({ kind: "driver", op: "add", id: undefined, name: "Dan", extra: "07" });
     expect(readFleetInput({ kind: "van", op: "rename", name: "x" }).error).toBe("bad_request");
     expect(readFleetInput({ kind: "car", op: "add", name: "x" }).error).toBe("bad_request");
     expect(readFleetInput({ kind: "van", op: "deactivate", id: "a" })).toEqual({ value: { kind: "van", op: "deactivate", id: "a" } });
@@ -84,6 +85,35 @@ describe("reading requests", () => {
     const bs = [{ vanId: "v", date: "d", drop: 1, amPm: "AM" }, { vanId: "v", date: "d", drop: 3, amPm: "AM" }, { vanId: "v", date: "d", drop: 4, amPm: "PM" }, { vanId: "w", date: "d", drop: 5, amPm: "AM" }, { vanId: "v", date: "e", drop: 6, amPm: "AM" }];
     expect(pmFollowers(bs, "v", "d", 2, "PM")).toEqual([bs[1]]);
     expect(pmFollowers(bs, "v", "d", 2, "AM")).toEqual([]);
+  });
+});
+
+describe("vans with drivers, and bulk changes", () => {
+  it("reads bulk changes", () => {
+    expect(readBulkFleet({ kind: "van", action: "delete", ids: ["a", "a", "b"] })).toEqual({ value: { kind: "van", action: "delete", ids: ["a", "b"] } });
+    expect(readBulkFleet({ kind: "slot", action: "delete", ids: ["a"] }).error).toBe("bad_request");
+    expect(readBulkFleet({ kind: "van", action: "wipe", ids: ["a"] }).error).toBe("bad_request");
+    expect(readBulkFleet({ kind: "van", action: "delete", ids: [] }).error).toBe("bad_request");
+  });
+  it("keeps a driver and co-driver on a van and refuses unknown drivers", async () => {
+    const { driver } = await seedFleet();
+    const co = (await saveFleetItem(db, SHOP, { kind: "driver", op: "add", name: "Cleo", extra: "0800" })).item;
+    const v = await saveFleetItem(db, SHOP, { kind: "van", op: "add", name: "Van 2", extra: "", driverId: driver.id, coDriverId: co.id });
+    expect(v.ok).toBe(true);
+    expect((await listFleet(db, SHOP)).vans.find((x) => x.name === "Van 2")).toMatchObject({ driverId: driver.id, coDriverId: co.id });
+    expect((await saveFleetItem(db, SHOP, { kind: "van", op: "add", name: "Van 3", extra: "", driverId: "nope" })).code).toBe("unknown_driver");
+  });
+  it("switches several on and off, and deletes only what nothing uses", async () => {
+    const { van, driver } = await seedFleet();
+    const spare = (await saveFleetItem(db, SHOP, { kind: "van", op: "add", name: "Spare" })).item;
+    expect(await bulkFleet(db, SHOP, { kind: "van", action: "deactivate", ids: [van.id, spare.id] })).toMatchObject({ ok: true, changed: 2 });
+    expect((await listFleet(db, SHOP)).vans.every((x) => !x.active)).toBe(true);
+    await db.deliveryBooking.create({ data: { shop: SHOP, lineId: "L1", orderId: O(1), vanId: van.id, driverId: driver.id, date: "2026-12-02" } });
+    const del = await bulkFleet(db, SHOP, { kind: "van", action: "delete", ids: [van.id, spare.id] });
+    expect(del).toMatchObject({ ok: true, changed: 1, blocked: ["Van 1"] });
+    expect((await listFleet(db, SHOP)).vans.map((x) => x.name)).toEqual(["Van 1"]);
+    expect((await bulkFleet(db, SHOP, { kind: "driver", action: "delete", ids: [driver.id] })).blocked).toEqual(["Dan"]);
+    expect((await bulkFleet(db, SHOP, { kind: "van", action: "delete", ids: ["nope"] })).code).toBe("not_found");
   });
 });
 

@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 20 (2 December 2026)
+**Guide version:** 21 (3 December 2026)
 
 ## Before you start
 
@@ -42,7 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
-| 26 | Van Management: the lists of vans and drivers | Ready |
+| 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
 | 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
 
 ---
@@ -531,11 +531,15 @@ Only staff with the **Process Order** permission can send these emails (see Perm
 ## 21. Van Management and Book Delivery
 
 ### Van Management
-Open it from the **Dashboard**: click the **Van Management** card in the **Delivery** group. It has two lists: **Vans** and **Drivers**.
+Open it from the **Dashboard**: click **Van Management** in the **Delivery** group. It is a table like the old system: ID, Van Name, Driver Name, Driver Mobile, Co-Driver Name, Co-Driver Mobile and Status.
 
-- Type a name (and, if you like, a registration or phone number) and press **Add**.
-- **Rename** changes a name. **Stop using** hides it from the booking box without losing past bookings; **Use again** brings it back.
-- The lists start empty. Add your vans and drivers here first.
+- **ADD NEW** opens a small form: type the van name and choose its **Driver** and **Co-Driver** from the list of drivers. The mobile numbers come from the drivers.
+- Click a van's name to change it.
+- Tick one or more vans, then press **INACTIVE** (hides them from the booking box), **ACTIVE** (brings them back) or **DELETE**.
+- **DELETE** asks you to confirm first. A van that is on a delivery booking is not deleted; make it inactive instead and the page tells you which one.
+
+### Driver Management
+Also on the **Dashboard**, in the **Delivery** group. Same layout: ID, Driver Name, Mobile and Status, with the same four buttons. Add your drivers here first, then put them on the vans. A driver who is on a booking or a van cannot be deleted; make them inactive instead.
 
 ### Book Delivery box (on an order)
 The box is laid out like the old system. Tick the items in the **Items** table, then:
@@ -571,6 +575,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 3 Dec 2026 | 21 | Van Management is now a table like the old system (driver, co-driver and mobile numbers, with ADD NEW, INACTIVE, ACTIVE and DELETE), and there is a new Driver Management page |
 | 2 Dec 2026 | 20 | The delivery box now looks like the old system: a delivery partner, Driver, VAN, Drop and Delivery slot (All Day, AM, PM) in one row, with BOOK & EMAIL, BOOK & SAVE and RESCHEDULE; the slot list was removed from Van Management |
 | 1 Dec 2026 | 19 | Added Van Management and the Delivery Booking box on an order (book, duplicate-drop warning, PM rule, reschedule with a customer email) |
 | 30 Nov 2026 | 18 | Lists now open with a row of count tiles, show friendlier "nothing here" messages, and the Supplier Chaseup and Date Lapsed lists colour expected dates (red passed, amber due within 3 days) |

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bookLines, bookedText, bookingLine, changeFleet, checkDrop, dropNumbers, loadFleet, loadOrderDelivery, rescheduleLines, rescheduledText, type BookForm } from './delivery';
+import { bookLines, bookedText, bulkFleetChange, bulkText, bookingLine, changeFleet, checkDrop, dropNumbers, loadFleet, loadOrderDelivery, rescheduleLines, rescheduledText, type BookForm } from './delivery';
 
 const reply = (status: number, body: unknown) => (async () => new Response(JSON.stringify(body), { status })) as typeof fetch;
 const form: BookForm = { partner: 'CFS', date: '2026-12-02', vanId: 'v1', driverId: '', drop: '3', amPm: 'PM' };
@@ -20,6 +20,22 @@ describe('fleet', () => {
     expect(await changeFleet({ kind: 'van', op: 'add', name: 'x' }, reply(409, { error: 'duplicate_name' }))).toMatchObject({ ok: false, message: 'That name is already in the list.' });
     expect(await changeFleet({ kind: 'van', op: 'add', name: 'x' }, reply(403, { error: 'no_permission' }))).toMatchObject({ ok: false, message: expect.stringContaining('permission') });
     expect(await loadFleet(reply(500, {}))).toMatchObject({ ok: false, message: expect.stringContaining('500') });
+  });
+});
+
+describe('bulk changes', () => {
+  it('sends the ids and reads the result', async () => {
+    const { bodies, f } = bodiesOf();
+    const fleet = { drivers: [], vans: [], slots: [] };
+    expect(await bulkFleetChange('van', 'delete', ['a', 'b'], reply(200, { fleet, changed: 1, blocked: ['Van 1'] }))).toEqual({ ok: true, data: { fleet, changed: 1, blocked: ['Van 1'] } });
+    await bulkFleetChange('driver', 'deactivate', ['a'], f);
+    expect(bodies[0]).toEqual({ kind: 'driver', bulk: true, action: 'deactivate', ids: ['a'] });
+    expect(await bulkFleetChange('van', 'delete', ['a'], reply(404, { error: 'not_found' }))).toMatchObject({ ok: false });
+  });
+  it('words the outcome', () => {
+    expect(bulkText('van', 'delete', { changed: 2, blocked: [] })).toBe('Deleted 2 vans.');
+    expect(bulkText('driver', 'activate', { changed: 1, blocked: [] })).toBe('Made active: 1 driver.');
+    expect(bulkText('van', 'delete', { changed: 0, blocked: ['Van 1'] })).toBe('Nothing was deleted. Van 1 is in use, so it was kept. Make it inactive instead.');
   });
 });
 
