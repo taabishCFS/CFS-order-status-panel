@@ -15,9 +15,9 @@ const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const dmy = (d) => (d ? d.split('-').reverse().join('/') : '');
 
 // Orders by Brand: one row per order line. Filters run on the backend, so they cover every order.
-export default function OrdersByBrand() {
-  const [applied, setApplied] = useState({ brand: '', statusId: null, from: '', to: '', insurance: false, page: 1, all: false });
-  const [draft, setDraft] = useState({ brand: '', statusId: '', from: '', to: '' });
+export default function OrdersByBrand({ initialStatusId = null, title = null }) {
+  const [applied, setApplied] = useState({ brand: '', statusId: initialStatusId, from: '', to: '', insurance: false, page: 1, all: false });
+  const [draft, setDraft] = useState({ brand: '', statusId: initialStatusId === null ? '' : String(initialStatusId), from: '', to: '' });
   const [brands, setBrands] = useState([]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -118,7 +118,7 @@ export default function OrdersByBrand() {
   const saveDate = () => runBulk((groups, actor) => bulkExpectedDate({ groups, date: bulkDate || null, actor }), 'Expected date saved');
 
   return (
-    <s-page heading={lineTitle(applied.brand, summary.lines)}>
+    <s-page heading={title ? `${title} : (${summary.lines})` : lineTitle(applied.brand, summary.lines)}>
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="secondary-actions" href="/">By Order</s-button>
       <s-button slot="secondary-actions" href="/refunds">Refund Orders List</s-button>

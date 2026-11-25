@@ -1,4 +1,5 @@
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
+import { parseOutcomeParams } from "../delivery/outcome-rules";
 import { MAX_EXPORT_ORDERS } from "../delivery/maxpro-rules";
 import { signExportLink } from "../orders/export-link.server";
 import { authenticate } from "../shopify.server";
@@ -30,6 +31,11 @@ export const loader = async ({ request }) => {
     const van = search.get("van");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || !van) return json({ error: "bad_request" }, 400);
     query = new URLSearchParams({ date, van }).toString();
+  } else if (kind === "outcome-completed" || kind === "outcome-failed") {
+    const p = parseOutcomeParams(new URLSearchParams([...search.entries()].filter(([k]) => k !== "kind")));
+    const q = new URLSearchParams({ kind: kind.slice(8) });
+    for (const k of ["from", "to", "q", "brand", "van", "pay"]) if (p[k]) q.set(k, p[k]);
+    query = q.toString();
   } else if (kind === "maxpro-order" || kind === "maxpro-product") {
     const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
     if (ids.length === 0 || ids.length > MAX_EXPORT_ORDERS) return json({ error: "bad_request" }, 400);

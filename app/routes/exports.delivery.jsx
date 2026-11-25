@@ -1,6 +1,8 @@
 import db from "../db.server";
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
 import { listBooked, onlyLines } from "../delivery/booked-delivery.server";
+import { outcomeRows } from "../delivery/outcome.server";
+import { KINDS, outcomeCsv, parseOutcomeParams } from "../delivery/outcome-rules";
 import { maxproRowsFor } from "../delivery/maxpro.server";
 import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
@@ -36,6 +38,12 @@ export const loader = async ({ request }) => {
     const rows = await maxproRowsFor(db, link.shop, ids);
     if (rows.length === 0) return refuse(404, "Nothing to export. The orders may have been booked or changed since the list was loaded.");
     return link.kind === "delivery-maxpro-order" ? file(orderWiseCsv(rows), "MaxPro_Orderwise.csv") : file(productWiseCsv(rows), "MaxPro_Productwise.csv");
+  }
+  if (link.kind === "delivery-outcome-completed" || link.kind === "delivery-outcome-failed") {
+    const params = { ...parseOutcomeParams(query), all: true };
+    const rows = await outcomeRows(db, link.shop, params);
+    if (rows.length === 0) return refuse(404, "Nothing to export.");
+    return file(outcomeCsv(params.kind, rows), KINDS[params.kind].file);
   }
   return refuse(400, "Unknown export.");
 };

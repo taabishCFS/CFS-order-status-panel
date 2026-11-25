@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 26 (6 December 2026)
+**Guide version:** 27 (6 December 2026)
 
 ## Before you start
 
@@ -42,6 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
+| 31 | Completed Delivery, Failed Delivery/Collection and On Hold Delivery pages with filters and CSV downloads | Ready, not yet tried |
 | 30 | Delivery Report CSV (Max) page (Maxpro): paid orders still to deliver, brand filter, White Glove list, Send Bulk Email, Order Wise and Product Wise files | Ready, not yet tried |
 | 29 | Delivery Booked page: every booked delivery by day, van and driver in drop order; change drops, reschedule, download the day, a Pick List or a Driver Sheet | Ready, not yet tried |
 | 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready, not yet tried |
@@ -565,6 +566,19 @@ Open it from the **Dashboard**: **Book Delivery** in the **Delivery** group. It 
 
 Booking, marking and rescheduling need the **Book and reschedule deliveries** permission.
 
+### Completed Delivery, Failed Delivery/Collection and On Hold Delivery
+Open them from the **Dashboard**, in the **Delivery** group. They are the old pages of the same names.
+
+**Completed Delivery** lists every item whose status is Completed: order date, order number, email, brand, item, the delivery date and van (or carrier), postcode and delivery type, pay mode and the final value. It opens on **today's** deliveries, as the old page did. To see more, change **From** and **To** (or clear both for every completed item) and press **GO**.
+
+**Failed Delivery/Collection** lists items whose status is Failed Delivery or Failed Collection: order date, order number, brand, item, code, qty, delivery date, driver, the reason (the last reason typed when it was rescheduled, if any), delivery type and status. It opens on everything.
+
+**Both pages.** Filter by **Van** (a van, or a carrier such as TNT, Pallet or Fur Deco; carriers have no date, so the dates are ignored for them), **Pay mode** (Completed only), **From** and **To** (the delivery date), **Brand / vendor**, or search by order number, postcode or email. **RESET** puts the filters back. **Download CSV** gives a file of everything the filters match (all pages), with the same columns as the old files. A link appears for five minutes.
+
+**On Hold Delivery** is the Orders by Brand list already filtered to the On Hold Delivery status, so you can see those items and change their status. You can still change the filter.
+
+The old Completed page also showed a tracking number. We do not hold tracking numbers per item, so it is left out for now.
+
 ### Delivery Report CSV (Max) page (Maxpro)
 Open it from the **Dashboard**: **Delivery Report CSV (Max)** in the **Delivery** group. It is the old Maxpro page. Use it to make the files you send to Maxpro, which plans the routes.
 
@@ -620,7 +634,7 @@ These will be added to this guide as soon as they are built:
 
 - Paying refunds straight from the system
 - Replacement orders, Add To Accounts and De-allocate
-- The other delivery lists (Supplier Collection, Completed, Failed, On Hold, the carrier pages), Area Management, and loading the Maxpro return file into Delivery Booking
+- The other delivery lists (Supplier Collection, Instock Delivery Not Booked, the carrier pages), Area Management, and loading the Maxpro return file into Delivery Booking
 - Review emails
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
@@ -633,6 +647,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 27 | New Completed Delivery, Failed Delivery/Collection and On Hold Delivery pages, with filters and CSV downloads |
 | 6 Dec 2026 | 26 | New Delivery Report CSV (Max) page: paid orders still to deliver with the Maxpro columns, search, brand filter, White Glove list, Send Bulk Email and the Order Wise and Product Wise files |
 | 5 Dec 2026 | 25 | Delivery Booked page: MARK COMPLETED button (sets Completed on the ticked lines, with an option to email the customers) |
 | 5 Dec 2026 | 24 | Delivery Booking page: new BOOK DELIVERY button (books without emailing the customers) and wider Drop and Time boxes so the choice can be seen |

@@ -34,6 +34,9 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     items: [
       { href: '/book-delivery', title: 'Book Delivery', description: 'Tick the orders that are ready, mark TNT or Pallet, or book them onto a van with drops and times and email the customers.', icon: 'delivery' },
       { href: '/delivery-booked', title: 'Delivery Booked', description: 'See every booked delivery by day, van and driver in drop order. Change drops, reschedule, and download the day, a Pick List or a Driver Sheet.', icon: 'delivery' },
+      { href: '/delivery-completed', title: 'Completed Delivery', description: 'Lines that have been delivered, by day, van or carrier, pay mode and brand, with the final value. Download the list.', icon: 'delivery' },
+      { href: '/delivery-failed', title: 'Failed Delivery/Collection', description: 'Lines whose delivery or collection failed, with the driver and the reason. Download the list.', icon: 'delivery' },
+      { href: '/on-hold-delivery', title: 'On Hold Delivery', description: 'Lines on hold for delivery, shown in Orders by Brand so you can change their status.', icon: 'delivery' },
       { href: '/maxpro', title: 'Delivery Report CSV (Max)', description: 'Every paid order still to deliver, with the Maxpro columns. Filter by brand, send a delivery update email, and export the Order Wise or Product Wise file for Maxpro.', icon: 'delivery' },
       { href: '/van-management', title: 'Van Management', description: 'The vans, with their driver and co-driver, that you choose from when booking a delivery.', icon: 'delivery' },
       { href: '/driver-management', title: 'Driver Management', description: 'The drivers, with their mobile numbers, who go on the vans.', icon: 'delivery' },
