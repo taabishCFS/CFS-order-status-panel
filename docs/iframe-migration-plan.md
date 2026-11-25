@@ -1,6 +1,6 @@
 # Switching the staff app from the App Home extension to an iframe app
 
-Written 25 November 2026. Status: **Phase 0 passed live (25 Nov). Phase 1 built (25 Nov): all 21 pages are server routes; waiting for push and the Phase 2 live walk-through.** Decisions answered by the user on 25 Nov: trial cutover on the dev store yes; React 19 upgrade yes; new delivery features paused until the switch is done; Render stays awake once all features are complete and tested.
+Written 25 November 2026. Status: **Phases 0, 1 and 2 done (25 Nov). Phase 3 (clean-up) next, then the delivery build resumes.** Decisions answered by the user on 25 Nov: trial cutover on the dev store yes; React 19 upgrade yes; new delivery features paused until the switch is done; Render stays awake once all features are complete and tested.
 
 ## Why
 
@@ -105,6 +105,10 @@ Maxpro page and exports, Load pre-fill from the Maxoptra file, the other deliver
 - `app/ui` is the single source; its 34 test files moved with it (`vitest.backend.config.js` now includes `.test.ts`). 1121 app tests plus 135 order-status tests pass.
 - `BookDeliveryPage` now uses React Router's `useNavigate`. The old extension folder `extensions/cfs-orders-dashboard` is inert (manifest renamed to `.toml.off`) and is to be deleted by the user (the assistant's delete was blocked); the root `test` script no longer runs it.
 - Still to check live (Phase 2): the order page's status save (direct `shopify:admin/api/graphql.json` calls) and `shopify://admin/...` links, every page's controls, a non-admin staff account.
+
+## Phase 2 result (25 Nov 2026)
+
+Closed by the user. All 21 pages load with data inside Shopify; saves checked on #1038: line status, instructions (save, reload, clear), internal note, older history ("Show 10 more"), email log, reschedule, Download All. One real fault found and fixed: archiving older status history failed from the iframe (staff access cannot write app-owned metaobjects), so the server now does it (`/api/orders/:id/history`, as the app). Left open by choice: a non-admin staff account (needs a restricted Shopify staff login), more file downloads (invoices, reports, Pick List: same signed-link route that worked), and the services, expected-date and tracking saves (same save path as those tested). Old size-limit workarounds are no longer needed.
 
 ## Decisions needed from you
 
