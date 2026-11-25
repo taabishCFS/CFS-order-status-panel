@@ -91,6 +91,12 @@ declare module './src/SuppliersPage.jsx' {
 }
 
 //@ts-ignore
+declare module './src/VanManagementPage.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/useStaff.js' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
@@ -164,6 +170,12 @@ declare module './src/CustomerSection.jsx' {
 
 //@ts-ignore
 declare module './src/DeliverySection.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/DeliveryBookingSection.jsx' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }
@@ -278,6 +290,12 @@ declare module './src/EmailTick.jsx' {
 
 //@ts-ignore
 declare module './src/emails.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/delivery.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }

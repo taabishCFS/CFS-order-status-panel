@@ -48,7 +48,16 @@ export const action = async ({ request, params }) => {
     return result.ok ? json(result) : json({ error: result.code }, STATUS[result.code] ?? 400);
   }
 
-  const result = await bookDelivery(db, { shop, orderId, request: read.value, actor: staff });
+  const config = readMailConfig(process.env);
+  const queueEmail = async ({ lineIds, date, amPm, drop }) => {
+    const shown = date.split("-").reverse().join("/");
+    const slot = amPm === "ALL" ? "All Day" : amPm ?? "";
+    const lineExtras = Object.fromEntries(lineIds.map((lineId) => [lineId, { deliveryDate: shown, slot, drop: drop === null ? "" : String(drop) }]));
+    const sent = await queueOrderEmails(db, { shop, orderId, request: { templateKey: "delivery.booking_confirmation", lineIds, extras: { deliveryDate: shown }, lineExtras }, actor: staff, config });
+    if (sent.ok) void runEmailTick({ db }).catch((e) => console.error("Email send pass failed", e?.message ?? e));
+    return sent;
+  };
+  const result = await bookDelivery(db, { shop, orderId, request: read.value, actor: staff, queueEmail });
   if (!result.ok) return json({ error: result.code, duplicates: result.duplicates }, STATUS[result.code] ?? 400);
   return json(result);
 };

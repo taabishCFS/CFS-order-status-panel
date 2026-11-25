@@ -5,15 +5,21 @@ import { callBackendResult } from './backend';
 export interface FleetItem { id: string; name: string; extra: string; active: boolean }
 export interface Fleet { drivers: FleetItem[]; vans: FleetItem[]; slots: FleetItem[] }
 export type FleetKind = 'driver' | 'van' | 'slot';
-export interface Booking { lineId: string; date: string; vanId: string | null; vanName: string; driverId: string | null; driverName: string; slotId: string | null; slotName: string; drop: number | null; amPm: string | null; bookedByName: string }
-export interface HistoryEntry { id: string; action: string; lineId: string; date: string | null; vanName: string; driverName: string; drop: number | null; amPm: string | null; reason: string; actorName: string; createdAt: string }
+export interface Booking { lineId: string; partner: string; date: string; vanId: string | null; vanName: string; driverId: string | null; driverName: string; drop: number | null; amPm: string | null; bookedByName: string }
+export interface HistoryEntry { id: string; action: string; partner: string; lineId: string; date: string | null; vanName: string; driverName: string; drop: number | null; amPm: string | null; reason: string; actorName: string; createdAt: string }
 export interface OrderDelivery { fleet: Fleet; bookings: Booking[]; history: HistoryEntry[] }
-export interface BookForm { date: string; vanId: string; driverId: string; slotId: string; drop: string; amPm: string }
+export interface BookForm { partner: string; date: string; vanId: string; driverId: string; drop: string; amPm: string }
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string };
 interface Body { error?: string; duplicates?: string[] }
 
 export const MAX_DROPS = 16;
+export const OWN_PARTNER = 'CFS';
+// Delivery partners: CFS has van, driver, drop and slot; the carriers only get a date.
+export const PARTNERS = ['CFS', 'TNT', 'Pallet', 'Graham Scotland', 'Graham Devon', 'Fur Deco'];
+// The delivery slots, as in the old system.
+export const SLOT_OPTIONS = [{ value: 'ALL', label: 'All Day' }, { value: 'AM', label: 'AM' }, { value: 'PM', label: 'PM' }];
+const slotLabel = (v: string | null): string => SLOT_OPTIONS.find((s) => s.value === v)?.label ?? '';
 
 const EXPLAIN: Record<string, string> = {
   staff_not_verified: 'Only a verified staff member can do this.',
@@ -27,7 +33,8 @@ const EXPLAIN: Record<string, string> = {
   unknown_slot: 'That slot is not available. Refresh and choose again.',
   bad_date: 'Choose a valid date.',
   bad_drop: `The drop must be a number from 1 to ${MAX_DROPS}.`,
-  bad_am_pm: 'Choose AM or PM.',
+  bad_am_pm: 'Choose All Day, AM or PM.',
+  bad_partner: 'Choose a delivery partner from the list.',
   drop_needs_van: 'Choose a van before choosing a drop.',
   reason_required: 'Give a reason for rescheduling.',
   bad_request: 'The request was not accepted. Refresh the page and try again.',
@@ -66,17 +73,17 @@ export async function loadOrderDelivery(id: string, fetchFn: typeof fetch = fetc
   }
 }
 
-const bookBody = (action: 'check' | 'book', lineIds: string[], f: BookForm, allowDuplicate = false) => ({
-  action, lineIds, date: f.date, vanId: f.vanId || null, driverId: f.driverId || null, slotId: f.slotId || null, drop: f.drop || null, amPm: f.amPm || null, allowDuplicate,
+const bookBody = (action: 'check' | 'book', lineIds: string[], f: BookForm, allowDuplicate = false, emailCustomer = false) => ({
+  action, lineIds, partner: f.partner || OWN_PARTNER, date: f.date, vanId: f.vanId || null, driverId: f.driverId || null, drop: f.drop || null, amPm: f.amPm || null, allowDuplicate, emailCustomer,
 });
 
-export type BookReply = { ok: true; duplicates: string[]; saved?: number; pmChanged?: number } | { ok: false; message: string; duplicates?: string[]; duplicate?: boolean };
+export type BookReply = { ok: true; duplicates: string[]; saved?: number; pmChanged?: number; email?: string } | { ok: false; message: string; duplicates?: string[]; duplicate?: boolean };
 
 async function bookCall(id: string, body: unknown, fetchFn: typeof fetch): Promise<BookReply> {
   try {
     const res = await callBackendResult(`/api/orders/${encodeURIComponent(id)}/delivery`, post(body), fetchFn);
-    const b = res.body as ({ duplicates?: string[]; saved?: number; pmChanged?: number } & Body) | null;
-    if (res.ok) return { ok: true, duplicates: b?.duplicates ?? [], saved: b?.saved, pmChanged: b?.pmChanged };
+    const b = res.body as ({ duplicates?: string[]; saved?: number; pmChanged?: number; email?: string } & Body) | null;
+    if (res.ok) return { ok: true, duplicates: b?.duplicates ?? [], saved: b?.saved, pmChanged: b?.pmChanged, email: b?.email };
     if (b?.error === 'duplicate') return { ok: false, duplicate: true, duplicates: b.duplicates ?? [], message: `Already booked for that date, van and drop: ${(b.duplicates ?? []).join(', ')}.` };
     return { ok: false, message: explain(res.status, b) };
   } catch (e) {
@@ -85,7 +92,7 @@ async function bookCall(id: string, body: unknown, fetchFn: typeof fetch): Promi
 }
 
 export const checkDrop = (id: string, lineIds: string[], form: BookForm, fetchFn: typeof fetch = fetch) => bookCall(id, bookBody('check', lineIds, form), fetchFn);
-export const bookLines = (id: string, lineIds: string[], form: BookForm, allowDuplicate = false, fetchFn: typeof fetch = fetch) => bookCall(id, bookBody('book', lineIds, form, allowDuplicate), fetchFn);
+export const bookLines = (id: string, lineIds: string[], form: BookForm, allowDuplicate = false, emailCustomer = false, fetchFn: typeof fetch = fetch) => bookCall(id, bookBody('book', lineIds, form, allowDuplicate, emailCustomer), fetchFn);
 
 export async function rescheduleLines(id: string, lineIds: string[], reason: string, emailCustomer: boolean, fetchFn: typeof fetch = fetch): Promise<Result<{ cleared: number; email: string }>> {
   try {
@@ -97,8 +104,12 @@ export async function rescheduleLines(id: string, lineIds: string[], reason: str
   }
 }
 
-export const bookedText = (r: { saved?: number; pmChanged?: number }): string =>
-  `Delivery booked for ${r.saved ?? 0} item${r.saved === 1 ? '' : 's'}.${r.pmChanged ? ` ${r.pmChanged} later order${r.pmChanged === 1 ? ' was' : 's were'} moved to PM.` : ''}`;
+export const bookedText = (r: { saved?: number; pmChanged?: number; email?: string }): string => {
+  const base = `Delivery booked for ${r.saved ?? 0} item${r.saved === 1 ? '' : 's'}.${r.pmChanged ? ` ${r.pmChanged} later order${r.pmChanged === 1 ? ' was' : 's were'} moved to PM.` : ''}`;
+  if (r.email === 'queued') return `${base} The customer is being emailed.`;
+  if (!r.email || r.email === 'not_requested') return base;
+  return `${base} The customer email was not sent (${r.email === 'email_off' ? 'email is switched off' : r.email}).`;
+};
 
 export const rescheduledText = (r: { cleared: number; email: string }): string => {
   const base = `Delivery rescheduled for ${r.cleared} item${r.cleared === 1 ? '' : 's'}.`;
@@ -111,4 +122,4 @@ export const rescheduledText = (r: { cleared: number; email: string }): string =
 export const dropNumbers = (): number[] => Array.from({ length: MAX_DROPS }, (_, i) => i + 1);
 
 export const bookingLine = (b: Booking): string =>
-  [b.date.split('-').reverse().join('/'), b.vanName && `Van ${b.vanName}`, b.driverName && `Driver ${b.driverName}`, b.drop !== null && `Drop ${b.drop}`, b.amPm, b.slotName].filter(Boolean).join(' · ');
+  [b.partner !== OWN_PARTNER && b.partner, b.date.split('-').reverse().join('/'), b.vanName && `Van: ${b.vanName}`, b.driverName && `Driver: ${b.driverName}`, b.drop !== null && `Drop ${b.drop}`, slotLabel(b.amPm)].filter(Boolean).join(' · ');

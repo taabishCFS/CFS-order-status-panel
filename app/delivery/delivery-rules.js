@@ -2,6 +2,8 @@
 
 export const MAX_DROPS = 16; // a van takes at most 16 drops a day
 export const MAX_LINES = 200;
+export const PARTNERS = ["CFS", "TNT", "Pallet", "Graham Scotland", "Graham Devon", "Fur Deco"]; // only CFS has van, driver and drop
+export const SLOTS = { ALL: "All Day", AM: "AM", PM: "PM" };
 export const FLEET_KINDS = ["driver", "van", "slot"];
 // Order statuses that count as "live" when checking whether a drop is already taken (the legacy list).
 export const LIVE_STATUSES = [4, 14, 31, 33, 40, 43, 44, 45, 46, 47, 48, 49, 5];
@@ -49,12 +51,17 @@ export function readBookingRequest(body) {
   if (!validDate(body.date)) return { error: "bad_date" };
   const drop = body.drop === undefined || body.drop === null || body.drop === "" ? null : Number(body.drop);
   if (drop !== null && (!Number.isInteger(drop) || drop < 1 || drop > MAX_DROPS)) return { error: "bad_drop" };
-  const amPm = body.amPm === undefined || body.amPm === null || body.amPm === "" ? null : body.amPm;
-  if (amPm !== null && amPm !== "AM" && amPm !== "PM") return { error: "bad_am_pm" };
+  const partner = body.partner === undefined || body.partner === null || body.partner === "" ? "CFS" : body.partner;
+  if (!PARTNERS.includes(partner)) return { error: "bad_partner" };
+  let amPm = body.amPm === undefined || body.amPm === null || body.amPm === "" ? null : body.amPm;
+  if (amPm !== null && !Object.hasOwn(SLOTS, amPm)) return { error: "bad_am_pm" };
   const id = (v) => (typeof v === "string" && v ? v : null);
-  const vanId = id(body.vanId);
-  if (drop !== null && !vanId) return { error: "drop_needs_van" };
-  return { value: { action, lineIds, date: body.date, vanId, driverId: id(body.driverId), slotId: id(body.slotId), drop, amPm, allowDuplicate: body.allowDuplicate === true } };
+  // A carrier only gets a date: no van, driver, drop or slot.
+  const own = partner === "CFS";
+  const vanId = own ? id(body.vanId) : null;
+  if (own && drop !== null && !vanId) return { error: "drop_needs_van" };
+  if (!own) amPm = null;
+  return { value: { action, lineIds, partner, date: body.date, vanId, driverId: own ? id(body.driverId) : null, slotId: null, drop: own ? drop : null, amPm, allowDuplicate: body.allowDuplicate === true, emailCustomer: body.emailCustomer === true } };
 }
 
 /** PM on a drop makes every later drop on the same van and day PM. Returns the bookings that must change to PM. */

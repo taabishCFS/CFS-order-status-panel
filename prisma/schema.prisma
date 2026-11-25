@@ -480,11 +480,12 @@ model DeliveryBooking {
   shop          String
   orderId       String
   lineId        String
+  partner       String   @default("CFS") // CFS (own vans) or a carrier: only CFS has van, driver and drop
   date          String // YYYY-MM-DD
   vanId         String?
   driverId      String?
   drop          Int?
-  amPm          String? // AM | PM
+  amPm          String? // AM | PM | ALL (All Day)
   slotId        String?
   bookedByName  String
   createdAt     DateTime @default(now())
@@ -502,6 +503,7 @@ model DeliveryHistory {
   orderId   String
   lineId    String
   action    String // booked | rescheduled
+  partner   String   @default("CFS")
   date      String?
   vanName   String?
   driverName String?

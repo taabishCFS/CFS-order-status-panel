@@ -47,7 +47,7 @@ const seedFleet = async () => {
   const slot = (await saveFleetItem(db, SHOP, { kind: "slot", op: "add", name: "8-12" })).item;
   return { van, driver, slot };
 };
-const book = (over = {}) => ({ action: "book", lineIds: ["L1"], date: "2026-12-02", vanId: null, driverId: null, slotId: null, drop: null, amPm: null, allowDuplicate: false, ...over });
+const book = (over = {}) => ({ action: "book", partner: "CFS", emailCustomer: false, lineIds: ["L1"], date: "2026-12-02", vanId: null, driverId: null, slotId: null, drop: null, amPm: null, allowDuplicate: false, ...over });
 
 describe("reading requests", () => {
   it("validates dates", () => {
@@ -70,6 +70,15 @@ describe("reading requests", () => {
     expect(readBookingRequest({ action: "book", lineIds: [], date: "2026-12-02" }).error).toBe("bad_request");
     expect(readBookingRequest({ action: "reschedule", lineIds: ["a"] }).error).toBe("reason_required");
     expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "Van broke down" }).value).toEqual({ action: "reschedule", lineIds: ["a"], reason: "Van broke down", emailCustomer: true });
+  });
+  it("a carrier booking keeps only the date, and slots are All Day, AM or PM", () => {
+    const r = readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", partner: "TNT", vanId: "v", driverId: "d", drop: 4, amPm: "PM" });
+    expect(r.value).toMatchObject({ partner: "TNT", vanId: null, driverId: null, drop: null, amPm: null });
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02" }).value.partner).toBe("CFS");
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", partner: "Nobody" }).error).toBe("bad_partner");
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", amPm: "ALL" }).value.amPm).toBe("ALL");
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", amPm: "constructor" }).error).toBe("bad_am_pm");
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", emailCustomer: true }).value.emailCustomer).toBe(true);
   });
   it("PM makes every later drop on that van and day PM", () => {
     const bs = [{ vanId: "v", date: "d", drop: 1, amPm: "AM" }, { vanId: "v", date: "d", drop: 3, amPm: "AM" }, { vanId: "v", date: "d", drop: 4, amPm: "PM" }, { vanId: "w", date: "d", drop: 5, amPm: "AM" }, { vanId: "v", date: "e", drop: 6, amPm: "AM" }];
@@ -99,8 +108,25 @@ describe("booking", () => {
     expect(r).toMatchObject({ ok: true, saved: 2 });
     const view = await orderDelivery(db, SHOP, O(1));
     expect(view.bookings).toHaveLength(2);
-    expect(view.bookings[0]).toMatchObject({ vanName: "Van 1", driverName: "Dan", slotName: "8-12", drop: 2, amPm: "AM", bookedByName: "Sam" });
+    expect(view.bookings[0]).toMatchObject({ partner: "CFS", vanName: "Van 1", driverName: "Dan", drop: 2, amPm: "AM", bookedByName: "Sam" });
     expect(view.history.map((h) => h.action)).toEqual(["booked", "booked"]);
+  });
+  it("Book & Email queues the customer email, Book & Save does not", async () => {
+    const queueEmail = vi.fn(async () => ({ ok: true }));
+    const r = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ emailCustomer: true, amPm: "ALL", drop: null }), actor, queueEmail });
+    expect(r.email).toBe("queued");
+    expect(queueEmail).toHaveBeenCalledWith({ orderId: O(1), lineIds: ["L1"], date: "2026-12-02", amPm: "ALL", drop: null });
+    const saved = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ date: "2026-12-03" }), actor, queueEmail });
+    expect(saved.email).toBe("not_requested");
+    expect(queueEmail).toHaveBeenCalledTimes(1);
+    const failed = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ emailCustomer: true }), actor, queueEmail: async () => ({ ok: false, code: "email_off" }) });
+    expect(failed).toMatchObject({ ok: true, email: "email_off" });
+  });
+  it("keeps the partner on the booking and in the history", async () => {
+    await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ partner: "TNT" }), actor });
+    const view = await orderDelivery(db, SHOP, O(1));
+    expect(view.bookings[0].partner).toBe("TNT");
+    expect(view.history[0].partner).toBe("TNT");
   });
   it("re-booking replaces the booking instead of adding one", async () => {
     await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book(), actor });

@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 19 (1 December 2026)
+**Guide version:** 20 (2 December 2026)
 
 ## Before you start
 
@@ -42,8 +42,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
-| 26 | Van Management: the lists of vans, drivers and delivery slots | Ready, not yet tried |
-| 27 | Delivery Booking box on an order: date, van, driver, drop, AM/PM, slot, and Reschedule | Ready, not yet tried |
+| 26 | Van Management: the lists of vans and drivers | Ready |
+| 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
 
 ---
 
@@ -528,24 +528,25 @@ Only staff with the **Process Order** permission can send these emails (see Perm
 
 ---
 
-## 21. Van Management and Delivery Booking
+## 21. Van Management and Book Delivery
 
 ### Van Management
-Open it from the **Dashboard**: click the **Van Management** card in the **Delivery** group. It has three lists: **Vans**, **Drivers** and **Delivery slots**.
+Open it from the **Dashboard**: click the **Van Management** card in the **Delivery** group. It has two lists: **Vans** and **Drivers**.
 
 - Type a name (and, if you like, a registration or phone number) and press **Add**.
-- **Rename** changes a name. **Stop using** hides it from the booking boxes without losing past bookings; **Use again** brings it back.
-- The lists start empty. Add your vans, drivers and slots here first.
+- **Rename** changes a name. **Stop using** hides it from the booking box without losing past bookings; **Use again** brings it back.
+- The lists start empty. Add your vans and drivers here first.
 
-### Delivery Booking box (on an order)
-On an order, tick the items in the **Items** table, then use the **Delivery Booking** box:
-1. Choose the **Delivery date**, and any of **Van**, **Driver**, **Drop** (1 to 16), **AM / PM** and **Delivery slot**. A drop needs a van.
-2. Press **Book delivery**.
+### Book Delivery box (on an order)
+The box is laid out like the old system. Tick the items in the **Items** table, then:
+1. Choose the **delivery partner** at the top. **CFS** is the default.
+2. Choose the **Delivery date**. For CFS also choose **Driver**, **VAN**, **Drop** (1 to 16, needs a van) and **Delivery slot** (**All Day**, **AM** or **PM**). For TNT, Pallet, Graham Scotland, Graham Devon and Fur Deco only the date is needed.
+3. Press **BOOK & EMAIL** (books and emails the customer the delivery booking confirmation) or **BOOK & SAVE** (books without emailing).
 - If another live order already has the same date, van and drop, a yellow warning names it. Press **Book anyway** or **Change it**.
 - Choosing **PM** on a drop also moves every later drop on that van and day to PM.
-- The box lists what is booked and a short history of who booked or rescheduled and when.
+- Booked items are listed above the form. **Delivery Update History** opens the list of who booked or rescheduled and when.
 
-**Reschedule ticked items** clears the booking on the ticked items. You must give a reason; the customer is emailed it (the **Email the customer** tick can be turned off). The email wording is the **Delivery rescheduled** template on the Email templates page, so you can change it.
+**RESCHEDULE** clears the booking on the ticked items. You must give a reason; the customer is emailed it (the **Email the customer** tick can be turned off). The email wording is the **Delivery rescheduled** template on the Email templates page, so you can change it.
 
 Booking and rescheduling need the **Book and reschedule deliveries** permission, and Van Management needs **Edit drivers, vans and slots** (see Permissions).
 
@@ -570,6 +571,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 2 Dec 2026 | 20 | The delivery box now looks like the old system: a delivery partner, Driver, VAN, Drop and Delivery slot (All Day, AM, PM) in one row, with BOOK & EMAIL, BOOK & SAVE and RESCHEDULE; the slot list was removed from Van Management |
 | 1 Dec 2026 | 19 | Added Van Management and the Delivery Booking box on an order (book, duplicate-drop warning, PM rule, reschedule with a customer email) |
 | 30 Nov 2026 | 18 | Lists now open with a row of count tiles, show friendlier "nothing here" messages, and the Supplier Chaseup and Date Lapsed lists colour expected dates (red passed, amber due within 3 days) |
 | 30 Nov 2026 | 17 | The Dashboard now opens with live number tiles (Date Lapsed, Chase-up due, Order in Progress, Refunds waiting, SBTS to collect, Free stock), coloured by urgency |

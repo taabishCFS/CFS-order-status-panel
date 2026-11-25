@@ -1,21 +1,27 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
 import { useStaff } from './useStaff';
-import { bookLines, bookedText, bookingLine, checkDrop, dropNumbers, loadOrderDelivery, rescheduleLines, rescheduledText } from './delivery';
+import { OWN_PARTNER, PARTNERS, SLOT_OPTIONS, bookLines, bookedText, bookingLine, checkDrop, dropNumbers, loadOrderDelivery, rescheduleLines, rescheduledText } from './delivery';
 
-const EMPTY = { date: '', vanId: '', driverId: '', slotId: '', drop: '', amPm: '' };
+const EMPTY = { partner: OWN_PARTNER, date: '', vanId: '', driverId: '', drop: '', amPm: '' };
+const dmy = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
 
-// Delivery Booking on an order: set the date, van, driver, drop and AM/PM for the ticked items, or reschedule them.
+// Book Delivery on an order, laid out like the old system:
+//   [Book Delivery]  [partner]
+//   [date] [Driver] [VAN] [Drop] [Delivery slot]
+//   [BOOK & EMAIL] [BOOK & SAVE] [RESCHEDULE]   Delivery Update History
+// CFS has van, driver, drop and slot; the carriers (TNT, Pallet...) only get a date.
 // `id` is the numeric order id; `picked` is the ticked line ids.
 export default function DeliveryBookingSection({ id, lines, picked, setNotice }) {
   const staff = useStaff();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [form, setForm] = useState(EMPTY);
-  const [warn, setWarn] = useState([]); // order names already holding this date, van and drop
+  const [warn, setWarn] = useState(null); // { names, email } when a drop is already taken
   const [busy, setBusy] = useState(false);
   const [rescheduling, setRescheduling] = useState(false);
   const [reason, setReason] = useState('');
   const [emailIt, setEmailIt] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
 
   const load = useCallback(async () => {
     const res = await loadOrderDelivery(id);
@@ -23,23 +29,26 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
   }, [id]);
   useEffect(() => { load(); }, [load]);
 
-  const set = (patch) => { setForm((f) => ({ ...f, ...patch })); setWarn([]); };
+  const own = form.partner === OWN_PARTNER;
+  const set = (patch) => { setForm((f) => ({ ...f, ...patch })); setWarn(null); };
   const none = picked.length === 0;
-  const ready = !none && form.date && (!form.drop || form.vanId);
+  const ready = !none && !!form.date && !!staff;
   const bookedPicked = (data?.bookings ?? []).filter((b) => picked.includes(b.lineId));
+  const fleet = data?.fleet ?? { drivers: [], vans: [] };
+  const nameOf = (lineId) => lines.find((l) => l.id === lineId)?.title ?? 'Item';
 
-  async function checkAndBook(allowDuplicate) {
+  async function book(emailCustomer, allowDuplicate = false) {
     setBusy(true);
-    if (!allowDuplicate && form.vanId && form.drop) {
+    if (!allowDuplicate && own && form.vanId && form.drop) {
       const chk = await checkDrop(id, picked, form);
-      if (chk.ok && chk.duplicates.length > 0) { setWarn(chk.duplicates); setBusy(false); return; }
+      if (chk.ok && chk.duplicates.length > 0) { setWarn({ names: chk.duplicates, email: emailCustomer }); setBusy(false); return; }
     }
-    const res = await bookLines(id, picked, form, allowDuplicate);
+    const res = await bookLines(id, picked, form, allowDuplicate, emailCustomer);
     setBusy(false);
-    if (!res.ok) { if (res.duplicate) setWarn(res.duplicates ?? []); else setNotice({ tone: 'critical', text: res.message }); return; }
-    setNotice({ tone: 'success', text: bookedText(res) });
+    if (!res.ok) { if (res.duplicate) setWarn({ names: res.duplicates ?? [], email: emailCustomer }); else setNotice({ tone: 'critical', text: res.message }); return; }
+    setNotice({ tone: res.email && res.email !== 'queued' && res.email !== 'not_requested' ? 'warning' : 'success', text: bookedText(res) });
     setForm(EMPTY);
-    setWarn([]);
+    setWarn(null);
     await load();
   }
 
@@ -54,11 +63,8 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
     await load();
   }
 
-  const fleet = data?.fleet ?? { drivers: [], vans: [], slots: [] };
-  const nameOf = (lineId) => lines.find((l) => l.id === lineId)?.title ?? 'Item';
-
   return (
-    <s-section heading="Delivery Booking">
+    <s-section heading="Book Delivery">
       <s-stack gap="base">
         {error && <s-banner tone="critical" dismissible onDismiss={() => setError(null)}>{error}</s-banner>}
         {staff === null && <s-banner tone="warning">Booking a delivery needs a verified Shopify staff sign-in.</s-banner>}
@@ -70,45 +76,50 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
           </s-stack>
         )}
 
-        <s-text color="subdued">Tick the items in the Items table, then choose the delivery details.</s-text>
-        <s-grid gridTemplateColumns="repeat(auto-fit, minmax(180px, 1fr))" gap="base">
-          <s-date-field label="Delivery date" value={form.date} onChange={(e) => set({ date: e.currentTarget.value })} />
-          <s-select label="Van" value={form.vanId} onChange={(e) => set({ vanId: e.currentTarget.value, ...(e.currentTarget.value ? {} : { drop: '' }) })}>
-            <s-option value="">No van</s-option>
-            {fleet.vans.map((v) => <s-option key={v.id} value={v.id}>{v.name}</s-option>)}
-          </s-select>
-          <s-select label="Driver" value={form.driverId} onChange={(e) => set({ driverId: e.currentTarget.value })}>
-            <s-option value="">No driver</s-option>
-            {fleet.drivers.map((d) => <s-option key={d.id} value={d.id}>{d.name}</s-option>)}
-          </s-select>
-          <s-select label="Drop" value={form.drop} disabled={!form.vanId || undefined} onChange={(e) => set({ drop: e.currentTarget.value })}>
-            <s-option value="">No drop</s-option>
-            {dropNumbers().map((n) => <s-option key={n} value={String(n)}>{n}</s-option>)}
-          </s-select>
-          <s-select label="AM / PM" value={form.amPm} onChange={(e) => set({ amPm: e.currentTarget.value })}>
-            <s-option value="">Not set</s-option>
-            <s-option value="AM">AM</s-option>
-            <s-option value="PM">PM</s-option>
-          </s-select>
-          <s-select label="Delivery slot" value={form.slotId} onChange={(e) => set({ slotId: e.currentTarget.value })}>
-            <s-option value="">No slot</s-option>
-            {fleet.slots.map((s) => <s-option key={s.id} value={s.id}>{s.name}</s-option>)}
-          </s-select>
-        </s-grid>
-        {form.amPm === 'PM' && form.drop && <s-text color="subdued">PM on a drop also moves every later drop on this van and day to PM.</s-text>}
-        {fleet.vans.length === 0 && <s-text color="subdued">No vans yet. Add vans, drivers and slots on the <s-link href="/van-management">Van Management</s-link> page.</s-text>}
+        <s-select label="Delivery partner" value={form.partner} onChange={(e) => set({ partner: e.currentTarget.value, ...(e.currentTarget.value === OWN_PARTNER ? {} : { vanId: '', driverId: '', drop: '', amPm: '' }) })}>
+          {PARTNERS.map((p) => <s-option key={p} value={p}>{p}</s-option>)}
+        </s-select>
 
-        {warn.length > 0 && (
+        <s-grid gridTemplateColumns={own ? 'repeat(auto-fit, minmax(150px, 1fr))' : '1fr'} gap="base">
+          <s-date-field label="Delivery date" value={form.date} onChange={(e) => set({ date: e.currentTarget.value })} />
+          {own && (
+            <>
+              <s-select label="Driver" value={form.driverId} onChange={(e) => set({ driverId: e.currentTarget.value })}>
+                <s-option value="">-- Driver --</s-option>
+                {fleet.drivers.map((d) => <s-option key={d.id} value={d.id}>{d.name}</s-option>)}
+              </s-select>
+              <s-select label="VAN" value={form.vanId} onChange={(e) => set({ vanId: e.currentTarget.value, ...(e.currentTarget.value ? {} : { drop: '' }) })}>
+                <s-option value="">-- VAN --</s-option>
+                {fleet.vans.map((v) => <s-option key={v.id} value={v.id}>{v.name}</s-option>)}
+              </s-select>
+              <s-select label="Drop" value={form.drop} disabled={!form.vanId || undefined} onChange={(e) => set({ drop: e.currentTarget.value })}>
+                <s-option value="">-- Drop --</s-option>
+                {dropNumbers().map((n) => <s-option key={n} value={String(n)}>{n}</s-option>)}
+              </s-select>
+              <s-select label="Delivery slot" value={form.amPm} onChange={(e) => set({ amPm: e.currentTarget.value })}>
+                <s-option value="">-- Delivery slot --</s-option>
+                {SLOT_OPTIONS.map((s) => <s-option key={s.value} value={s.value}>{s.label}</s-option>)}
+              </s-select>
+            </>
+          )}
+        </s-grid>
+        {own && form.amPm === 'PM' && form.drop && <s-text color="subdued">PM on a drop also moves every later drop on this van and day to PM.</s-text>}
+        {own && fleet.vans.length === 0 && <s-text color="subdued">No vans yet. Add vans and drivers on the <s-link href="/van-management">Van Management</s-link> page.</s-text>}
+        <s-text color="subdued">Tick the items in the Items table first.</s-text>
+
+        {warn && (
           <s-banner tone="warning" heading="This drop is already taken">
-            {warn.join(', ')} already {warn.length === 1 ? 'has' : 'have'} this van and drop on that day.
-            <s-button slot="primary-action" disabled={busy || undefined} onClick={() => checkAndBook(true)}>Book anyway</s-button>
-            <s-button slot="secondary-actions" onClick={() => setWarn([])}>Change it</s-button>
+            {warn.names.join(', ')} already {warn.names.length === 1 ? 'has' : 'have'} this van and drop on that day.
+            <s-button slot="primary-action" disabled={busy || undefined} onClick={() => book(warn.email, true)}>Book anyway</s-button>
+            <s-button slot="secondary-actions" onClick={() => setWarn(null)}>Change it</s-button>
           </s-banner>
         )}
 
-        <s-stack direction="inline" gap="base">
-          <s-button variant="primary" disabled={!ready || !staff || busy || undefined} loading={busy || undefined} onClick={() => checkAndBook(false)}>Book delivery</s-button>
-          <s-button tone="critical" disabled={bookedPicked.length === 0 || !staff || busy || undefined} onClick={() => setRescheduling(true)}>Reschedule ticked items</s-button>
+        <s-stack direction="inline" gap="base" alignItems="center">
+          <s-button variant="primary" disabled={!ready || busy || undefined} loading={busy || undefined} onClick={() => book(true)}>BOOK &amp; EMAIL</s-button>
+          <s-button variant="primary" disabled={!ready || busy || undefined} onClick={() => book(false)}>BOOK &amp; SAVE</s-button>
+          <s-button tone="critical" disabled={bookedPicked.length === 0 || !staff || busy || undefined} onClick={() => setRescheduling(true)}>RESCHEDULE</s-button>
+          <s-link onClick={() => setShowHistory(!showHistory)}>Delivery Update History</s-link>
         </s-stack>
 
         {rescheduling && (
@@ -123,13 +134,14 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
           </s-banner>
         )}
 
-        {data && data.history.length > 0 && (
+        {showHistory && (
           <s-stack gap="small-200">
-            <s-text type="strong">Delivery history</s-text>
-            {data.history.slice(0, 10).map((h) => (
+            <s-text type="strong">Delivery Update History</s-text>
+            {(data?.history ?? []).length === 0 && <s-text color="subdued">No delivery updates yet.</s-text>}
+            {(data?.history ?? []).slice(0, 20).map((h) => (
               <s-text key={h.id} color="subdued">
                 {new Date(h.createdAt).toLocaleString('en-GB')} · {h.actorName} · {h.action === 'booked' ? 'Booked' : 'Rescheduled'}
-                {h.date ? ` ${h.date.split('-').reverse().join('/')}` : ''}{h.vanName ? ` · Van ${h.vanName}` : ''}{h.drop !== null ? ` · Drop ${h.drop}` : ''}{h.reason ? ` · ${h.reason}` : ''}
+                {h.partner && h.partner !== OWN_PARTNER ? ` · ${h.partner}` : ''}{h.date ? ` ${dmy(h.date)}` : ''}{h.vanName ? ` · Van: ${h.vanName}` : ''}{h.drop !== null ? ` · Drop ${h.drop}` : ''}{h.reason ? ` · ${h.reason}` : ''}
               </s-text>
             ))}
           </s-stack>

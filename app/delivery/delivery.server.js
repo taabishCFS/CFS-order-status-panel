@@ -46,8 +46,7 @@ const bookingView = (b, names) => ({
   vanName: b.vanId ? names.vans.get(b.vanId) ?? "" : "",
   driverId: b.driverId,
   driverName: b.driverId ? names.drivers.get(b.driverId) ?? "" : "",
-  slotId: b.slotId,
-  slotName: b.slotId ? names.slots.get(b.slotId) ?? "" : "",
+  partner: b.partner ?? "CFS",
   drop: b.drop,
   amPm: b.amPm,
   bookedByName: b.bookedByName,
@@ -69,7 +68,7 @@ export async function orderDelivery(db, shop, orderId) {
   return {
     fleet: { drivers: fleet.drivers.filter((d) => d.active), vans: fleet.vans.filter((v) => v.active), slots: fleet.slots.filter((s) => s.active) },
     bookings: bookings.map((b) => bookingView(b, names)),
-    history: history.map((h) => ({ id: h.id, action: h.action, lineId: h.lineId, date: h.date, vanName: h.vanName ?? "", driverName: h.driverName ?? "", drop: h.drop, amPm: h.amPm, reason: h.reason ?? "", actorName: h.actorName, createdAt: h.createdAt.toISOString() })),
+    history: history.map((h) => ({ id: h.id, action: h.action, partner: h.partner ?? "CFS", lineId: h.lineId, date: h.date, vanName: h.vanName ?? "", driverName: h.driverName ?? "", drop: h.drop, amPm: h.amPm, reason: h.reason ?? "", actorName: h.actorName, createdAt: h.createdAt.toISOString() })),
   };
 }
 
@@ -91,7 +90,7 @@ async function ownedLines(db, shop, orderId, lineIds) {
 }
 
 /** Book (or re-book) delivery for the ticked lines. action "check" only looks for a taken drop. */
-export async function bookDelivery(db, { shop, orderId, request, actor }) {
+export async function bookDelivery(db, { shop, orderId, request, actor, queueEmail }) {
   if (!(await ownedLines(db, shop, orderId, request.lineIds))) return { ok: false, code: "no_lines" };
   const { fleet, names } = await nameMaps(db, shop);
   const live = (list, id) => list.some((i) => i.id === id && i.active);
@@ -103,11 +102,11 @@ export async function bookDelivery(db, { shop, orderId, request, actor }) {
   if (request.action === "check") return { ok: true, duplicates };
   if (duplicates.length > 0 && !request.allowDuplicate) return { ok: false, code: "duplicate", duplicates };
 
-  const data = { orderId, date: request.date, vanId: request.vanId, driverId: request.driverId, slotId: request.slotId, drop: request.drop, amPm: request.amPm, bookedByName: actor.name };
+  const data = { orderId, partner: request.partner, date: request.date, vanId: request.vanId, driverId: request.driverId, slotId: request.slotId, drop: request.drop, amPm: request.amPm, bookedByName: actor.name };
   for (const lineId of request.lineIds) {
     await db.deliveryBooking.upsert({ where: { shop_lineId: { shop, lineId } }, create: { shop, lineId, ...data }, update: data });
     await db.deliveryHistory.create({
-      data: { shop, orderId, lineId, action: "booked", date: request.date, vanName: request.vanId ? names.vans.get(request.vanId) : null, driverName: request.driverId ? names.drivers.get(request.driverId) : null, drop: request.drop, amPm: request.amPm, actorName: actor.name },
+      data: { shop, orderId, lineId, action: "booked", partner: request.partner, date: request.date, vanName: request.vanId ? names.vans.get(request.vanId) : null, driverName: request.driverId ? names.drivers.get(request.driverId) : null, drop: request.drop, amPm: request.amPm, actorName: actor.name },
     });
   }
 
@@ -120,7 +119,12 @@ export async function bookDelivery(db, { shop, orderId, request, actor }) {
       pmChanged = new Set(followers.map((f) => f.orderId)).size;
     }
   }
-  return { ok: true, saved: request.lineIds.length, duplicates, pmChanged };
+  let email = "not_requested";
+  if (request.emailCustomer && queueEmail) {
+    const sent = await queueEmail({ orderId, lineIds: request.lineIds, date: request.date, amPm: request.amPm, drop: request.drop });
+    email = sent.ok ? "queued" : sent.code;
+  }
+  return { ok: true, saved: request.lineIds.length, duplicates, pmChanged, email };
 }
 
 /** Clear the booking for the ticked lines, log why, and (optionally) email the customer. */
@@ -132,7 +136,7 @@ export async function rescheduleDelivery(db, { shop, orderId, request, actor, qu
   const { names } = await nameMaps(db, shop);
   for (const b of booked) {
     await db.deliveryHistory.create({
-      data: { shop, orderId, lineId: b.lineId, action: "rescheduled", date: b.date, vanName: b.vanId ? names.vans.get(b.vanId) : null, driverName: b.driverId ? names.drivers.get(b.driverId) : null, drop: b.drop, amPm: b.amPm, reason: request.reason, actorName: actor.name },
+      data: { shop, orderId, lineId: b.lineId, action: "rescheduled", partner: b.partner ?? "CFS", date: b.date, vanName: b.vanId ? names.vans.get(b.vanId) : null, driverName: b.driverId ? names.drivers.get(b.driverId) : null, drop: b.drop, amPm: b.amPm, reason: request.reason, actorName: actor.name },
     });
   }
   await db.deliveryBooking.deleteMany({ where: { shop, orderId, lineId: { in: booked.map((b) => b.lineId) } } });

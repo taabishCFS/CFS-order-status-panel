@@ -6,7 +6,6 @@ import { changeFleet, loadFleet } from './delivery';
 const KINDS = [
   { kind: 'van', key: 'vans', heading: 'Vans', noun: 'van', extraLabel: 'Registration (optional)', hint: 'Add the vans that make deliveries. Orders are booked onto a van and a drop number.' },
   { kind: 'driver', key: 'drivers', heading: 'Drivers', noun: 'driver', extraLabel: 'Phone (optional)', hint: 'Add each driver so they can be chosen when a delivery is booked.' },
-  { kind: 'slot', key: 'slots', heading: 'Delivery slots', noun: 'slot', extraLabel: null, hint: 'Time slots such as "8am to 12pm" or "All day", shown on a booking.' },
 ];
 
 function FleetList({ spec, items, canEdit, onChange, setNotice }) {
