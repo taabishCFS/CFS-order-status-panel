@@ -1,5 +1,7 @@
 import db from "../db.server";
 import { buildExport } from "../orders/export-query.server";
+import { buildChaseCsv } from "../orders/supplier-chase.server";
+import { parseChaseParams } from "../orders/supplier-chase-rules";
 import { verifyExportLink } from "../orders/export-link.server";
 import { exportFilename } from "../orders/export-rules";
 import { parseListParams } from "../orders/list-rules";
@@ -11,6 +13,12 @@ const refuse = (status, text) => new Response(text, { status, headers: { "conten
 export const loader = async ({ request }) => {
   const link = verifyExportLink(new URL(request.url).searchParams.get("t"), process.env.SHOPIFY_API_SECRET);
   if (!link.ok) return refuse(403, link.reason === "expired" ? "This download link has expired. Go back to the app and press the export button again." : "This download link is not valid.");
+  if (link.kind === "chaseup" || link.kind === "lapsed") {
+    const chase = parseChaseParams(new URLSearchParams(`${link.query}&kind=${link.kind}`));
+    const csv = await buildChaseCsv(db, link.shop, chase);
+    const filename = link.kind === "lapsed" ? "date-lapsed.csv" : "supplier-chaseup.csv";
+    return new Response(csv.csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="${filename}"`, "cache-control": "no-store" } });
+  }
   if (link.kind !== 2 && link.kind !== 3) return refuse(400, "Unknown export.");
 
   const params = parseListParams(new URLSearchParams(link.query));

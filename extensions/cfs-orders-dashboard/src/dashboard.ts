@@ -17,6 +17,8 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     items: [
       { href: '/', title: 'Orders', description: 'Every order in one list. Open one to change its status, dates and notes.', icon: 'order' },
       { href: '/orders-by-brand', title: 'Orders by Brand', description: 'One row per product, by supplier brand. Chase suppliers and download the ordering sheets.', icon: 'product' },
+      { href: '/supplier-chaseup', title: 'Supplier Chaseup', description: 'Lines due soon: email the supplier a chase-up and update expected dates.', icon: 'clock' },
+      { href: '/date-lapsed', title: 'Date Lapsed', description: 'Lines whose expected date has passed and are still waiting on the supplier.', icon: 'alert-circle' },
     ],
   },
   {
@@ -25,7 +27,6 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/stock', title: 'Stock', description: 'Free stock we already own, so it can be given to an order instead of buying again.', icon: 'inventory' },
       { href: '/containers', title: 'Containers', description: 'Stock arriving in containers, the expected dates and the freight paid, ready to give to an order.', icon: 'delivery' },
       { href: '/sbts', title: 'SBTS / Display', description: 'Goods to send back to the supplier, and showroom display pieces. Mark them collected.', icon: 'return' },
-      { href: '/permissions', title: 'Permissions', description: 'Choose which staff can change delivery charges, work refunds and print delivery notes.', icon: 'lock' },
     ],
   },
   {
@@ -40,6 +41,8 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     items: [
       { href: '/brand-terms', title: 'Brand terms', description: 'Choose whether each brand is paid on credit or pro-forma.', icon: 'settings' },
       { href: '/email-templates', title: 'Email templates', description: 'Edit the emails customers receive.', icon: 'email' },
+      { href: '/suppliers', title: 'Suppliers', description: 'Set each brand\'s supplier email, or mark it as ordered by hand.', icon: 'store' },
+      { href: '/permissions', title: 'Permissions', description: 'Choose which staff can change delivery charges, work refunds and print delivery notes.', icon: 'lock' },
     ],
   },
 ];

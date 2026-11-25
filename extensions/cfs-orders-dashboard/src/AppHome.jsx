@@ -12,10 +12,15 @@ import StockPage from './StockPage.jsx';
 import ContainersPage from './ContainersPage.jsx';
 import SbtsPage from './SbtsPage.jsx';
 import PermissionsPage from './PermissionsPage.jsx';
+import SupplierChasePage from './SupplierChasePage.jsx';
+import SuppliersPage from './SuppliersPage.jsx';
 
 export default async () => {
   render(<App />, document.body);
 };
+
+const SupplierChaseup = () => <SupplierChasePage kind="chaseup" />;
+const DateLapsed = () => <SupplierChasePage kind="lapsed" />;
 
 function NotFound() {
   return (
@@ -42,6 +47,9 @@ function App() {
           <Route path="/containers" component={ContainersPage} />
           <Route path="/sbts" component={SbtsPage} />
           <Route path="/permissions" component={PermissionsPage} />
+          <Route path="/supplier-chaseup" component={SupplierChaseup} />
+          <Route path="/date-lapsed" component={DateLapsed} />
+          <Route path="/suppliers" component={SuppliersPage} />
           <Route path="/brand-terms" component={BrandTermsPage} />
           <Route path="/email-templates" component={EmailTemplatesPage} />
           <Route default component={NotFound} />

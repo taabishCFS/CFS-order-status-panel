@@ -13,6 +13,7 @@ import ExpectedDateSection from './ExpectedDateSection.jsx';
 import NotesSection from './NotesSection.jsx';
 import RefundSection from './RefundSection.jsx';
 import ProductSection from './ProductSection.jsx';
+import ProcessOrderButton from './ProcessOrderButton.jsx';
 import ServicesSection from './ServicesSection.jsx';
 import StatusSection from './StatusSection.jsx';
 import TrackingSection from './TrackingSection.jsx';
@@ -135,6 +136,10 @@ export default function OrderDetailPage({ id }) {
           {notice.refresh && <s-button slot="secondary-actions" onClick={reload}>Refresh</s-button>}
         </s-banner>
       )}
+
+      <s-section>
+        <ProcessOrderButton orderIds={[`gid://shopify/Order/${id}`]} onDone={reload} label="Process Order (all lines)" />
+      </s-section>
 
       <DocumentsSection id={id} detail={detail} lines={lines} picked={picked} verified={verified} email={customer && !customer.restricted ? customer.email : undefined} />
 

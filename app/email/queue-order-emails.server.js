@@ -14,7 +14,7 @@ const optionsOf = (line) => {
   return line.variantTitle && line.variantTitle !== "Default Title" ? line.variantTitle : "";
 };
 
-const lineData = (line, extra = {}) => ({
+export const lineData = (line, extra = {}) => ({
   name: line.title,
   options: optionsOf(line),
   qty: line.quantity,

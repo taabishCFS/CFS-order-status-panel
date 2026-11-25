@@ -113,3 +113,29 @@ Each answer unblocks a piece of the Order Detail screen. Short answers are fine.
 62. Delivery Date on Outstanding Payments: What did the old "Delivery Date" column show (the date the goods arrived, or the date the customer will get them)? Today the new report leaves it blank.
 63. Container freight: How is a container's freight cost shared across the items in it (by item, by volume, or not at all), and are container "clearance" items sold on separate orders from normal stock? (Today we only show the freight beside each item.)
 64. Container cost and dates: What dollar-to-pound rate should container costs use, and where does it change? Do container spreadsheets write dates day first (31/12/2026) or month first? (We use 0.81 and day first.)
+
+### Answers received 2026-11-25 (delivery booking, permissions, replacements, reviews)
+- Mark buttons: only TNT, PALLET and FURDECO (no SGK, Kinetic, Prebook or Panther).
+- Delivery partners on the order page: remove Prebook, Kinetic and Panther; CFS has Driver/Van/Drop/Slot; the remaining partners (TNT, Pallet, Graham Scotland, Graham Devon, Fur Deco) only get a date, as in the old system.
+- Maxpro flow: staff open the Delivery Report CSV Maxpro page, filter orders by brand/vendor (new filter), select orders, download Excel, fill in order date and columns, upload to Maxpro, which plans routes by van and drop and exports an Excel; that Excel is uploaded on the Delivery Booking page. Staff then enter van, drop and AM/PM per drop; choosing PM for a drop makes every drop below it PM.
+- A van does at most 16 drops; keep all workings exactly like the old app.
+- Reschedule: staff enter a valid reason and email the customer.
+- Permissions: list all important pages and actions; only the main admin can edit or give permissions.
+- Replacement: only the ticked items; created as a draft order; not free. Same value = no balance; cheaper = show refundable amount; dearer = show balance due.
+- Review email: Trustpilot, starting from the old wording.
+
+### Open questions (asked 2026-11-25, numbered again from 1)
+1. Sample files for Maxpro: We have the columns of the Maxpro page from the screenshot. Please send one real example of (a) the Excel after staff have filled it in for Maxpro, and (b) the file Maxpro gives back for upload to the Delivery Booking page, with exact column names.
+2. Drivers, vans, drops and slots list: Please send the current list of drivers, vans, drops and delivery slots (a spreadsheet or a typed list is fine). We will use it to set up the page where these are entered and imported, and as the starting data.
+3. Reschedule reason and email: When staff reschedule a delivery they type a reason and email the customer. Should the reason be typed freely, or chosen from a short list (if a list, what are the choices)? Should the reschedule email use the old wording?
+4. Process Order, brands that order by hand: Which brands should NOT get an order email because staff order from them by hand or on the supplier's website (for example Actona)? For the others we will email the order form.
+5. Supplier details: Which email address should each supplier's order form go to, should anyone be copied, and which address should it be sent from? (Staff can type the supplier emails into the app; we only need to know the sending address and who is copied.)
+6. Who is the main admin: Only the main admin can give or change permissions. Who is the main admin? Is it the owner of the Shopify store account, or a named person?
+7. Which actions need permission: We will list all the important pages and actions so the main admin can switch each one on or off per person. Our proposed list is: delivery charges, refund list, delivery notes, Process Order, Book Delivery and Reschedule, Pay Suppliers, Credit Note, Clearance Ordered Items, Damage Items, SBTS / Display, Free Stock and Containers, Resend Invoice, Replacement orders, Brand terms and email templates. Please say what to add or remove.
+8. Trustpilot review link: Please send the Trustpilot review link (or one link per brand if each brand has its own page) that the review email should point customers to. We will start from the old email wording.
+9. Xero account codes: Please list every Xero account code used and what decides which one an order gets (brand, product type or payment method). Is the tax type "20% (VAT on Income)" still right? Does the old "Urban Deco" tracking tag still matter?
+10. Delivery Date on Outstanding Payments: What did the old "Delivery Date" column show (the date the goods arrived, or the date the customer will get them)? Today the new report leaves it blank.
+11. Container freight: How is a container's freight cost shared across the items in it (by item, by volume, or not at all), and are container "clearance" items sold on separate orders from normal stock? (Today we only show the freight beside each item.)
+12. Container cost and dates: What dollar-to-pound rate should container costs use, and where does it change? Do container spreadsheets write dates day first (31/12/2026) or month first? (We use 0.81 and day first.)
+
+### Added 2026-11-25: every Delivery page that lists orders gets a brand / vendor filter. Full Delivery menu and Maxpro page layout are in docs/delivery-menu-plan.md.

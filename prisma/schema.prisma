@@ -413,3 +413,30 @@ model StaffMember {
 
   @@unique([shop, staffId])
 }
+
+// How to order from one brand's supplier: where the order form goes, who is copied, and whether staff order by hand (no email).
+model SupplierContact {
+  id          String   @id @default(cuid())
+  shop        String
+  brand       String
+  email       String?
+  cc          String?
+  handOrdered Boolean  @default(false)
+  updatedBy   String?
+  updatedAt   DateTime @updatedAt
+
+  @@unique([shop, brand])
+}
+
+// When a line was last chased with its supplier (the legacy "Last Chaseup" date).
+model LineChase {
+  id           String   @id @default(cuid())
+  shop         String
+  lineId       String
+  orderId      String
+  lastChasedAt DateTime
+  chasedByName String?
+
+  @@unique([shop, lineId])
+  @@index([shop, orderId])
+}

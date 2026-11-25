@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 15 (29 November 2026)
+**Guide version:** 16 (30 November 2026)
 
 ## Before you start
 
@@ -38,7 +38,10 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 19 | Give free stock to an order's item instead of buying it again, and take it back | Ready |
 | 20 | Keep a list of stock arriving in containers, with expected dates and freight, and give it to an order's item | Ready |
 | 21 | Keep a list of goods to send back to the supplier, and display pieces, and mark them collected | Ready |
-| 22 | Choose which staff can change delivery charges, work the refund list and print delivery notes | Ready, not yet tried |
+| 22 | Choose which staff can change delivery charges, work the refund list and print delivery notes | Ready |
+| 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
+| 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
+| 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
 
 ---
 
@@ -473,7 +476,7 @@ The restricted actions are:
 - **Manage permissions** (open this page and change what others can do).
 
 ### Setting it up
-Open it from the **Dashboard**: click the **Permissions** card.
+Open it from the **Dashboard**: click the **Permissions** card in the **Settings** group.
 
 1. Everyone appears on the list after opening the app once.
 2. **Until someone is given Manage permissions, nobody is restricted** and everyone can do everything. Tick **Manage permissions** for yourself first. From then on each person can only do what is ticked for them.
@@ -485,13 +488,46 @@ There must always be at least one manager; the page will not let you remove the 
 
 ---
 
+## 20. Suppliers, Process Order and chasing suppliers
+
+### Suppliers page
+Open it from the **Dashboard**: click the **Suppliers** card in the **Settings** group. Every brand is listed. For each brand type the **Supplier email** (and, if you want, a **Copy to** address; separate several addresses with commas) and press **Save**.
+
+Tick **Ordered by hand (no email)** for brands you order from on the phone or the supplier's website. They get no email, but their lines still move to Order in Progress when you press Process Order.
+
+### Process Order
+Process Order emails the supplier an order form and sets the lines to **Order in Progress**. You will find it:
+- on an order (**Process Order (all lines)**),
+- on the **Orders** list (tick orders, then **Process Order**),
+- on **Orders by Brand** (tick lines, then **Process Order**).
+
+When you press it the app first shows what it will do: how many order forms will be emailed, how many lines are for hand-ordered brands, and any brand with no supplier email saved. Press **Send and set Order in Progress** to go ahead, or **Cancel**.
+
+- One order form is sent for each order and brand.
+- Brands with no supplier email are skipped: nothing is sent and their lines are not changed. Add the email on the Suppliers page and try again.
+- Lines whose status cannot be ordered (for example Container Stock) are skipped.
+- No email goes to the customer.
+
+### Supplier Chaseup
+Open it from the **Dashboard**. It lists lines that are Order in Progress, Delayed, Service Issue or Part Order Delivered and have an expected date. With no dates chosen it shows lines due in three days; choose **Expected from** and **Expected to** (one date alone means that exact day) and press **Go**.
+
+- Choose a **Brand**, tick lines and press **Chaseup** to email the supplier one chase-up listing those lines. The line then shows today's date under **Last chaseup**, in red.
+- **Update expected date** changes a line's expected date right here.
+- **Download CSV** gives the list as a spreadsheet.
+
+### Date Lapsed
+Lines whose expected date is today or earlier and that are still Order in Progress, Delayed, Invoice Paid, Due In Stock or Service Issue. Filter by brand or expected date and download the CSV.
+
+Only staff with the **Process Order** permission can send these emails (see Permissions).
+
+---
+
 ## Not ready yet
 
 These will be added to this guide as soon as they are built:
 
 - Paying refunds straight from the system
 - Replacement orders, Add To Accounts and De-allocate
-- Process Order and Chase Up (ordering from suppliers)
 - Booking deliveries
 - Review emails
 - Export 1 and the Store Orders filter
@@ -505,6 +541,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 30 Nov 2026 | 16 | Added Suppliers, Process Order, Supplier Chaseup and Date Lapsed |
 | 29 Nov 2026 | 15 | Added the Permissions page: choose who can change delivery charges, work refunds and print delivery notes |
 | 28 Nov 2026 | 14 | Added the SBTS / Display page: send-back-to-supplier and display items, mark collected, remove |
 | 27 Nov 2026 | 13 | Added the Containers page: container stock, expected dates, freight, and giving it to an order's item |

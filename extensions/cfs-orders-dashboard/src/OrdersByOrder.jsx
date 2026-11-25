@@ -4,6 +4,7 @@ import { archiveOrders, loadBrands, loadOrderList } from './listApi';
 import { runBackfill } from './mirrorSync';
 import ExpandedOrder from './ExpandedOrder.jsx';
 import Pager from './Pager.jsx';
+import ProcessOrderButton from './ProcessOrderButton.jsx';
 import { formatDate, formatMoney, gatewayLabel, payTypeLabel, rangeText, statusTone } from './orderList';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
@@ -96,6 +97,7 @@ export default function OrdersByOrder() {
         <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
           <s-text>{data ? rangeText(data.page, 50, data.total, applied.all) : 'Loading...'}</s-text>
           {data && <Pager page={data.page} pageCount={data.pageCount} all={applied.all} onPage={goPage} onAll={() => setApplied((a) => ({ ...a, all: true, page: 1 }))} />}
+          <ProcessOrderButton orderIds={[...picked]} disabled={picked.size === 0 || applied.archived} onDone={load} />
           <s-button tone="critical" disabled={picked.size === 0 || undefined} onClick={() => setConfirming(true)}>
             {applied.archived ? 'Restore' : 'Archive'} selected ({picked.size})
           </s-button>

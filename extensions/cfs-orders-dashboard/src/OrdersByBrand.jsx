@@ -6,6 +6,7 @@ import { bulkChangeStatus, bulkExpectedDate, groupByOrder } from './bulk';
 import { DEFAULT_MESSAGE, DEFAULT_SUBJECT, callBulkEmail } from './bulkEmail';
 import { loadBrands, loadExportLink, loadLineList } from './listApi';
 import Pager from './Pager.jsx';
+import ProcessOrderButton from './ProcessOrderButton.jsx';
 import { formatDate, formatMoney, lineTitle, matchesFind, rangeText, statusTone, stockBadge, toggleAll, toggleOne } from './orderList';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
@@ -172,6 +173,7 @@ export default function OrdersByBrand() {
           <s-date-field label="Expected date" value={bulkDate} onChange={(e) => setBulkDate(e.currentTarget.value)} />
           <s-button disabled={noneTicked || working || staff === undefined || undefined} onClick={saveDate}>Save Expt. Date</s-button>
           <s-button disabled={noneTicked || undefined} onClick={() => { setBulkNote(null); setBulkOpen(true); }}>Send Bulk Email</s-button>
+          <ProcessOrderButton lineIds={[...picked]} disabled={noneTicked || working} onDone={load} />
           {staff === null && <s-text-field label="Your name (not verified)" value={name} onInput={(e) => setName(e.currentTarget.value)} />}
         </s-stack>
         {report && (
