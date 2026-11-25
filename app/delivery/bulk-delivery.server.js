@@ -171,14 +171,15 @@ export async function bulkBook(db, { shop, request, actor, queueEmail }) {
   for (const r of request.rows) byOrder.set(orderOf.get(r.lineId), [...(byOrder.get(orderOf.get(r.lineId)) ?? []), { lineId: r.lineId, date: request.date, amPm: r.amPm, drop: r.drop }]);
   let emailed = 0;
   const failed = [];
-  for (const [orderId, rows] of byOrder) {
+  // BOOK only (no email): the lines are booked and the customers are not told.
+  for (const [orderId, rows] of request.emailCustomers === false ? [] : byOrder) {
     const sent = await queueEmail({ orderId, lines: rows, prebook });
     if (sent.ok) {
       emailed += 1;
       await db.deliveryBooking.updateMany({ where: { shop, lineId: { in: rows.map((x) => x.lineId) } }, data: { emailed: true } });
     } else failed.push(sent.code);
   }
-  return { ok: true, saved: request.rows.length, orders: byOrder.size, emailed, emailFailed: failed.length, emailCode: failed[0] ?? null, pmChanged, shifted };
+  return { ok: true, saved: request.rows.length, orders: byOrder.size, emailed, emailFailed: failed.length, emailCode: failed[0] ?? null, emailRequested: request.emailCustomers !== false, pmChanged, shifted };
 }
 
 /** Clear the booking (or carrier mark) on the ticked lines and log it (legacy Reschedule: no email). */

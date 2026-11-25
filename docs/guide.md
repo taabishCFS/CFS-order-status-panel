@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 23 (5 December 2026)
+**Guide version:** 24 (5 December 2026)
 
 ## Before you start
 
@@ -557,7 +557,7 @@ Open it from the **Dashboard**: **Book Delivery** in the **Delivery** group. It 
 **Book Delivery / Collection.** Tick lines, press the button and confirm. You go to the **Delivery Booking** page:
 1. Choose the **Delivery date** and the **Van** (or **Prebook** for a provisional date).
 2. Tick the lines to book. Choose the **Drop** and **AM/PM** for each. Choosing the first line's drop fills the rest: lines from the same order share a drop, the next order gets the next number. Choosing **PM** on a line makes every line below it PM.
-3. Press **EMAIL DELIVERY BOOKING** and confirm. The lines are booked (the van's driver is added) and **each customer gets one email** listing their items, date and time, or the pre-booked email if you chose Prebook. The **eMail?** column then shows Yes.
+3. Press **EMAIL DELIVERY BOOKING** and confirm. To book without telling the customers, press **BOOK DELIVERY** instead. The lines are booked (the van's driver is added) and **each customer gets one email** listing their items, date and time, or the pre-booked email if you chose Prebook. The **eMail?** column then shows Yes.
 - If another order already has that van and drop on that day, a yellow warning names it. Press **Book anyway** or change the drop.
 - **RESCHEDULE** clears the booking on the ticked lines (no email, as in the old system); they go back on the Book Delivery list.
 - Not on these pages yet: the Box column, the green download icon (Maxpro export) and the PRINT button.
@@ -617,6 +617,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 5 Dec 2026 | 24 | Delivery Booking page: new BOOK DELIVERY button (books without emailing the customers) and wider Drop and Time boxes so the choice can be seen |
 | 5 Dec 2026 | 23 | New Delivery Booked page (runs by day, van and driver, drop order, New Drop with the order in the way moving down, reschedule, Pick List, Driver Sheet and CSV downloads). A booked drop that is already taken now moves the other orders down |
 | 4 Dec 2026 | 22 | New Book Delivery page (list, search, brand filter, Maxpro CSV, Mark TNT/Pallet/FurDeco) and Delivery Booking page (date, van, drops, AM/PM, email the customers, reschedule), like the old system |
 | 3 Dec 2026 | 21 | Van Management is now a table like the old system (driver, co-driver and mobile numbers, with ADD NEW, INACTIVE, ACTIVE and DELETE), and there is a new Driver Management page |

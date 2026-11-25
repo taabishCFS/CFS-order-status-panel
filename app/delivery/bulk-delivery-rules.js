@@ -84,7 +84,7 @@ export function readBulkRequest(body) {
       out.push({ lineId: r.lineId, drop, amPm: r.amPm });
     }
     if (new Set(out.map((r) => r.lineId)).size !== out.length) return { error: "bad_request" };
-    return { value: { action, date: body.date, vanId: van, rows: out, allowDuplicate: body.allowDuplicate === true } };
+    return { value: { action, date: body.date, vanId: van, rows: out, allowDuplicate: body.allowDuplicate === true, emailCustomers: body.emailCustomers !== false } };
   }
   return { error: "bad_request" };
 }

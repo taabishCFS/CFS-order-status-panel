@@ -68,8 +68,8 @@ export const markLines = (mark: MarkKey, lineIds: string[], fetchFn: typeof fetc
 export const loadBookingPage = (lineIds: string[], fetchFn: typeof fetch = fetch) =>
   act<BookingPage>({ action: 'load', lineIds }, (b) => (Array.isArray(b.rows) ? (b as unknown as BookingPage) : null), fetchFn);
 
-export interface BookResult { saved: number; orders: number; emailed: number; emailFailed: number; emailCode: string | null; pmChanged: number }
-export const bookBulk = (req: { date: string; vanId: string; rows: { lineId: string; drop: number; amPm: string }[]; allowDuplicate: boolean }, fetchFn: typeof fetch = fetch) =>
+export interface BookResult { saved: number; orders: number; emailed: number; emailFailed: number; emailCode: string | null; emailRequested?: boolean; pmChanged: number }
+export const bookBulk = (req: { date: string; vanId: string; rows: { lineId: string; drop: number; amPm: string }[]; allowDuplicate: boolean; emailCustomers?: boolean }, fetchFn: typeof fetch = fetch) =>
   act<BookResult>({ action: 'book', ...req }, (b) => (typeof b.saved === 'number' ? (b as unknown as BookResult) : null), fetchFn);
 
 export const rescheduleBulk = (lineIds: string[], fetchFn: typeof fetch = fetch) =>
@@ -79,6 +79,7 @@ export const rescheduleBulk = (lineIds: string[], fetchFn: typeof fetch = fetch)
 export function bookedBulkText(r: BookResult, prebook: boolean): string {
   const what = prebook ? 'Pre-booked' : 'Booked';
   const base = `${what} ${r.saved} item${r.saved === 1 ? '' : 's'} on ${r.orders} order${r.orders === 1 ? '' : 's'}.${r.pmChanged ? ` ${r.pmChanged} later order${r.pmChanged === 1 ? ' was' : 's were'} moved to PM.` : ''}`;
+  if (r.emailRequested === false) return `${base} The customers were not emailed.`;
   if (r.emailFailed === 0) return `${base} Booking confirmation emailed to ${r.emailed} customer${r.emailed === 1 ? '' : 's'}.`;
   const why = r.emailCode === 'email_off' ? 'email is switched off' : r.emailCode ?? 'unknown reason';
   return `${base} ${r.emailFailed} customer email${r.emailFailed === 1 ? ' was' : 's were'} not sent (${why}).`;

@@ -109,6 +109,12 @@ declare module './src/BookDeliveryPage.jsx' {
 }
 
 //@ts-ignore
+declare module './src/DeliveryBookedPage.jsx' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
 declare module './src/DeliveryBookingPage.jsx' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
@@ -470,6 +476,12 @@ declare module './src/FleetTablePage.jsx' {
 
 //@ts-ignore
 declare module './src/bulkDelivery.ts' {
+  const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/bookedDelivery.ts' {
   const shopify: import('@shopify/ui-extensions/admin.app.home.render').Api;
   const globalThis: { shopify: typeof shopify };
 }

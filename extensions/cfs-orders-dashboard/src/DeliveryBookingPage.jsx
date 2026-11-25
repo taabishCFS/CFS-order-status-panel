@@ -21,7 +21,8 @@ export default function DeliveryBookingPage() {
   const [drops, setDrops] = useState({});
   const [slots, setSlots] = useState({});
   const [ticked, setTicked] = useState(new Set());
-  const [confirm, setConfirm] = useState(null); // 'book' | 'reschedule'
+  const [confirm, setConfirm] = useState(null); // 'book' | 'save' | 'reschedule'
+  const [lastEmail, setLastEmail] = useState(true); // whether the booking being confirmed (or retried after a warning) emails the customers
   const [warn, setWarn] = useState(null); // order names holding the drop
   const [busy, setBusy] = useState(false);
 
@@ -58,10 +59,11 @@ export default function DeliveryBookingPage() {
     setWarn(null);
   }
 
-  function askBook() {
+  function askBook(email) {
     const problem = bookingProblem({ date, vanId, drops, slots }, rows.filter((r) => ticked.has(r.lineId)).map((r) => r.lineId));
     if (problem) { setNotice({ tone: 'warning', text: problem }); return; }
-    setConfirm('book');
+    setLastEmail(email);
+    setConfirm(email ? 'book' : 'save');
   }
   function askReschedule() {
     if (ticked.size === 0) { setNotice({ tone: 'warning', text: 'Please Select Record(s) to Reschedule Delivery.' }); return; }
@@ -71,7 +73,7 @@ export default function DeliveryBookingPage() {
   async function book(allowDuplicate = false) {
     setBusy(true);
     const chosen = rows.filter((r) => ticked.has(r.lineId));
-    const res = await bookBulk({ date, vanId, rows: chosen.map((r) => ({ lineId: r.lineId, drop: Number(drops[r.lineId]), amPm: slots[r.lineId] })), allowDuplicate });
+    const res = await bookBulk({ date, vanId, rows: chosen.map((r) => ({ lineId: r.lineId, drop: Number(drops[r.lineId]), amPm: slots[r.lineId] })), allowDuplicate, emailCustomers: lastEmail });
     setBusy(false);
     setConfirm(null);
     if (!res.ok) {
@@ -140,14 +142,17 @@ export default function DeliveryBookingPage() {
                 <s-banner tone="warning" heading="Please Confirm This Action..!">
                   {confirm === 'book'
                     ? `Book ${ticked.size} item${ticked.size === 1 ? '' : 's'} for ${dmy(date)} and email the customers.`
+                    : confirm === 'save'
+                    ? `Book ${ticked.size} item${ticked.size === 1 ? '' : 's'} for ${dmy(date)}. The customers are not emailed.`
                     : `Clear the delivery booking on ${ticked.size} item${ticked.size === 1 ? '' : 's'}. The customers are not emailed.`}
-                  <s-button slot="primary-action" disabled={busy || undefined} loading={busy || undefined} onClick={() => (confirm === 'book' ? book(false) : reschedule())}>Confirm</s-button>
+                  <s-button slot="primary-action" disabled={busy || undefined} loading={busy || undefined} onClick={() => (confirm === 'reschedule' ? reschedule() : book(false))}>Confirm</s-button>
                   <s-button slot="secondary-actions" onClick={() => setConfirm(null)}>Cancel</s-button>
                 </s-banner>
               )}
 
               <s-stack direction="inline" gap="base">
-                <s-button variant="primary" disabled={!canWrite || busy || undefined} onClick={askBook}>EMAIL DELIVERY BOOKING</s-button>
+                <s-button variant="primary" disabled={!canWrite || busy || undefined} onClick={() => askBook(true)}>EMAIL DELIVERY BOOKING</s-button>
+                <s-button variant="primary" disabled={!canWrite || busy || undefined} onClick={() => askBook(false)}>BOOK DELIVERY</s-button>
                 <s-button tone="critical" disabled={!canWrite || busy || undefined} onClick={askReschedule}>RESCHEDULE</s-button>
               </s-stack>
             </s-stack>
@@ -183,17 +188,21 @@ export default function DeliveryBookingPage() {
                     <s-table-cell>{r.postcode}</s-table-cell>
                     <s-table-cell>{dmy(r.deliveryDate)}{r.prebook ? ' (Prebook)' : ''}</s-table-cell>
                     <s-table-cell>
-                      <s-select label="Drop" labelAccessibilityVisibility="exclusive" value={drops[r.lineId] ?? ''} onChange={(e) => changeDrop(i, e.currentTarget.value)}>
-                        <s-option value="">-- Drop --</s-option>
-                        {DROPS.map((n) => <s-option key={n} value={String(n)}>Drop {n}</s-option>)}
-                      </s-select>
+                      <s-box minInlineSize="140px">
+                        <s-select label="Drop" labelAccessibilityVisibility="exclusive" value={drops[r.lineId] ?? ''} onChange={(e) => changeDrop(i, e.currentTarget.value)}>
+                          <s-option value="">-- Drop --</s-option>
+                          {DROPS.map((n) => <s-option key={n} value={String(n)}>Drop {n}</s-option>)}
+                        </s-select>
+                      </s-box>
                     </s-table-cell>
                     <s-table-cell>
-                      <s-select label="AM/PM" labelAccessibilityVisibility="exclusive" value={slots[r.lineId] ?? ''} onChange={(e) => changeSlot(i, e.currentTarget.value)}>
-                        <s-option value="">AM/PM</s-option>
-                        <s-option value="AM">AM</s-option>
-                        <s-option value="PM">PM</s-option>
-                      </s-select>
+                      <s-box minInlineSize="140px">
+                        <s-select label="AM/PM" labelAccessibilityVisibility="exclusive" value={slots[r.lineId] ?? ''} onChange={(e) => changeSlot(i, e.currentTarget.value)}>
+                          <s-option value="">AM/PM</s-option>
+                          <s-option value="AM">AM</s-option>
+                          <s-option value="PM">PM</s-option>
+                        </s-select>
+                      </s-box>
                     </s-table-cell>
                     <s-table-cell>{r.deliveryType}</s-table-cell>
                     <s-table-cell>{r.emailed ? <s-text tone="success" type="strong">Yes</s-text> : r.deliveryDate ? <s-text tone="critical" type="strong">No</s-text> : ''}</s-table-cell>

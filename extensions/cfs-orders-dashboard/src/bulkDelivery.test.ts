@@ -65,6 +65,7 @@ describe('calls', () => {
   });
   it('words the booking outcome', () => {
     expect(bookedBulkText({ saved: 3, orders: 2, emailed: 2, emailFailed: 0, emailCode: null, pmChanged: 1 }, false)).toBe('Booked 3 items on 2 orders. 1 later order was moved to PM. Booking confirmation emailed to 2 customers.');
+    expect(bookedBulkText({ saved: 2, orders: 1, emailed: 0, emailFailed: 0, emailCode: null, emailRequested: false, pmChanged: 0 }, false)).toBe('Booked 2 items on 1 order. The customers were not emailed.');
     expect(bookedBulkText({ saved: 1, orders: 1, emailed: 0, emailFailed: 1, emailCode: 'email_off', pmChanged: 0 }, true)).toBe('Pre-booked 1 item on 1 order. 1 customer email was not sent (email is switched off).');
   });
 });

@@ -117,6 +117,13 @@ describe("booking many lines", () => {
     expect(db.deliveryHistory.rows).toHaveLength(3);
     expect((await listBookable(db, SHOP, { q: "", brand: null, page: 1 })).rows.map((x) => x.lineId)).toEqual(["L4"]);
   });
+  it("BOOK DELIVERY books the lines without emailing anyone", async () => {
+    const queueEmail = vi.fn(async () => ({ ok: true }));
+    const r = await bulkBook(db, { shop: SHOP, request: request({ emailCustomers: false }), actor, queueEmail });
+    expect(r).toMatchObject({ ok: true, saved: 3, orders: 2, emailed: 0, emailFailed: 0, emailRequested: false });
+    expect(queueEmail).not.toHaveBeenCalled();
+    expect(db.deliveryBooking.rows.find((x) => x.lineId === "L3")).toMatchObject({ date: "2026-12-02", emailed: false });
+  });
   it("a pre-book needs no van, keeps the lines on the list, and uses the pre-book email", async () => {
     const queueEmail = vi.fn(async () => ({ ok: true }));
     const r = await bulkBook(db, { shop: SHOP, request: request({ vanId: "prebook" }), actor, queueEmail });
