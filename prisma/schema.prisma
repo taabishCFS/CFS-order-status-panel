@@ -483,7 +483,9 @@ model DeliveryBooking {
   orderId       String
   lineId        String
   partner       String   @default("CFS") // CFS (own vans) or a carrier: only CFS has van, driver and drop
-  date          String // YYYY-MM-DD
+  date          String? // YYYY-MM-DD; empty when the line is only marked for a carrier (Mark TNT ...)
+  prebook       Boolean  @default(false) // a provisional date: the line stays on the Book Delivery list
+  emailed       Boolean  @default(false) // the customer was sent the booking email
   vanId         String?
   driverId      String?
   drop          Int?
@@ -504,7 +506,7 @@ model DeliveryHistory {
   shop      String
   orderId   String
   lineId    String
-  action    String // booked | rescheduled
+  action    String // booked | prebooked | rescheduled | marked
   partner   String   @default("CFS")
   date      String?
   vanName   String?

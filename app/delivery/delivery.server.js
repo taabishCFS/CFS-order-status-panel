@@ -131,7 +131,7 @@ export async function bookDelivery(db, { shop, orderId, request, actor, queueEma
   if (request.action === "check") return { ok: true, duplicates };
   if (duplicates.length > 0 && !request.allowDuplicate) return { ok: false, code: "duplicate", duplicates };
 
-  const data = { orderId, partner: request.partner, date: request.date, vanId: request.vanId, driverId: request.driverId, slotId: request.slotId, drop: request.drop, amPm: request.amPm, bookedByName: actor.name };
+  const data = { orderId, partner: request.partner, date: request.date, vanId: request.vanId, driverId: request.driverId, slotId: request.slotId, drop: request.drop, amPm: request.amPm, prebook: false, emailed: false, bookedByName: actor.name };
   for (const lineId of request.lineIds) {
     await db.deliveryBooking.upsert({ where: { shop_lineId: { shop, lineId } }, create: { shop, lineId, ...data }, update: data });
     await db.deliveryHistory.create({
@@ -152,6 +152,7 @@ export async function bookDelivery(db, { shop, orderId, request, actor, queueEma
   if (request.emailCustomer && queueEmail) {
     const sent = await queueEmail({ orderId, lineIds: request.lineIds, date: request.date, amPm: request.amPm, drop: request.drop });
     email = sent.ok ? "queued" : sent.code;
+    if (sent.ok) await db.deliveryBooking.updateMany({ where: { shop, lineId: { in: request.lineIds } }, data: { emailed: true } });
   }
   return { ok: true, saved: request.lineIds.length, duplicates, pmChanged, email };
 }

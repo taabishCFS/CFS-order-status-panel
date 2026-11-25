@@ -16,6 +16,8 @@ import SupplierChasePage from './SupplierChasePage.jsx';
 import SuppliersPage from './SuppliersPage.jsx';
 import VanManagementPage from './VanManagementPage.jsx';
 import DriverManagementPage from './DriverManagementPage.jsx';
+import BookDeliveryPage from './BookDeliveryPage.jsx';
+import DeliveryBookingPage from './DeliveryBookingPage.jsx';
 
 export default async () => {
   render(<App />, document.body);
@@ -54,6 +56,8 @@ function App() {
           <Route path="/suppliers" component={SuppliersPage} />
           <Route path="/van-management" component={VanManagementPage} />
           <Route path="/driver-management" component={DriverManagementPage} />
+          <Route path="/book-delivery" component={BookDeliveryPage} />
+          <Route path="/book-delivery/booking" component={DeliveryBookingPage} />
           <Route path="/brand-terms" component={BrandTermsPage} />
           <Route path="/email-templates" component={EmailTemplatesPage} />
           <Route default component={NotFound} />

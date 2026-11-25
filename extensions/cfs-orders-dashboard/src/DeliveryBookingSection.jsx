@@ -140,7 +140,7 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
             {(data?.history ?? []).length === 0 && <s-text color="subdued">No delivery updates yet.</s-text>}
             {(data?.history ?? []).slice(0, 20).map((h) => (
               <s-text key={h.id} color="subdued">
-                {new Date(h.createdAt).toLocaleString('en-GB')} · {h.actorName} · {h.action === 'booked' ? 'Booked' : 'Rescheduled'}
+                {new Date(h.createdAt).toLocaleString('en-GB')} · {h.actorName} · {{ booked: 'Booked', prebooked: 'Pre-booked', marked: 'Marked', rescheduled: 'Rescheduled' }[h.action] ?? h.action}
                 {h.partner && h.partner !== OWN_PARTNER ? ` · ${h.partner}` : ''}{h.date ? ` ${dmy(h.date)}` : ''}{h.vanName ? ` · Van: ${h.vanName}` : ''}{h.drop !== null ? ` · Drop ${h.drop}` : ''}{h.reason ? ` · ${h.reason}` : ''}
               </s-text>
             ))}

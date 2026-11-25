@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 21 (3 December 2026)
+**Guide version:** 22 (4 December 2026)
 
 ## Before you start
 
@@ -42,6 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
+| 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/SGK/FurDeco or book them onto a van with drops and times, email the customers | Ready, not yet tried |
 | 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
 | 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
 
@@ -541,6 +542,27 @@ Open it from the **Dashboard**: click **Van Management** in the **Delivery** gro
 ### Driver Management
 Also on the **Dashboard**, in the **Delivery** group. Same layout: ID, Driver Name, Mobile and Status, with the same four buttons. Add your drivers here first, then put them on the vans. A driver who is on a booking or a van cannot be deleted; make them inactive instead.
 
+### Book Delivery page (many orders at once)
+Open it from the **Dashboard**: **Book Delivery** in the **Delivery** group. It works like the old Book Delivery page.
+
+**What is listed.** Lines that are ready to go out: In Stock, Coming IN, Allocated From Stock, Collection and Exchange types, and so on. An order only appears when it is paid up (no balance owing) and **every** line on it is ready. Lines already booked, or marked for a carrier, are not shown. A line that has only been **pre-booked** stays on the list with a "Prebook" tag.
+
+**Finding orders.** Type order numbers or postcodes in the search box (separate several with commas) and press Search. The list follows the order you typed them in. The **Brand / vendor** box shows one brand only.
+
+**Upload Maxpro CSV.** Choose the Maxpro file and press **Load**. The order numbers in the first column are put into the search for you.
+
+**Mark.** Tick lines and press **TNT**, **PALLET**, **SGK** or **FURDECO**, then confirm. Those lines leave the list and are recorded as going by that carrier (SGK = Graham Scotland).
+
+**Book Delivery / Collection.** Tick lines, press the button and confirm. You go to the **Delivery Booking** page:
+1. Choose the **Delivery date** and the **Van** (or **Prebook** for a provisional date).
+2. Tick the lines to book. Choose the **Drop** and **AM/PM** for each. Choosing the first line's drop fills the rest: lines from the same order share a drop, the next order gets the next number. Choosing **PM** on a line makes every line below it PM.
+3. Press **EMAIL DELIVERY BOOKING** and confirm. The lines are booked (the van's driver is added) and **each customer gets one email** listing their items, date and time, or the pre-booked email if you chose Prebook. The **eMail?** column then shows Yes.
+- If another order already has that van and drop on that day, a yellow warning names it. Press **Book anyway** or change the drop.
+- **RESCHEDULE** clears the booking on the ticked lines (no email, as in the old system); they go back on the Book Delivery list.
+- Not on these pages yet: the Box column, the green download icon (Maxpro export) and the PRINT button.
+
+Booking, marking and rescheduling need the **Book and reschedule deliveries** permission.
+
 ### Book Delivery box (on an order)
 The box is laid out like the old system. Tick the items in the **Items** table, then:
 1. Choose the **delivery partner** at the top. **CFS** is the default.
@@ -575,6 +597,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 4 Dec 2026 | 22 | New Book Delivery page (list, search, brand filter, Maxpro CSV, Mark TNT/Pallet/SGK/FurDeco) and Delivery Booking page (date, van, drops, AM/PM, email the customers, reschedule), like the old system |
 | 3 Dec 2026 | 21 | Van Management is now a table like the old system (driver, co-driver and mobile numbers, with ADD NEW, INACTIVE, ACTIVE and DELETE), and there is a new Driver Management page |
 | 2 Dec 2026 | 20 | The delivery box now looks like the old system: a delivery partner, Driver, VAN, Drop and Delivery slot (All Day, AM, PM) in one row, with BOOK & EMAIL, BOOK & SAVE and RESCHEDULE; the slot list was removed from Van Management |
 | 1 Dec 2026 | 19 | Added Van Management and the Delivery Booking box on an order (book, duplicate-drop warning, PM rule, reschedule with a customer email) |

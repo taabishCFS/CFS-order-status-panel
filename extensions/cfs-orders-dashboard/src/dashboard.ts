@@ -32,6 +32,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
   {
     heading: 'Delivery',
     items: [
+      { href: '/book-delivery', title: 'Book Delivery', description: 'Tick the orders that are ready, mark TNT or Pallet, or book them onto a van with drops and times and email the customers.', icon: 'delivery' },
       { href: '/van-management', title: 'Van Management', description: 'The vans, with their driver and co-driver, that you choose from when booking a delivery.', icon: 'delivery' },
       { href: '/driver-management', title: 'Driver Management', description: 'The drivers, with their mobile numbers, who go on the vans.', icon: 'delivery' },
     ],
