@@ -83,9 +83,10 @@ export default function DeliveryOutcomePage({ kind }) {
             </s-select>
             <s-search-field label="Search" placeholder="Order No., postcode or email" value={draft.q} onInput={(e) => setDraft({ ...draft, q: e.currentTarget.value })} onKeyDown={(e) => { if (e.key === 'Enter') go(); }} />
             <s-button variant="primary" onClick={() => go()}>GO</s-button>
+            <s-button onClick={() => { setDraft({ ...draft, from: '', to: '' }); go({ from: '', to: '' }); }}>All dates</s-button>
             <s-button onClick={reset}>RESET</s-button>
           </s-stack>
-          {kind === 'completed' && <s-text color="subdued">Opens on today's deliveries. Clear both dates and press GO to see every completed line.</s-text>}
+          {kind === 'completed' && <s-text color="subdued">Opens on today's deliveries. Press All dates to see every completed line.</s-text>}
         </s-stack>
       </s-section>
 
