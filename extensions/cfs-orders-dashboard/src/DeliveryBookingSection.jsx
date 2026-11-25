@@ -109,7 +109,7 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
 
         {warn && (
           <s-banner tone="warning" heading="This drop is already taken">
-            {warn.names.join(', ')} already {warn.names.length === 1 ? 'has' : 'have'} this van and drop on that day.
+            {warn.names.join(', ')} already {warn.names.length === 1 ? 'has' : 'have'} this van and drop on that day. Booking anyway gives this order the drop and moves them down one place.
             <s-button slot="primary-action" disabled={busy || undefined} onClick={() => book(warn.email, true)}>Book anyway</s-button>
             <s-button slot="secondary-actions" onClick={() => setWarn(null)}>Change it</s-button>
           </s-banner>

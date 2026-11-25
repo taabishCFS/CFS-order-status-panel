@@ -29,6 +29,13 @@ describe("queueOrderEmails", () => {
     expect(result.rows[0].replyTo).toBe("customerservice@cfsonline.co.uk");
   });
 
+  it("a request with no idempotency key is never a duplicate of an earlier one", async () => {
+    await queue({ idempotencyKey: undefined });
+    const again = await queue({ idempotencyKey: undefined });
+    expect(again.duplicate).toBe(false);
+    expect(again.rows).toHaveLength(1);
+  });
+
   it("the same request twice is a duplicate and creates nothing new", async () => {
     await queue();
     const again = await queue();

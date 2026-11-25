@@ -1,6 +1,7 @@
 // The bulk Book Delivery pages: the list of lines ready to book, Mark TNT/Pallet/..., and booking many lines (many orders) at once.
 import { duplicateOrders, listFleet } from "./delivery.server.js";
 import { pmFollowers } from "./delivery-rules.js";
+import { placeOnVan } from "./drop-shift.server.js";
 import { BOOKABLE_STATUSES, IGNORED_STATUSES, PAGE_SIZE, deliveryTypeOf, keywordIndex, splitKeywords } from "./bulk-delivery-rules.js";
 
 const ALLOWED = new Set([...BOOKABLE_STATUSES, ...IGNORED_STATUSES]);
@@ -147,6 +148,14 @@ export async function bulkBook(db, { shop, request, actor, queueEmail }) {
     });
   }
 
+  // Each booked order takes its drop; orders already on that van and day that are in the way move down.
+  let shifted = 0;
+  if (van) {
+    const pinned = new Map();
+    for (const r of request.rows) pinned.set(orderOf.get(r.lineId), r.drop);
+    const placed = await placeOnVan(db, { shop, date: request.date, vanId: van.id, pinned, actor });
+    if (placed.ok) shifted = placed.moved;
+  }
   let pmChanged = 0;
   if (van) {
     const same = await db.deliveryBooking.findMany({ where: { shop, date: request.date, vanId: van.id } });
@@ -169,7 +178,7 @@ export async function bulkBook(db, { shop, request, actor, queueEmail }) {
       await db.deliveryBooking.updateMany({ where: { shop, lineId: { in: rows.map((x) => x.lineId) } }, data: { emailed: true } });
     } else failed.push(sent.code);
   }
-  return { ok: true, saved: request.rows.length, orders: byOrder.size, emailed, emailFailed: failed.length, emailCode: failed[0] ?? null, pmChanged };
+  return { ok: true, saved: request.rows.length, orders: byOrder.size, emailed, emailFailed: failed.length, emailCode: failed[0] ?? null, pmChanged, shifted };
 }
 
 /** Clear the booking (or carrier mark) on the ticked lines and log it (legacy Reschedule: no email). */

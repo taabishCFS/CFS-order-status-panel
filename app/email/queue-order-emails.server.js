@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 // Turns an email request into queued outbox rows: picks the template and site, renders, and writes the rows.
 import { enqueueEmails } from "./outbox.server";
 import { renderEmail } from "./render.server";
@@ -28,6 +29,8 @@ export const lineData = (line, extra = {}) => ({
 /** @returns {Promise<{ok:true,rows:object[],duplicate:boolean}|{ok:false,code:string}>} */
 export async function queueOrderEmails(db, { shop, orderId, request, actor, config, now = new Date() }) {
   if (!config.enabled) return { ok: false, code: "email_off" };
+  // Callers that do not send a key (delivery booking, reschedule) get a fresh one, so one send never swallows the next.
+  const key = request.idempotencyKey ?? randomUUID();
   await ensureSeeded(db, shop);
 
   const order = await db.order.findUnique({ where: { shop_orderId: { shop, orderId } } });
@@ -90,10 +93,10 @@ export async function queueOrderEmails(db, { shop, orderId, request, actor, conf
       recipient: recipient || null,
       subject,
       ...(recipient ? { status: "queued" } : { status: "skipped", error: "no_recipient" }),
-      dedupeKey: `${request.idempotencyKey}:${unit}:customer`,
+      dedupeKey: `${key}:${unit}:customer`,
     });
     if (config.internalCopyTo) {
-      drafts.push({ ...base, kind: "internal_copy", status: "queued", recipient: config.internalCopyTo, subject: `${subject} : ${actor.name}`, dedupeKey: `${request.idempotencyKey}:${unit}:internal_copy` });
+      drafts.push({ ...base, kind: "internal_copy", status: "queued", recipient: config.internalCopyTo, subject: `${subject} : ${actor.name}`, dedupeKey: `${key}:${unit}:internal_copy` });
     }
   }
 

@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 22 (4 December 2026)
+**Guide version:** 23 (5 December 2026)
 
 ## Before you start
 
@@ -42,6 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
+| 29 | Delivery Booked page: every booked delivery by day, van and driver in drop order; change drops, reschedule, download the day, a Pick List or a Driver Sheet | Ready, not yet tried |
 | 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready, not yet tried |
 | 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
 | 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
@@ -563,6 +564,25 @@ Open it from the **Dashboard**: **Book Delivery** in the **Delivery** group. It 
 
 Booking, marking and rescheduling need the **Book and reschedule deliveries** permission.
 
+### Delivery Booked page
+Open it from the **Dashboard**: **Delivery Booked** in the **Delivery** group. It is the old "Delivery Booking History" page.
+
+**What you see.** One block for each **day, van and driver**, for example "25/11/2026 (Wednesday) - Van 1 - Driver1". Each block lists its orders in **drop** order (AM drops first, then PM), with the item, code, qty, whether the customer has confirmed the delivery, the status, the time slot, the delivery type, the postcode and the amount. The block ends with its total. The top of the page shows how many runs and order entries there are and how many you have ticked.
+
+**Finding bookings.** Choose **From** and **To** dates (it opens on today) and press **GO**. You can also pick a **Brand / vendor** or search by order number or postcode. Orders that are only **pre-booked** (no van yet) are not shown here.
+
+**Changing a drop.** Press **EDIT** on a block, type the new drop in **New Drop**, then **SAVE**. An order that already has that drop moves down one place, and so does anything after it that is in the way. The same happens when you book an order into a taken drop, from the order page or from the Book Delivery page and you press **Book anyway**. Every move is written to the order's **Delivery Update History**. A van has at most 16 drops.
+
+**Reschedule.** Tick lines and press **RESCHEDULE DELIVERY**. Their booking is cleared and they go back on the Book Delivery list. The customer is not emailed.
+
+**Downloads.**
+- **Download All** gives one file for everything shown, run by run with a total for each. **Export selected** gives only the ticked lines. The file is named by day, van and drop, for example `25-11-2026_Van1_DropWise.csv`.
+- **Pick List** (one run): the run listed from the last drop back to the first, with the order total.
+- **Driver Sheet** (one run): the run in drop order, with the delivery type.
+- A link appears for five minutes; open it to save the file.
+
+**Not on the page yet:** Mark Completed, the **Box** numbers (we do not hold box data) and the greyed rows for other staff.
+
 ### Book Delivery box (on an order)
 The box is laid out like the old system. Tick the items in the **Items** table, then:
 1. Choose the **delivery partner** at the top. **CFS** is the default.
@@ -597,6 +617,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 5 Dec 2026 | 23 | New Delivery Booked page (runs by day, van and driver, drop order, New Drop with the order in the way moving down, reschedule, Pick List, Driver Sheet and CSV downloads). A booked drop that is already taken now moves the other orders down |
 | 4 Dec 2026 | 22 | New Book Delivery page (list, search, brand filter, Maxpro CSV, Mark TNT/Pallet/FurDeco) and Delivery Booking page (date, van, drops, AM/PM, email the customers, reschedule), like the old system |
 | 3 Dec 2026 | 21 | Van Management is now a table like the old system (driver, co-driver and mobile numbers, with ADD NEW, INACTIVE, ACTIVE and DELETE), and there is a new Driver Management page |
 | 2 Dec 2026 | 20 | The delivery box now looks like the old system: a delivery partner, Driver, VAN, Drop and Delivery slot (All Day, AM, PM) in one row, with BOOK & EMAIL, BOOK & SAVE and RESCHEDULE; the slot list was removed from Van Management |

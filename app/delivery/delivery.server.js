@@ -1,4 +1,5 @@
 import { LIVE_STATUSES, pmFollowers } from "./delivery-rules.js";
+import { placeOnVan } from "./drop-shift.server.js";
 
 const MODEL = { driver: "driver", van: "van", slot: "deliverySlot" };
 const NAME_FIELD = { driver: "name", van: "name", slot: "label" };
@@ -139,6 +140,12 @@ export async function bookDelivery(db, { shop, orderId, request, actor, queueEma
     });
   }
 
+  // The order takes this drop; an order that had it, and any in the way after it, moves down one place.
+  let shifted = 0;
+  if (request.vanId && request.drop !== null && request.drop !== undefined) {
+    const placed = await placeOnVan(db, { shop, date: request.date, vanId: request.vanId, pinned: new Map([[orderId, request.drop]]), actor });
+    if (placed.ok) shifted = placed.moved;
+  }
   let pmChanged = 0;
   if (request.amPm === "PM" && request.vanId && request.drop !== null) {
     const same = await db.deliveryBooking.findMany({ where: { shop, date: request.date, vanId: request.vanId } });
@@ -154,7 +161,7 @@ export async function bookDelivery(db, { shop, orderId, request, actor, queueEma
     email = sent.ok ? "queued" : sent.code;
     if (sent.ok) await db.deliveryBooking.updateMany({ where: { shop, lineId: { in: request.lineIds } }, data: { emailed: true } });
   }
-  return { ok: true, saved: request.lineIds.length, duplicates, pmChanged, email };
+  return { ok: true, saved: request.lineIds.length, duplicates, pmChanged, shifted, email };
 }
 
 /** Clear the booking for the ticked lines, log why, and (optionally) email the customer. */
