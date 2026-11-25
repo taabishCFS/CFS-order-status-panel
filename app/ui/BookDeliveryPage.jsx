@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'preact-iso';
+import { useNavigate } from 'react-router';
 import { labelFor } from '../../extensions/cfs-order-status/src/statuses';
 import EmptyState from './EmptyState.jsx';
 import Pager from './Pager.jsx';
@@ -13,7 +13,7 @@ const MAX_CSV_BYTES = 2 * 1024 * 1024;
 // Book Delivery, laid out like the old system: search, Mark TNT / PALLET / FURDECO, upload a Maxpro CSV, then tick lines and
 // press "Book Delivery / Collection" to go to the Delivery Booking page. Plus a brand filter.
 export default function BookDeliveryPage() {
-  const { route } = useLocation();
+  const route = useNavigate();
   const staff = useStaff();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);

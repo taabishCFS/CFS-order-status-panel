@@ -20,7 +20,10 @@ export default function StaffLayout() {
     <AppProvider embedded apiKey={apiKey}>
       <s-app-nav>
         <s-link href="/dashboard">Dashboard</s-link>
+        <s-link href="/orders-by-brand">Orders by Brand</s-link>
+        <s-link href="/book-delivery">Delivery Booking</s-link>
         <s-link href="/delivery-booked">Delivery Booked</s-link>
+        <s-link href="/settings">Settings</s-link>
       </s-app-nav>
       {ready ? <Outlet /> : null}
     </AppProvider>
