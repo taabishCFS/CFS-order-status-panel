@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 16 (30 November 2026)
+**Guide version:** 17 (30 November 2026)
 
 ## Before you start
 
@@ -377,6 +377,8 @@ The Dashboard is a page with one big card for every part of the app, grouped as 
 
 If you ever feel lost, press **Dashboard** and start again.
 
+At the top of the Dashboard is a row of tiles with live numbers. **Red** means something is overdue (Date Lapsed), **amber** means work is waiting (chase-ups due, refunds to pay, SBTS items to collect), **green** means all clear, and blue or grey tiles are for information. Press a tile to open that list.
+
 ---
 
 ## 16. Stock
@@ -541,6 +543,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 30 Nov 2026 | 17 | The Dashboard now opens with live number tiles (Date Lapsed, Chase-up due, Order in Progress, Refunds waiting, SBTS to collect, Free stock), coloured by urgency |
 | 30 Nov 2026 | 16 | Added Suppliers, Process Order, Supplier Chaseup and Date Lapsed |
 | 29 Nov 2026 | 15 | Added the Permissions page: choose who can change delivery charges, work refunds and print delivery notes |
 | 28 Nov 2026 | 14 | Added the SBTS / Display page: send-back-to-supplier and display items, mark collected, remove |
