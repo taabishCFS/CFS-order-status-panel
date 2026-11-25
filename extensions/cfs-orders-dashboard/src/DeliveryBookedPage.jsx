@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
 import { labelFor } from '../../cfs-order-status/src/statuses';
+import { resolveActor } from '../../cfs-order-status/src/identity';
 import EmptyState from './EmptyState.jsx';
 import { useStaff } from './useStaff';
 import { formatDate, statusTone } from './orderList';
+import { groupLines, markCompleted, markCompletedText } from './markCompleted';
 import { changedDrops, downloadLink, groupByDay, loadBooked, poundsText, rescheduleBooked, runTitle, saveDropsForRun } from './bookedDelivery';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
@@ -22,6 +24,8 @@ export default function DeliveryBookedPage() {
   const [editing, setEditing] = useState({}); // run key -> { lineId: typed drop }
   const [confirm, setConfirm] = useState(false);
   const [reason, setReason] = useState('');
+  const [completing, setCompleting] = useState(false); // the Mark Completed question is open
+  const [emailDone, setEmailDone] = useState(false); // ...and whether it emails the customers
   const [busy, setBusy] = useState(false);
   const [link, setLink] = useState(null);
 
@@ -89,7 +93,34 @@ export default function DeliveryBookedPage() {
   }
   function askReschedule() {
     if (picked.size === 0) { setNotice({ tone: 'warning', text: 'Select Record(s) to Reschedule.' }); return; }
+    setCompleting(false);
     setConfirm(true);
+  }
+
+  function askComplete() {
+    if (picked.size === 0) { setNotice({ tone: 'warning', text: 'Select Record(s) to Mark Completed.' }); return; }
+    setConfirm(false);
+    setCompleting(true);
+  }
+  async function complete() {
+    let actor;
+    try {
+      actor = resolveActor(staff ?? null, '');
+    } catch (e) {
+      setNotice({ tone: 'warning', text: e.message });
+      return;
+    }
+    setBusy(true);
+    const rows = runs.flatMap((r) => r.rows);
+    const res = await markCompleted({ groups: groupLines(rows, picked), actor, email: emailDone });
+    setBusy(false);
+    setCompleting(false);
+    const names = new Map(rows.map((r) => [r.orderId, r.orderName]));
+    const failed = res.failed.map((f) => `${names.get(f.orderId) ?? f.orderId}: ${f.message}`);
+    setNotice({ tone: failed.length ? 'warning' : 'success', text: `${markCompletedText(res, emailDone)}${failed.length ? ` Not saved: ${failed.join(' ')}` : ''}` });
+    setPicked(new Set());
+    setEmailDone(false);
+    await load();
   }
 
   const summary = data ? `${data.from} to ${data.to} · ${data.summary.runs} delivery run${data.summary.runs === 1 ? '' : 's'} · ${data.summary.entries} order entr${data.summary.entries === 1 ? 'y' : 'ies'} · ${picked.size} selected` : 'Loading...';
@@ -125,7 +156,18 @@ export default function DeliveryBookedPage() {
             <s-button onClick={exportPicked} disabled={busy || runs.length === 0 || undefined}>Export selected</s-button>
             <s-button onClick={exportAll} disabled={busy || runs.length === 0 || undefined}>Download All</s-button>
             <s-button tone="critical" onClick={askReschedule} disabled={!canWrite || busy || undefined}>RESCHEDULE DELIVERY</s-button>
+            <s-button onClick={askComplete} disabled={!canWrite || busy || undefined}>MARK COMPLETED</s-button>
           </s-stack>
+          {completing && (
+            <s-banner tone="warning" heading={`Mark ${picked.size} line${picked.size === 1 ? '' : 's'} Completed?`}>
+              <s-stack gap="small">
+                <s-text>Their status becomes Completed. Tick the box to also email the customers.</s-text>
+                <s-checkbox label="Email the customers" checked={emailDone} onChange={(e) => setEmailDone(e.currentTarget.checked)} />
+              </s-stack>
+              <s-button slot="primary-action" disabled={busy || undefined} loading={busy || undefined} onClick={complete}>Mark Completed</s-button>
+              <s-button slot="secondary-actions" onClick={() => setCompleting(false)}>Cancel</s-button>
+            </s-banner>
+          )}
           {confirm && (
             <s-banner tone="warning" heading={`Reschedule ${picked.size} line${picked.size === 1 ? '' : 's'}?`}>
               <s-stack gap="small">

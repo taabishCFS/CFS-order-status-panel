@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 24 (5 December 2026)
+**Guide version:** 25 (5 December 2026)
 
 ## Before you start
 
@@ -575,6 +575,8 @@ Open it from the **Dashboard**: **Delivery Booked** in the **Delivery** group. I
 
 **Reschedule.** Tick lines and press **RESCHEDULE DELIVERY**. Their booking is cleared and they go back on the Book Delivery list. The customer is not emailed.
 
+**Mark Completed.** Tick the lines that have been delivered and press **MARK COMPLETED**. Their status becomes Completed. A box asks whether to email the customers as well; leave it empty and nobody is emailed. If an email cannot be sent, the status is still saved and the message tells you why.
+
 **Downloads.**
 - **Download All** gives one file for everything shown, run by run with a total for each. **Export selected** gives only the ticked lines. The file is named by day, van and drop, for example `25-11-2026_Van1_DropWise.csv`.
 - **Pick List** (one run): the run listed from the last drop back to the first, with the order total.
@@ -617,6 +619,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 5 Dec 2026 | 25 | Delivery Booked page: MARK COMPLETED button (sets Completed on the ticked lines, with an option to email the customers) |
 | 5 Dec 2026 | 24 | Delivery Booking page: new BOOK DELIVERY button (books without emailing the customers) and wider Drop and Time boxes so the choice can be seen |
 | 5 Dec 2026 | 23 | New Delivery Booked page (runs by day, van and driver, drop order, New Drop with the order in the way moving down, reschedule, Pick List, Driver Sheet and CSV downloads). A booked drop that is already taken now moves the other orders down |
 | 4 Dec 2026 | 22 | New Book Delivery page (list, search, brand filter, Maxpro CSV, Mark TNT/Pallet/FurDeco) and Delivery Booking page (date, van, drops, AM/PM, email the customers, reschedule), like the old system |
