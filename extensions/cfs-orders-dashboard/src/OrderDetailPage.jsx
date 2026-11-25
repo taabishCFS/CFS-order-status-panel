@@ -7,6 +7,7 @@ import { callBackend } from './backend';
 import ConfigurationSection from './ConfigurationSection.jsx';
 import CustomerSection from './CustomerSection.jsx';
 import DeliverySection from './DeliverySection.jsx';
+import DeliveryBookingSection from './DeliveryBookingSection.jsx';
 import DocumentsSection from './DocumentsSection.jsx';
 import EmailsSection from './EmailsSection.jsx';
 import ExpectedDateSection from './ExpectedDateSection.jsx';
@@ -234,6 +235,7 @@ export default function OrderDetailPage({ id }) {
 
 
       <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <DeliveryBookingSection id={id} lines={lines} picked={picked} setNotice={setNotice} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <StockAllocationSection id={id} lines={lines} verified={verified} />
       <StockAllocationSection id={id} lines={lines} verified={verified} kind="container" />

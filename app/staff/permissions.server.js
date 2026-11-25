@@ -6,6 +6,8 @@ export const PERMISSIONS = [
   { key: "refunds", label: "Work the refund list", detail: "Refunded, Save, Add Order and Remove on the Refund Orders List." },
   { key: "delivery_notes", label: "Print delivery notes", detail: "Print Delivery Note on an order." },
   { key: "process_order", label: "Process Order and chase suppliers", detail: "Process Order and Chase Up buttons: email the supplier and set Order in Progress." },
+  { key: "book_delivery", label: "Book and reschedule deliveries", detail: "The Delivery Booking box on an order: set the date, van and drop, or reschedule." },
+  { key: "van_management", label: "Edit drivers, vans and slots", detail: "The Van Management page." },
   { key: "manage_permissions", label: "Manage permissions", detail: "Open this page and change what other staff can do." },
 ];
 export const PERMISSION_KEYS = PERMISSIONS.map((p) => p.key);

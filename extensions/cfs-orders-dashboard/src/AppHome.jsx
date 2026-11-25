@@ -14,6 +14,7 @@ import SbtsPage from './SbtsPage.jsx';
 import PermissionsPage from './PermissionsPage.jsx';
 import SupplierChasePage from './SupplierChasePage.jsx';
 import SuppliersPage from './SuppliersPage.jsx';
+import VanManagementPage from './VanManagementPage.jsx';
 
 export default async () => {
   render(<App />, document.body);
@@ -50,6 +51,7 @@ function App() {
           <Route path="/supplier-chaseup" component={SupplierChaseup} />
           <Route path="/date-lapsed" component={DateLapsed} />
           <Route path="/suppliers" component={SuppliersPage} />
+          <Route path="/van-management" component={VanManagementPage} />
           <Route path="/brand-terms" component={BrandTermsPage} />
           <Route path="/email-templates" component={EmailTemplatesPage} />
           <Route default component={NotFound} />

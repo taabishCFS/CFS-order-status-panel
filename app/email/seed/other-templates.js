@@ -100,6 +100,19 @@ if any correction is required.</strong></p>
     mustContain: ["Thank you for confirming your delivery", "is now scheduled for"],
   },
   {
+    key: "delivery.rescheduled",
+    label: "Delivery rescheduled",
+    subject: "Order No. {{order_number}} : Delivery Rescheduled : {{site_name}}",
+    body: `<p>Dear <strong>{{customer_first_name}}</strong>,</p>
+<p>We are sorry, but we have had to reschedule the delivery of the items below on your order <strong>{{order_number}}</strong>.</p>
+<p><strong>Reason:</strong> {{reason}}</p>
+${itemsTable("Delivery", "To be rearranged")}
+<p>We will contact you shortly with a new delivery date. If you have any questions in the meantime, please email us at
+   <a href="mailto:{{deliveries_email}}" style="color:#4D403A;">{{deliveries_email}}</a>.</p>
+<p>We apologise for any inconvenience.<br>Warm regards,<br>Delivery Team<br>{{site_name}}</p>`,
+    mustContain: ["we have had to reschedule the delivery", "We will contact you shortly with a new delivery date"],
+  },
+  {
     key: "delivery.update",
     label: "Delivery update (customer cannot accept)",
     subject: "Order No. {{order_number}} : Delivery Update : {{site_name}}",

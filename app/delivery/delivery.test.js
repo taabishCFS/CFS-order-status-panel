@@ -1,0 +1,166 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { pmFollowers, readBookingRequest, readFleetInput, validDate } from "./delivery-rules.js";
+import { bookDelivery, duplicateOrders, listFleet, orderDelivery, rescheduleDelivery, saveFleetItem } from "./delivery.server.js";
+
+const SHOP = "s.myshopify.com";
+const actor = { id: "9", name: "Sam" };
+const O = (n) => `gid://shopify/Order/${n}`;
+
+// A tiny in-memory table that understands the few where-shapes the code uses.
+function table(rows = []) {
+  let seq = 0;
+  const match = (row, where = {}) =>
+    Object.entries(where).every(([k, v]) => {
+      if (k === "shop_lineId") return row.shop === v.shop && row.lineId === v.lineId;
+      if (v !== null && typeof v === "object" && !(v instanceof Date)) {
+        if ("in" in v) return v.in.includes(row[k]);
+        if ("not" in v) return row[k] !== v.not;
+        return true;
+      }
+      return row[k] === v;
+    });
+  const t = {
+    rows,
+    findMany: async ({ where, take } = {}) => rows.filter((r) => match(r, where)).slice(0, take ?? 1e9),
+    findFirst: async ({ where }) => rows.find((r) => match(r, where)) ?? null,
+    create: async ({ data }) => { const r = { id: `id${++seq}`, active: true, createdAt: new Date(), ...data }; rows.push(r); return r; },
+    update: async ({ where, data }) => { const r = rows.find((x) => x.id === where.id); Object.assign(r, data); return r; },
+    updateMany: async ({ where, data }) => { const hit = rows.filter((r) => match(r, where)); hit.forEach((r) => Object.assign(r, data)); return { count: hit.length }; },
+    deleteMany: async ({ where }) => { const keep = rows.filter((r) => !match(r, where)); const n = rows.length - keep.length; rows.splice(0, rows.length, ...keep); return { count: n }; },
+    upsert: async ({ where, create, update }) => { const r = rows.find((x) => match(x, where)); if (r) return Object.assign(r, update); return t.create({ data: create }); },
+  };
+  return t;
+}
+
+let db;
+beforeEach(() => {
+  db = {
+    driver: table(), van: table(), deliverySlot: table(), deliveryBooking: table(), deliveryHistory: table(),
+    orderLine: table([1, 2, 3, 4].map((n) => ({ shop: SHOP, orderId: n < 4 ? O(1) : O(2), lineId: `L${n}`, lineStatusId: 4 }))),
+    order: table([{ shop: SHOP, orderId: O(1), name: "#1001" }, { shop: SHOP, orderId: O(2), name: "#1002" }]),
+  };
+});
+
+const seedFleet = async () => {
+  const van = (await saveFleetItem(db, SHOP, { kind: "van", op: "add", name: "Van 1", extra: "AB12" })).item;
+  const driver = (await saveFleetItem(db, SHOP, { kind: "driver", op: "add", name: "Dan", extra: "0700" })).item;
+  const slot = (await saveFleetItem(db, SHOP, { kind: "slot", op: "add", name: "8-12" })).item;
+  return { van, driver, slot };
+};
+const book = (over = {}) => ({ action: "book", lineIds: ["L1"], date: "2026-12-02", vanId: null, driverId: null, slotId: null, drop: null, amPm: null, allowDuplicate: false, ...over });
+
+describe("reading requests", () => {
+  it("validates dates", () => {
+    expect(validDate("2026-12-02")).toBe(true);
+    expect(validDate("2026-02-30")).toBe(false);
+    expect(validDate("2/12/2026")).toBe(false);
+  });
+  it("reads fleet changes", () => {
+    expect(readFleetInput({ kind: "van", op: "add", name: " Van 1 ", extra: "AB12" })).toEqual({ value: { kind: "van", op: "add", id: undefined, name: "Van 1", extra: "AB12" } });
+    expect(readFleetInput({ kind: "van", op: "rename", name: "x" }).error).toBe("bad_request");
+    expect(readFleetInput({ kind: "car", op: "add", name: "x" }).error).toBe("bad_request");
+    expect(readFleetInput({ kind: "van", op: "deactivate", id: "a" })).toEqual({ value: { kind: "van", op: "deactivate", id: "a" } });
+  });
+  it("reads bookings and rejects rubbish", () => {
+    expect(readBookingRequest(book({ vanId: "v", drop: "3", amPm: "PM" })).value).toMatchObject({ drop: 3, amPm: "PM", vanId: "v" });
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "bad" }).error).toBe("bad_date");
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", vanId: "v", drop: 17 }).error).toBe("bad_drop");
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", drop: 2 }).error).toBe("drop_needs_van");
+    expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", amPm: "noon" }).error).toBe("bad_am_pm");
+    expect(readBookingRequest({ action: "book", lineIds: [], date: "2026-12-02" }).error).toBe("bad_request");
+    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"] }).error).toBe("reason_required");
+    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "Van broke down" }).value).toEqual({ action: "reschedule", lineIds: ["a"], reason: "Van broke down", emailCustomer: true });
+  });
+  it("PM makes every later drop on that van and day PM", () => {
+    const bs = [{ vanId: "v", date: "d", drop: 1, amPm: "AM" }, { vanId: "v", date: "d", drop: 3, amPm: "AM" }, { vanId: "v", date: "d", drop: 4, amPm: "PM" }, { vanId: "w", date: "d", drop: 5, amPm: "AM" }, { vanId: "v", date: "e", drop: 6, amPm: "AM" }];
+    expect(pmFollowers(bs, "v", "d", 2, "PM")).toEqual([bs[1]]);
+    expect(pmFollowers(bs, "v", "d", 2, "AM")).toEqual([]);
+  });
+});
+
+describe("fleet lists", () => {
+  it("adds, renames, deactivates and restores", async () => {
+    const { van } = await seedFleet();
+    expect((await saveFleetItem(db, SHOP, { kind: "van", op: "add", name: "Van 1" })).code).toBe("duplicate_name");
+    expect((await saveFleetItem(db, SHOP, { kind: "van", op: "rename", id: van.id, name: "Van One", extra: "ZZ" })).ok).toBe(true);
+    expect((await listFleet(db, SHOP)).vans[0]).toMatchObject({ name: "Van One", extra: "ZZ", active: true });
+    await saveFleetItem(db, SHOP, { kind: "van", op: "deactivate", id: van.id });
+    expect((await listFleet(db, SHOP)).vans[0].active).toBe(false);
+    await saveFleetItem(db, SHOP, { kind: "van", op: "restore", id: van.id });
+    expect((await listFleet(db, SHOP)).vans[0].active).toBe(true);
+    expect((await saveFleetItem(db, SHOP, { kind: "van", op: "deactivate", id: "nope" })).code).toBe("not_found");
+  });
+});
+
+describe("booking", () => {
+  it("books lines and logs history", async () => {
+    const { van, driver, slot } = await seedFleet();
+    const r = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ lineIds: ["L1", "L2"], vanId: van.id, driverId: driver.id, slotId: slot.id, drop: 2, amPm: "AM" }), actor });
+    expect(r).toMatchObject({ ok: true, saved: 2 });
+    const view = await orderDelivery(db, SHOP, O(1));
+    expect(view.bookings).toHaveLength(2);
+    expect(view.bookings[0]).toMatchObject({ vanName: "Van 1", driverName: "Dan", slotName: "8-12", drop: 2, amPm: "AM", bookedByName: "Sam" });
+    expect(view.history.map((h) => h.action)).toEqual(["booked", "booked"]);
+  });
+  it("re-booking replaces the booking instead of adding one", async () => {
+    await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book(), actor });
+    await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ date: "2026-12-05" }), actor });
+    expect(db.deliveryBooking.rows).toHaveLength(1);
+    expect(db.deliveryBooking.rows[0].date).toBe("2026-12-05");
+  });
+  it("refuses lines that are not on the order and unknown or inactive fleet items", async () => {
+    const { van } = await seedFleet();
+    expect((await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ lineIds: ["L4"] }), actor })).code).toBe("no_lines");
+    expect((await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ vanId: "zzz" }), actor })).code).toBe("unknown_van");
+    await saveFleetItem(db, SHOP, { kind: "van", op: "deactivate", id: van.id });
+    expect((await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ vanId: van.id }), actor })).code).toBe("unknown_van");
+  });
+  it("warns about a taken drop, and books anyway when told to", async () => {
+    const { van } = await seedFleet();
+    await bookDelivery(db, { shop: SHOP, orderId: O(2), request: book({ lineIds: ["L4"], vanId: van.id, drop: 3 }), actor });
+    expect(await duplicateOrders(db, SHOP, { date: "2026-12-02", vanId: van.id, drop: 3, orderId: O(1) })).toEqual(["#1002"]);
+    const check = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ action: "check", vanId: van.id, drop: 3 }), actor });
+    expect(check).toEqual({ ok: true, duplicates: ["#1002"] });
+    expect(db.deliveryBooking.rows).toHaveLength(1);
+    const refused = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ vanId: van.id, drop: 3 }), actor });
+    expect(refused).toMatchObject({ ok: false, code: "duplicate", duplicates: ["#1002"] });
+    const forced = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ vanId: van.id, drop: 3, allowDuplicate: true }), actor });
+    expect(forced.ok).toBe(true);
+  });
+  it("ignores a taken drop whose line is no longer live", async () => {
+    const { van } = await seedFleet();
+    await bookDelivery(db, { shop: SHOP, orderId: O(2), request: book({ lineIds: ["L4"], vanId: van.id, drop: 3 }), actor });
+    db.orderLine.rows.find((l) => l.lineId === "L4").lineStatusId = 6;
+    expect(await duplicateOrders(db, SHOP, { date: "2026-12-02", vanId: van.id, drop: 3, orderId: O(1) })).toEqual([]);
+  });
+  it("PM on a drop turns later drops that day PM", async () => {
+    const { van } = await seedFleet();
+    await bookDelivery(db, { shop: SHOP, orderId: O(2), request: book({ lineIds: ["L4"], vanId: van.id, drop: 5, amPm: "AM" }), actor });
+    const r = await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ vanId: van.id, drop: 2, amPm: "PM" }), actor });
+    expect(r.pmChanged).toBe(1);
+    expect(db.deliveryBooking.rows.find((b) => b.lineId === "L4").amPm).toBe("PM");
+  });
+});
+
+describe("rescheduling", () => {
+  it("clears the booking, logs the reason and emails the customer", async () => {
+    await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ lineIds: ["L1", "L2"] }), actor });
+    const queueEmail = vi.fn(async () => ({ ok: true }));
+    const r = await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "Van broke down", emailCustomer: true }, actor, queueEmail });
+    expect(r).toEqual({ ok: true, cleared: 1, email: "queued" });
+    expect(db.deliveryBooking.rows.map((b) => b.lineId)).toEqual(["L2"]);
+    expect(db.deliveryHistory.rows.at(-1)).toMatchObject({ action: "rescheduled", reason: "Van broke down", lineId: "L1" });
+    expect(queueEmail).toHaveBeenCalledWith({ orderId: O(1), lineIds: ["L1"], reason: "Van broke down" });
+  });
+  it("can skip the email, and reports a failed one", async () => {
+    await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book(), actor });
+    const queueEmail = vi.fn();
+    expect(await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "x", emailCustomer: false }, actor, queueEmail })).toMatchObject({ email: "not_requested" });
+    expect(queueEmail).not.toHaveBeenCalled();
+    await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book(), actor });
+    expect(await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "x", emailCustomer: true }, actor, queueEmail: async () => ({ ok: false, code: "email_off" }) })).toMatchObject({ ok: true, email: "email_off" });
+  });
+  it("refuses lines that are not booked", async () => {
+    expect((await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "x", emailCustomer: false }, actor, queueEmail: vi.fn() })).code).toBe("not_booked");
+  });
+});

@@ -440,3 +440,76 @@ model LineChase {
   @@unique([shop, lineId])
   @@index([shop, orderId])
 }
+
+// Delivery fleet lists, typed in by staff on the Van Management page (the legacy van, driver and slot lists).
+model Driver {
+  id        String   @id @default(cuid())
+  shop      String
+  name      String
+  phone     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([shop, name])
+}
+
+model Van {
+  id        String   @id @default(cuid())
+  shop      String
+  name      String
+  reg       String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([shop, name])
+}
+
+model DeliverySlot {
+  id        String   @id @default(cuid())
+  shop      String
+  label     String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([shop, label])
+}
+
+// One delivery booking per order line (the legacy deliveryDateFinal, iVanId, iDriverId, iDrop, amPm).
+model DeliveryBooking {
+  id            String   @id @default(cuid())
+  shop          String
+  orderId       String
+  lineId        String
+  date          String // YYYY-MM-DD
+  vanId         String?
+  driverId      String?
+  drop          Int?
+  amPm          String? // AM | PM
+  slotId        String?
+  bookedByName  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([shop, lineId])
+  @@index([shop, orderId])
+  @@index([shop, date, vanId, drop])
+}
+
+// Every booking, reschedule and completion (the legacy delivery_booking_history).
+model DeliveryHistory {
+  id        String   @id @default(cuid())
+  shop      String
+  orderId   String
+  lineId    String
+  action    String // booked | rescheduled
+  date      String?
+  vanName   String?
+  driverName String?
+  drop      Int?
+  amPm      String?
+  reason    String?
+  actorName String
+  createdAt DateTime @default(now())
+
+  @@index([shop, orderId, createdAt])
+}

@@ -30,6 +30,12 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     ],
   },
   {
+    heading: 'Delivery',
+    items: [
+      { href: '/van-management', title: 'Van Management', description: 'Add the vans, drivers and delivery slots you choose from when booking a delivery.', icon: 'delivery' },
+    ],
+  },
+  {
     heading: 'Money',
     items: [
       { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },

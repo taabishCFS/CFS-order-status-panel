@@ -6,7 +6,7 @@ import { ensureSeeded } from "./seed/index.server";
 import { DEFAULT_SITE_CODE } from "./seed/sites";
 
 // These go out from the deliveries address; everything else from customer service.
-const DELIVERY_KEYS = new Set(["delivery.prebooked", "delivery.booking_confirmation", "tracking"]);
+const DELIVERY_KEYS = new Set(["delivery.prebooked", "delivery.rescheduled", "delivery.booking_confirmation", "tracking"]);
 
 const optionsOf = (line) => {
   const props = (Array.isArray(line.properties) ? line.properties : []).filter((p) => p?.key && !String(p.key).startsWith("_"));
