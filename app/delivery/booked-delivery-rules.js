@@ -46,6 +46,11 @@ export function readBookedRequest(body) {
     if (lineIds.length === 0 || lineIds.length > 500) return { error: "bad_request" };
     return { value: { action: "reschedule", lineIds, reason: typeof body.reason === "string" ? body.reason.trim().slice(0, 1000) : "" } };
   }
+  if (body.action === "complete") {
+    const lineIds = lineIdsOf(body.lineIds);
+    if (lineIds.length === 0 || lineIds.length > 500) return { error: "bad_request" };
+    return { value: { action: "complete", lineIds, email: body.email === true } };
+  }
   if (body.action === "drops") {
     if (!validDate(body.date) || typeof body.vanId !== "string" || !body.vanId) return { error: "bad_request" };
     if (!Array.isArray(body.rows) || body.rows.length === 0 || body.rows.length > 500) return { error: "bad_request" };

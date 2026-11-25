@@ -1,4 +1,5 @@
 import db from "../db.server";
+import { withMessage } from "../delivery/error-messages";
 import { readMailConfig } from "../email/config.server";
 import { queueOrderEmails } from "../email/queue-order-emails.server";
 import { runEmailTick } from "../email/worker.server";
@@ -21,7 +22,7 @@ export const loader = async ({ request, params }) => {
 
 export const action = async ({ request, params }) => {
   const { session, cors } = await authenticate.admin(request);
-  const json = (body, status = 200) => cors(Response.json(body, { status }));
+  const json = (body, status = 200) => cors(Response.json(withMessage(body), { status }));
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   const staff = staffFromSession(session);
   if (!staff) return json({ error: "staff_not_verified" }, 403);

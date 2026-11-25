@@ -13,18 +13,9 @@ export interface BookedFilter { from?: string; to?: string; brand?: string; q?: 
 export interface DownloadLink { url: string }
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string };
-interface Body { error?: string }
+interface Body { error?: string; message?: string }
 
-const EXPLAIN: Record<string, string> = {
-  staff_not_verified: 'Only a verified staff member can do this.',
-  no_permission: 'You do not have permission to change deliveries. Ask a manager to tick it on the Permissions page.',
-  no_lines: 'Some of those lines are no longer on this run. Refresh the page and try again.',
-  not_booked: 'None of the ticked lines has a booking to reschedule.',
-  drop_limit: 'A van can have at most 16 drops. Choose a lower drop number.',
-  bad_drop: 'Drop numbers start at 1.',
-  bad_request: 'The request was not accepted. Refresh the page and try again.',
-};
-const explain = (status: number, body: Body | null): string => EXPLAIN[body?.error ?? ''] ?? `The server answered with status ${status}.`;
+const explain = (status: number, body: Body | null): string => body?.message ?? `The server answered with status ${status}.`;
 const failure = (e: unknown) => ({ ok: false as const, message: e instanceof Error ? e.message : String(e) });
 const post = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 
@@ -64,6 +55,10 @@ export const saveDropsForRun = (run: { date: string; vanId: string }, rows: { li
 export const rescheduleBooked = (lineIds: string[], reason: string, fetchFn: typeof fetch = fetch) =>
   act<{ cleared: number }>({ action: 'reschedule', lineIds, reason }, (b) => (typeof b.cleared === 'number' ? { cleared: b.cleared } : null), fetchFn);
 
+/** Mark Completed runs on the server; it answers with the sentence to show and whether every order saved. */
+export const markCompletedLines = (lineIds: string[], email: boolean, fetchFn: typeof fetch = fetch) =>
+  act<{ text: string; failed: number }>({ action: 'complete', lineIds, email }, (b) => (typeof b.text === 'string' ? { text: b.text, failed: Array.isArray(b.failed) ? b.failed.length : 0 } : null), fetchFn);
+
 /** A download link: the page export (all of it, or just the ticked lines), or one run's Pick List or Driver Sheet. */
 export async function downloadLink(
   what: { kind: 'booked'; filter: BookedFilter; lineIds?: string[] } | { kind: 'picklist' | 'driversheet'; date: string; vanId: string },
@@ -97,18 +92,10 @@ export function runTitle(run: { date: string; vanName: string; driverName: strin
 }
 export const poundsText = (minor: number): string => `£${(minor / 100).toFixed(2)}`;
 
-/** The New Drop values that differ from the saved drops: the lines to send. A blank or invalid entry is reported as a problem. */
+/** The New Drop values that differ from the saved drops: the lines to send. The server checks the numbers. */
 export function changedDrops(rows: BookedRow[], typed: Record<string, string>): { changes: { lineId: string; drop: number }[]; problem: string | null } {
-  const changes: { lineId: string; drop: number }[] = [];
-  for (const r of rows) {
-    const text = typed[r.lineId];
-    if (text === undefined || text.trim() === '' || Number(text) === r.drop) continue;
-    const n = Number(text);
-    if (!Number.isInteger(n) || n < 1) return { changes: [], problem: 'Drop numbers are whole numbers from 1.' };
-    if (n > 16) return { changes: [], problem: 'A van can have at most 16 drops.' };
-    changes.push({ lineId: r.lineId, drop: n });
-  }
-  return { changes, problem: null };
+  const changes = rows.filter((r) => (typed[r.lineId] ?? '').trim() !== '' && Number(typed[r.lineId]) !== r.drop).map((r) => ({ lineId: r.lineId, drop: Number(typed[r.lineId]) }));
+  return { changes, problem: changes.some((c) => !Number.isInteger(c.drop) || c.drop < 1) ? 'Drop numbers are whole numbers from 1.' : null };
 }
 
 /** The days in a list of runs, in order, each with its runs. */

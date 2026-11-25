@@ -18,22 +18,9 @@ export const MAX_DROP = 16;
 export const PREBOOK = 'prebook';
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string; duplicates?: string[] };
-interface Body { error?: string; duplicates?: string[] }
+interface Body { error?: string; message?: string; duplicates?: string[] }
 
-const EXPLAIN: Record<string, string> = {
-  staff_not_verified: 'Only a verified staff member can do this.',
-  no_permission: 'You do not have permission to book deliveries. Ask a manager to tick it on the Permissions page.',
-  no_lines: 'Some of those items can no longer be booked. Go back, refresh the list and try again.',
-  not_booked: 'None of the ticked items has a booking to reschedule.',
-  unknown_van: 'That van is not available. Refresh and choose again.',
-  duplicate: 'Another order already has that van and drop on that day.',
-  bad_date: 'Select Delivery Date.',
-  van_required: 'Select Driver/van.',
-  drop_required: 'Select Drop Number.',
-  slot_required: 'Select Time Slot.',
-  bad_request: 'The request was not accepted. Refresh the page and try again.',
-};
-const explain = (status: number, body: Body | null): string => EXPLAIN[body?.error ?? ''] ?? `The server answered with status ${status}.`;
+const explain = (status: number, body: Body | null): string => body?.message ?? `The server answered with status ${status}.`;
 const failure = (e: unknown) => ({ ok: false as const, message: e instanceof Error ? e.message : String(e) });
 const post = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 

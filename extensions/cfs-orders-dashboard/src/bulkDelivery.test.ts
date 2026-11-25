@@ -61,7 +61,7 @@ describe('calls', () => {
   });
   it('explains refusals, and a taken drop with the order names', async () => {
     expect(await bookBulk({ date: 'x', vanId: 'v', rows: [], allowDuplicate: false }, reply(409, { error: 'duplicate', duplicates: ['UD1'] }))).toMatchObject({ ok: false, duplicates: ['UD1'] });
-    expect(await markLines('TNT', ['a'], reply(403, { error: 'no_permission' }))).toMatchObject({ ok: false, message: expect.stringContaining('permission') });
+    expect(await markLines('TNT', ['a'], reply(403, { error: 'no_permission', message: 'You do not have permission for this.' }))).toMatchObject({ ok: false, message: expect.stringContaining('permission') });
   });
   it('words the booking outcome', () => {
     expect(bookedBulkText({ saved: 3, orders: 2, emailed: 2, emailFailed: 0, emailCode: null, pmChanged: 1 }, false)).toBe('Booked 3 items on 2 orders. 1 later order was moved to PM. Booking confirmation emailed to 2 customers.');

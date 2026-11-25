@@ -17,8 +17,8 @@ describe('fleet', () => {
     const fleet = { drivers: [], vans: [{ id: 'v', name: 'Van 1', extra: '', active: true }], slots: [] };
     expect(await loadFleet(reply(200, fleet))).toEqual({ ok: true, data: fleet });
     expect(await changeFleet({ kind: 'van', op: 'add', name: 'x' }, reply(200, { fleet }))).toEqual({ ok: true, data: fleet });
-    expect(await changeFleet({ kind: 'van', op: 'add', name: 'x' }, reply(409, { error: 'duplicate_name' }))).toMatchObject({ ok: false, message: 'That name is already in the list.' });
-    expect(await changeFleet({ kind: 'van', op: 'add', name: 'x' }, reply(403, { error: 'no_permission' }))).toMatchObject({ ok: false, message: expect.stringContaining('permission') });
+    expect(await changeFleet({ kind: 'van', op: 'add', name: 'x' }, reply(409, { error: 'duplicate_name', message: 'That name is already in the list.' }))).toMatchObject({ ok: false, message: 'That name is already in the list.' });
+    expect(await changeFleet({ kind: 'van', op: 'add', name: 'x' }, reply(403, { error: 'no_permission', message: 'You do not have permission for this.' }))).toMatchObject({ ok: false, message: expect.stringContaining('permission') });
     expect(await loadFleet(reply(500, {}))).toMatchObject({ ok: false, message: expect.stringContaining('500') });
   });
 });
@@ -52,14 +52,14 @@ describe('booking calls', () => {
     expect(r).toMatchObject({ ok: false, duplicate: true, duplicates: ['#1002'], message: 'Already booked for that date, van and drop: #1002.' });
   });
   it('explains refusals', async () => {
-    expect(await bookLines('1', ['L1'], form, false, false, reply(422, { error: 'unknown_van' }))).toMatchObject({ ok: false, message: expect.stringContaining('van') });
+    expect(await bookLines('1', ['L1'], form, false, false, reply(422, { error: 'unknown_van', message: 'That van is not available.' }))).toMatchObject({ ok: false, message: expect.stringContaining('van') });
     expect(await loadOrderDelivery('1', reply(200, { fleet: {}, bookings: [], history: [] }))).toMatchObject({ ok: true });
   });
   it('reschedules with a reason', async () => {
     const { bodies, f } = bodiesOf();
     expect(await rescheduleLines('1', ['L1'], 'Van broke down', true, f)).toEqual({ ok: true, data: { cleared: 1, email: 'queued' } });
     expect(bodies[0]).toEqual({ action: 'reschedule', lineIds: ['L1'], reason: 'Van broke down', emailCustomer: true });
-    expect(await rescheduleLines('1', ['L1'], '', true, reply(400, { error: 'reason_required' }))).toMatchObject({ ok: false, message: 'Give a reason for rescheduling.' });
+    expect(await rescheduleLines('1', ['L1'], '', true, reply(400, { error: 'reason_required', message: 'Give a reason for rescheduling.' }))).toMatchObject({ ok: false, message: 'Give a reason for rescheduling.' });
   });
 });
 

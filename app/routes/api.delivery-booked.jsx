@@ -1,7 +1,11 @@
 import db from "../db.server";
+import { withMessage } from "../delivery/error-messages";
 import { parseBookedParams, readBookedRequest } from "../delivery/booked-delivery-rules";
 import { listBooked, saveDrops } from "../delivery/booked-delivery.server";
 import { bulkReschedule } from "../delivery/bulk-delivery.server";
+import { markCompleted } from "../delivery/mark-completed.server";
+import { readMailConfig } from "../email/config.server";
+import { runEmailTick } from "../email/worker.server";
 import { listBrands } from "../orders/list-query.server";
 import { authenticate } from "../shopify.server";
 import { can } from "../staff/permissions.server";
@@ -21,8 +25,8 @@ export const loader = async ({ request }) => {
 };
 
 export const action = async ({ request }) => {
-  const { session, cors } = await authenticate.admin(request);
-  const json = (body, status = 200) => cors(Response.json(body, { status }));
+  const { session, admin, cors } = await authenticate.admin(request);
+  const json = (body, status = 200) => cors(Response.json(withMessage(body), { status }));
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   const staff = staffFromSession(session);
   if (!staff) return json({ error: "staff_not_verified" }, 403);
@@ -36,6 +40,13 @@ export const action = async ({ request }) => {
   const read = readBookedRequest(body);
   if (read.error) return json({ error: read.error }, STATUS[read.error] ?? 400);
   const shop = session.shop;
+  if (read.value.action === "complete") {
+    // Status Completed on the ticked lines, with the customer email only when asked. Any verified staff member may do this, like any status change.
+    const done = await markCompleted(db, { shop, graphql: admin.graphql, lineIds: read.value.lineIds, email: read.value.email, actor: { id: staff.id, name: staff.name, source: "staff-member" }, config: readMailConfig(process.env) });
+    if (!done.ok) return json({ error: done.code }, STATUS[done.code] ?? 400);
+    if (read.value.email) void runEmailTick({ db }).catch((error) => console.error("Email send pass failed", error?.message ?? error));
+    return json(done);
+  }
   const result = read.value.action === "drops"
     ? await saveDrops(db, { shop, request: read.value, actor: staff })
     : await bulkReschedule(db, { shop, request: read.value, actor: staff });

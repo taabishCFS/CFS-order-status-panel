@@ -11,7 +11,7 @@ export interface OrderDelivery { fleet: Fleet; bookings: Booking[]; history: His
 export interface BookForm { partner: string; date: string; vanId: string; driverId: string; drop: string; amPm: string }
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string };
-interface Body { error?: string; duplicates?: string[] }
+interface Body { error?: string; message?: string; duplicates?: string[] }
 
 export const MAX_DROPS = 16;
 export const OWN_PARTNER = 'CFS';
@@ -21,25 +21,7 @@ export const PARTNERS = ['CFS', 'TNT', 'Pallet', 'Graham Scotland', 'Graham Devo
 export const SLOT_OPTIONS = [{ value: 'ALL', label: 'All Day' }, { value: 'AM', label: 'AM' }, { value: 'PM', label: 'PM' }];
 const slotLabel = (v: string | null): string => SLOT_OPTIONS.find((s) => s.value === v)?.label ?? '';
 
-const EXPLAIN: Record<string, string> = {
-  staff_not_verified: 'Only a verified staff member can do this.',
-  no_permission: 'You do not have permission for this. Ask a manager to tick it on the Permissions page.',
-  duplicate_name: 'That name is already in the list.',
-  not_found: 'That item was not found. Refresh and try again.',
-  no_lines: 'Those items were not found on the order. Refresh and try again.',
-  not_booked: 'None of the ticked items has a booking to reschedule.',
-  unknown_van: 'That van is not available. Refresh and choose again.',
-  unknown_driver: 'That driver is not available. Refresh and choose again.',
-  unknown_slot: 'That slot is not available. Refresh and choose again.',
-  bad_date: 'Choose a valid date.',
-  bad_drop: `The drop must be a number from 1 to ${MAX_DROPS}.`,
-  bad_am_pm: 'Choose All Day, AM or PM.',
-  bad_partner: 'Choose a delivery partner from the list.',
-  drop_needs_van: 'Choose a van before choosing a drop.',
-  reason_required: 'Give a reason for rescheduling.',
-  bad_request: 'The request was not accepted. Refresh the page and try again.',
-};
-const explain = (status: number, body: Body | null): string => EXPLAIN[body?.error ?? ''] ?? `The server answered with status ${status}.`;
+const explain = (status: number, body: Body | null): string => body?.message ?? `The server answered with status ${status}.`;
 const failure = (e: unknown) => ({ ok: false as const, message: e instanceof Error ? e.message : String(e) });
 const post = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 

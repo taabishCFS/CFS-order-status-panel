@@ -1,4 +1,5 @@
 import db from "../db.server";
+import { withMessage } from "../delivery/error-messages";
 import { readBulkFleet, readFleetInput } from "../delivery/delivery-rules";
 import { bulkFleet, listFleet, saveFleetItem } from "../delivery/delivery.server";
 import { authenticate } from "../shopify.server";
@@ -16,7 +17,7 @@ export const loader = async ({ request }) => {
 
 export const action = async ({ request }) => {
   const { session, cors } = await authenticate.admin(request);
-  const json = (body, status = 200) => cors(Response.json(body, { status }));
+  const json = (body, status = 200) => cors(Response.json(withMessage(body), { status }));
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   const staff = staffFromSession(session);
   if (!staff) return json({ error: "staff_not_verified" }, 403);

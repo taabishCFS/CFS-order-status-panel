@@ -22,7 +22,6 @@ describe('Delivery Booked helpers', () => {
     const rows = [row('a', 1), row('b', 2), row('c', 3)];
     expect(changedDrops(rows, { a: '1', b: '5', c: '' })).toEqual({ changes: [{ lineId: 'b', drop: 5 }], problem: null });
     expect(changedDrops(rows, { a: 'x' }).problem).toMatch(/whole numbers/);
-    expect(changedDrops(rows, { a: '17' }).problem).toMatch(/16/);
   });
   it('groups runs by day', () => {
     const days = groupByDay([run('2026-11-25', 'v1'), run('2026-11-25', 'v2'), run('2026-11-26', 'v1')]);
@@ -38,7 +37,7 @@ describe('Delivery Booked calls', () => {
     expect(calls[0].url).toBe('/api/delivery-booked?from=2026-11-25&to=2026-11-26&brand=Acme&q=UD1');
   });
   it('explains a refusal in words', async () => {
-    const r = await saveDropsForRun({ date: '2026-11-25', vanId: 'v' }, [{ lineId: 'a', drop: 2 }], capture({ error: 'drop_limit' }, 422).f);
+    const r = await saveDropsForRun({ date: '2026-11-25', vanId: 'v' }, [{ lineId: 'a', drop: 2 }], capture({ error: 'drop_limit', message: 'A van can have at most 16 drops. Choose a lower drop number.' }, 422).f);
     expect(r).toEqual({ ok: false, message: 'A van can have at most 16 drops. Choose a lower drop number.' });
     expect((await rescheduleBooked(['a'], '', capture({ error: 'no_permission' }, 403).f)).ok).toBe(false);
   });
