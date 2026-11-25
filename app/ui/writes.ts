@@ -1,6 +1,7 @@
 import { commitChange } from '../../extensions/cfs-order-status/src/save';
 import type { SaveResult } from '../../extensions/cfs-order-status/src/store';
 import type { StatusState } from '../../extensions/cfs-order-status/src/types';
+import { archiveViaServer } from './historyApi';
 
 interface Deps {
   commit?: typeof commitChange;
@@ -15,7 +16,8 @@ export async function saveChange(
   build: (state: StatusState) => StatusState,
   deps: Deps = {},
 ): Promise<SaveResult> {
-  const commit = deps.commit ?? commitChange;
+  // Older history is archived by the server (staff access cannot write it); the order's own record is saved from here.
+  const commit = deps.commit ?? ((id, current, next, digest) => commitChange(id, current, next, digest, { archive: archiveViaServer }));
   let next: StatusState;
   try {
     next = build(loaded.state);

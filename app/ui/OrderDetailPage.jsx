@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { loadOlderHistory } from '../../extensions/cfs-order-status/src/archive';
+import { loadOlderViaServer } from './historyApi';
 import { describeEntry, scopeLabel } from '../../extensions/cfs-order-status/src/historyText';
 import { deliveryOf, expectedOf } from '../../extensions/cfs-order-status/src/lineInfo';
 import { labelFor } from '../../extensions/cfs-order-status/src/statuses';
@@ -106,7 +106,7 @@ export default function OrderDetailPage({ id }) {
   async function showOlder() {
     setOlder((o) => ({ ...o, loading: true, error: null }));
     try {
-      const page = await loadOlderHistory(orderId, { after: older.cursor });
+      const page = await loadOlderViaServer(orderId, { after: older.cursor });
       setOlder((o) => ({
         entries: [...o.entries, ...page.entries.filter((e) => !shownIds.has(e.id))],
         cursor: page.endCursor,
