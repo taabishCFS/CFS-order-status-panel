@@ -116,6 +116,24 @@ model LineSupplierInvoice {
   @@index([shop, orderId])
 }
 
+// Payment details for one order line on the Pay To Supplier pages: a manual cost, a DHD cost, the batch invoice number and when it was marked paid.
+// (The supplier invoice number and the paid flag live on LineSupplierInvoice.)
+model LinePayment {
+  id              String    @id @default(cuid())
+  shop            String
+  orderId         String
+  lineId          String
+  manualCostMinor Int?
+  dhdCostMinor    Int?
+  batchInvoiceNo  String?
+  paidAt          DateTime?
+  updatedByName   String?
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([shop, lineId])
+  @@index([shop, orderId])
+}
+
 // One saved configuration of one configured order line. Version 1 is the original from the
 // configurator; later versions are staff changes. The newest applied version is the current one.
 model LineConfiguration {

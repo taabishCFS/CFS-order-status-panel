@@ -9,6 +9,8 @@ import { balanceRowsFor, instockBalanceCsv } from "../delivery/instock-balance.s
 import { maxproRowsFor } from "../delivery/maxpro.server";
 import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
+import { payCsv, payRowsFor } from "../orders/pay-supplier.server";
+import { unauthenticated } from "../shopify.server";
 import { verifyExportLink } from "../orders/export-link.server";
 
 const refuse = (status, text) => new Response(text, { status, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } });
@@ -35,6 +37,14 @@ export const loader = async ({ request }) => {
     const run = runs.find((r) => r.vanId === query.get("van"));
     if (!run) return refuse(404, "Nothing to export.");
     return link.kind === "delivery-picklist" ? file(pickListCsv(run), sheetFileName(run, "picklist")) : file(driverSheetCsv(run), sheetFileName(run, "driversheet"));
+  }
+  if (link.kind === "delivery-pay-supplier") {
+    const lines = (query.get("lines") ?? "").split(",").filter((x) => /^gid:\/\/shopify\/LineItem\/\d{1,20}$/.test(x));
+    const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
+    const rows = await payRowsFor(db, graphql, link.shop, lines);
+    if (rows.length === 0) return refuse(404, "Nothing to export.");
+    const stamp = new Date().toLocaleString("en-GB", { timeZone: "Europe/London", hour12: false }).replace(/[/:, ]+/g, "-");
+    return file(payCsv(rows), `Pay-Balance${stamp}.csv`);
   }
   if (link.kind === "delivery-instock-balance") {
     const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x));

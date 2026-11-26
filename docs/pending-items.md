@@ -26,8 +26,8 @@ Not yet seen: the Catalogue, Import, Export Catalog, Settings and Admin menus an
 16. Credit Payment Report
 17. Reschedule Delivery Orders
 18. Power BI Analytics
-19. Pay To Supplier
-20. Supplier Paid (the Pay Suppliers page with Paid, Not Paid and Delete was already planned from the staff answers)
+19. Pay To Supplier: BUILT (still to do: Create Payment Batch and Draft Email, supplier discount steps)
+20. Supplier Paid: BUILT
 
 **Downloads menu** (built: Xero VAT Invoice Report)
 - Order Reports, Marketing Sales Report, Supplier Sales Summary, Sales Summary: check each against the Reports page.

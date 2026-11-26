@@ -43,6 +43,8 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/dhd-orders', title: 'DHD Orders', description: 'Lines with the DHD with Supplier status. Email the customers and download the list.', icon: 'delivery' },
       { href: '/white-glove-orders', title: 'White Glove Delivery Orders', description: 'Lines on orders that bought White Glove delivery. Email the customers and download the list.', icon: 'delivery' },
       { href: '/supplier-collection', title: 'Supplier Collection', description: 'Plan a pick-up from a supplier: choose the brand, the van and the day.', icon: 'delivery' },
+      { href: '/pay-to-supplier', title: 'Pay To Supplier', description: 'Lines we still owe a supplier for: check the cost, add the invoice number and mark them paid.', icon: 'cash-dollar' },
+      { href: '/supplier-paid', title: 'Supplier Paid', description: 'Lines already paid to suppliers, grouped by batch invoice. Mark one unpaid if it was a mistake.', icon: 'receipt-refund' },
       { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/instock-not-booked', title: 'Instock Delivery Not Booked', description: 'Items that are in stock or on their way but have no delivery date yet. Filter by payment and download the ticked ones.', icon: 'delivery' },
       { href: '/allocated-booked', title: 'Allocated From Stock + Delivery Booked', description: 'Part-order-in-stock lines that are already booked onto a van, with the date and van.', icon: 'delivery' },
