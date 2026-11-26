@@ -75,6 +75,7 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
   }
 
   async function download() {
+    if (data && data.total === 0) { setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
     setBusy('export');
     const res = await loadChaseExport({ kind, ...applied });
     setBusy(null);

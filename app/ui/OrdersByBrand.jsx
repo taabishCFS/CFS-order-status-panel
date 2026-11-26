@@ -85,6 +85,7 @@ export default function OrdersByBrand({ initialStatusId = null, title = null }) 
 
   // Asks for a download link covering every line the filters match (not just this page). The link opens in a new tab.
   async function download(kind) {
+    if (data && data.total === 0) { setExportNote({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
     setExporting(kind);
     setExportNote(null);
     const res = await loadExportLink(kind, applied);

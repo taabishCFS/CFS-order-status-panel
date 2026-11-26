@@ -35,6 +35,7 @@ export default function DeliveryOutcomePage({ kind }) {
   const failed = kind === 'failed';
 
   async function download() {
+    if (data && rows.length === 0) { setLink(null); setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
     setBusy(true);
     const res = await outcomeLink(applied);
     setBusy(false);

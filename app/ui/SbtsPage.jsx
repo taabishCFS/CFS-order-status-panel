@@ -77,6 +77,7 @@ export default function SbtsPage() {
   }
 
   async function download() {
+    if (data && data.total === 0) { setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
     setBusy('download');
     const res = await loadReportLink('sbtsstock', null);
     setBusy(null);

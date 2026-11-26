@@ -71,6 +71,7 @@ export default function CarrierOrdersPage({ carrier }) {
   const lineIds = [...picked];
 
   async function download(print = false) {
+    if (data && data.total === 0) { setLink(null); setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
     setBusy(print ? 'pdf' : 'csv');
     const res = await carrierLink(applied, undefined, print);
     setBusy(false);

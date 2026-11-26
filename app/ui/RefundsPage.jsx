@@ -131,7 +131,7 @@ export default function RefundsPage() {
           <s-date-field label="Date from" value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.currentTarget.value })} />
           <s-date-field label="Date to" value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.currentTarget.value })} />
           <s-button variant="primary" onClick={goDates}>GO</s-button>
-          <s-button onClick={exportByDate} loading={busy === 'export' || undefined}>Export Refund By Date</s-button>
+          <s-button onClick={exportByDate} loading={busy === 'export-csv' || undefined}>Export Refund By Date</s-button>
           <s-button tone="critical" variant={applied.view === 'pending' ? 'primary' : 'secondary'} onClick={() => showView('pending')}>PENDING</s-button>
           <s-button variant={applied.view === 'refunded' ? 'primary' : 'secondary'} onClick={() => showView('refunded')}>REFUNDED</s-button>
         </s-stack>
@@ -144,7 +144,7 @@ export default function RefundsPage() {
           <s-search-field label="Search" placeholder="Search order no" value={draft.q} onInput={(e) => setDraft({ ...draft, q: e.currentTarget.value })} onChange={(e) => search(e.currentTarget.value)} />
         </s-stack>
         <s-stack direction="inline" gap="base" alignItems="center">
-          <s-button onClick={exportCsv} loading={busy === 'export-csv' || undefined}>Export CSV ({picked.size} ticked)</s-button>
+          <s-button onClick={exportCsv} loading={busy === 'export' || undefined}>Export CSV ({picked.size} ticked)</s-button>
           <s-button tone="critical" disabled={picked.size === 0 || !verified || undefined} onClick={() => setConfirming(true)}>Remove selected ({picked.size})</s-button>
           <s-button variant="primary" disabled={!verified || undefined} onClick={() => setAdding(!adding)}>Add Order</s-button>
         </s-stack>

@@ -82,6 +82,7 @@ export default function StockPage() {
   }
 
   async function download(kind, text) {
+    if (kind === 'freestock' && data && data.total === 0) { setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
     setBusy(kind);
     const res = await loadReportLink(kind, null);
     setBusy(null);
