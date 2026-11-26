@@ -46,7 +46,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 36 | Instock Balance Due (orders that still owe money while every item is in stock or on its way) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
-| 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready, not yet tried |
+| 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -382,7 +382,7 @@ Some suppliers are paid on **credit** (we pay later) and some are paid **pro-for
 
 ## 15. The Dashboard
 
-The Dashboard is a page with one big card for every part of the app, grouped as **Orders**, **Stock**, **Money** and **Settings**. Each card says in a sentence what the page is for.
+The Dashboard is a page with one big card for every part of the app, grouped like the menus of the old admin: **Orders**, **Stock**, **Delivery**, **Accounts**, **Downloads** and **Settings**. Each card says in a sentence what the page is for.
 
 ![The Dashboard](guide-images/15-dashboard.jpg)
 

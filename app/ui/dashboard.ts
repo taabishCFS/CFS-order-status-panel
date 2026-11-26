@@ -19,6 +19,8 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/orders-by-brand', title: 'Orders by Brand', description: 'One row per product, by supplier brand. Chase suppliers and download the ordering sheets.', icon: 'product' },
       { href: '/supplier-chaseup', title: 'Supplier Chaseup', description: 'Lines due soon: email the supplier a chase-up and update expected dates.', icon: 'clock' },
       { href: '/date-lapsed', title: 'Date Lapsed', description: 'Lines whose expected date has passed and are still waiting on the supplier.', icon: 'alert-circle' },
+      { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
+      { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },
     ],
   },
   {
@@ -43,12 +45,6 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/dhd-orders', title: 'DHD Orders', description: 'Lines with the DHD with Supplier status. Email the customers and download the list.', icon: 'delivery' },
       { href: '/white-glove-orders', title: 'White Glove Delivery Orders', description: 'Lines on orders that bought White Glove delivery. Email the customers and download the list.', icon: 'delivery' },
       { href: '/supplier-collection', title: 'Supplier Collection', description: 'Plan a pick-up from a supplier: choose the brand, the van and the day.', icon: 'delivery' },
-      { href: '/supplier-payments', title: 'Supplier Payments', description: 'Your own list of items to pay suppliers for, added with Add To Accounts on an order. Mark them Paid or Not Paid.', icon: 'cash-dollar' },
-      { href: '/pay-to-supplier', title: 'Pay To Supplier', description: 'Lines we still owe a supplier for: check the cost, add the invoice number and mark them paid.', icon: 'cash-dollar' },
-      { href: '/supplier-paid', title: 'Supplier Paid', description: 'Lines already paid to suppliers, grouped by batch invoice. Mark one unpaid if it was a mistake.', icon: 'receipt-refund' },
-      { href: '/proforma-payment-report', title: 'Proforma Payment Report', description: 'Items of pro-forma brands waiting for payment, with the invoice amount with and without VAT. Download the ticked ones.', icon: 'cash-dollar' },
-      { href: '/credit-payment-report', title: 'Credit Payment Report', description: 'Items of credit brands that are In Stock, with the invoice amount with and without VAT. Download the ticked ones.', icon: 'cash-dollar' },
-      { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/instock-not-booked', title: 'Instock Delivery Not Booked', description: 'Items that are in stock or on their way but have no delivery date yet. Filter by payment and download the ticked ones.', icon: 'delivery' },
       { href: '/allocated-booked', title: 'Allocated From Stock + Delivery Booked', description: 'Part-order-in-stock lines that are already booked onto a van, with the date and van.', icon: 'delivery' },
       { href: '/maxpro', title: 'Delivery Report CSV (Max)', description: 'Every paid order still to deliver, with the Maxpro columns. Filter by brand, send a delivery update email, and export the Order Wise or Product Wise file for Maxpro.', icon: 'delivery' },
@@ -58,9 +54,18 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     ],
   },
   {
-    heading: 'Money',
+    heading: 'Accounts',
     items: [
-      { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },
+      { href: '/supplier-payments', title: 'Supplier Payments', description: 'Your own list of items to pay suppliers for, added with Add To Accounts on an order. Mark them Paid or Not Paid.', icon: 'cash-dollar' },
+      { href: '/pay-to-supplier', title: 'Pay To Supplier', description: 'Lines we still owe a supplier for: check the cost, add the invoice number and mark them paid.', icon: 'cash-dollar' },
+      { href: '/supplier-paid', title: 'Supplier Paid', description: 'Lines already paid to suppliers, grouped by batch invoice. Mark one unpaid if it was a mistake.', icon: 'receipt-refund' },
+      { href: '/proforma-payment-report', title: 'Proforma Payment Report', description: 'Items of pro-forma brands waiting for payment, with the invoice amount with and without VAT. Download the ticked ones.', icon: 'cash-dollar' },
+      { href: '/credit-payment-report', title: 'Credit Payment Report', description: 'Items of credit brands that are In Stock, with the invoice amount with and without VAT. Download the ticked ones.', icon: 'cash-dollar' },
+    ],
+  },
+  {
+    heading: 'Downloads',
+    items: [
       { href: '/reports', title: 'Reports', description: 'Download the Xero invoice report, the supplier payment reports and the Delivery Report.', icon: 'chart-vertical' },
     ],
   },
