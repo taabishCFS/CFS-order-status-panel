@@ -48,7 +48,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
 | 40 | Reschedule Delivery Orders, and the Delivery attempted before? question when rescheduling on an order | Ready |
-| 41 | Minerva Supplier Orders (discount due from Minerva brands on what we paid them) | Ready, not yet tried |
+| 41 | Minerva Supplier Orders (discount due from Minerva brands on what we paid them) | Ready |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |

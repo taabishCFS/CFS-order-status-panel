@@ -61,6 +61,7 @@ export default function MinervaPage() {
     setBusy(null);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
     setLink(null);
+    setForm((f) => (f.brand === brand ? blankForm : f));
     setNotice({ tone: 'success', text: `${brand} is no longer a Minerva supplier. Items already paid stay on the report.` });
     load();
   }
