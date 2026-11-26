@@ -10,10 +10,10 @@ import { COLUMN_NAMES, PAGES, carrierLink, loadCarrier } from './carrierOrders';
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const dmy = (iso) => (iso ? iso.slice(0, 10).split('-').reverse().join('/') : '');
 
-function cellFor(column, r) {
+function cellFor(column, r, page) {
   switch (column) {
     case 'orderDate': return formatDate(r.orderDate);
-    case 'orderNo': return <s-link href={orderUrl(r.orderId)}>{r.orderName}</s-link>;
+    case 'orderNo': return <s-link href={orderUrl(r.orderId)} tone={page.columns.includes('balance') && r.balanceMinor > 0 ? 'critical' : undefined}>{r.orderName}</s-link>;
     case 'brand': return r.brand;
     case 'postcode': return r.postcode;
     case 'item': return r.size ? <s-stack direction="block" gap="small-500"><s-text>{r.product}</s-text><s-text color="subdued">{r.size}</s-text></s-stack> : r.product;
@@ -203,7 +203,7 @@ export default function CarrierOrdersPage({ carrier }) {
               {rows.map((r) => (
                 <s-table-row key={r.lineId}>
                   <s-table-cell><s-checkbox label={`Select ${r.orderName} ${r.product}`} labelAccessibilityVisibility="exclusive" checked={picked.has(r.lineId)} onChange={(e) => tick(r.lineId, e.currentTarget.checked)} /></s-table-cell>
-                  {page.columns.map((c) => <s-table-cell key={c}>{cellFor(c, r)}</s-table-cell>)}
+                  {page.columns.map((c) => <s-table-cell key={c}>{cellFor(c, r, page)}</s-table-cell>)}
                 </s-table-row>
               ))}
             </s-table-body>
