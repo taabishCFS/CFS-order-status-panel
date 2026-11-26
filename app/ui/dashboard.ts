@@ -43,6 +43,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/dhd-orders', title: 'DHD Orders', description: 'Lines with the DHD with Supplier status. Email the customers and download the list.', icon: 'delivery' },
       { href: '/white-glove-orders', title: 'White Glove Delivery Orders', description: 'Lines on orders that bought White Glove delivery. Email the customers and download the list.', icon: 'delivery' },
       { href: '/supplier-collection', title: 'Supplier Collection', description: 'Plan a pick-up from a supplier: choose the brand, the van and the day.', icon: 'delivery' },
+      { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/instock-not-booked', title: 'Instock Delivery Not Booked', description: 'Items that are in stock or on their way but have no delivery date yet. Filter by payment and download the ticked ones.', icon: 'delivery' },
       { href: '/allocated-booked', title: 'Allocated From Stock + Delivery Booked', description: 'Part-order-in-stock lines that are already booked onto a van, with the date and van.', icon: 'delivery' },
       { href: '/maxpro', title: 'Delivery Report CSV (Max)', description: 'Every paid order still to deliver, with the Maxpro columns. Filter by brand, send a delivery update email, and export the Order Wise or Product Wise file for Maxpro.', icon: 'delivery' },

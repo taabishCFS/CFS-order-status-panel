@@ -43,6 +43,10 @@ export const loader = async ({ request }) => {
     const q = new URLSearchParams({ kind: kind.slice(8) });
     for (const k of ["from", "to", "q", "brand", "van", "pay"]) if (p[k]) q.set(k, p[k]);
     query = q.toString();
+  } else if (kind === "instock-balance") {
+    const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
+    if (ids.length === 0 || ids.length > 2000) return json({ error: "bad_request" }, 400);
+    query = new URLSearchParams({ ids: ids.join(",") }).toString();
   } else if (kind === "maxpro-order" || kind === "maxpro-product") {
     const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
     if (ids.length === 0 || ids.length > MAX_EXPORT_ORDERS) return json({ error: "bad_request" }, 400);

@@ -5,6 +5,7 @@ import { carrierRows } from "../delivery/carrier.server";
 import { CARRIERS, carrierCsv, carrierPrintHtml, parseCarrierParams } from "../delivery/carrier-rules";
 import { outcomeRows } from "../delivery/outcome.server";
 import { KINDS, outcomeCsv, parseOutcomeParams } from "../delivery/outcome-rules";
+import { balanceRowsFor, instockBalanceCsv } from "../delivery/instock-balance.server";
 import { maxproRowsFor } from "../delivery/maxpro.server";
 import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
@@ -34,6 +35,12 @@ export const loader = async ({ request }) => {
     const run = runs.find((r) => r.vanId === query.get("van"));
     if (!run) return refuse(404, "Nothing to export.");
     return link.kind === "delivery-picklist" ? file(pickListCsv(run), sheetFileName(run, "picklist")) : file(driverSheetCsv(run), sheetFileName(run, "driversheet"));
+  }
+  if (link.kind === "delivery-instock-balance") {
+    const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x));
+    const rows = await balanceRowsFor(db, link.shop, ids);
+    if (rows.length === 0) return refuse(404, "Nothing to export. The orders may have been paid or changed since the list was loaded.");
+    return file(instockBalanceCsv(rows), "Instock-Pending-Balance.csv");
   }
   if (link.kind === "delivery-maxpro-order" || link.kind === "delivery-maxpro-product") {
     const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)).map((x) => `gid://shopify/Order/${x}`);
