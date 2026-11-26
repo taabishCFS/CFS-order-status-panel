@@ -10,6 +10,9 @@ import { emailRequest, statusEmailInput } from './emails';
 // Whole-order and per-line status, with the legacy rule that a line save may propose the order status.
 export default function StatusSection({ orderId, detail, picked, loading, loadFailed, writer, setNotice, emails }) {
   const { saving, ready, write } = writer;
+  // The save state is shared by every section of the order page, so only the button pressed here shows loading.
+  const [mine, setMine] = useState(false);
+  const track = (fn) => async (...args) => { setMine(true); try { await fn(...args); } finally { setMine(false); } };
   const [scope, setScope] = useState('order');
   const [statusId, setStatusId] = useState('');
   const [declined, setDeclined] = useState(null);
@@ -82,7 +85,7 @@ export default function StatusSection({ orderId, detail, picked, loading, loadFa
         {statusId === '21' && <s-text-field label="Credit note amount (£)" value={extras.creditNoteAmount} onInput={setExtra('creditNoteAmount')} />}
         {statusId === '15' && <s-text-area label="Service remarks" rows={2} value={extras.serviceRemarks} onInput={setExtra('serviceRemarks')} />}
         <EmailTick emails={emails} checked={emailIt} onChange={setEmailIt} />
-        <s-button variant="primary" disabled={!canSaveNow || undefined} loading={saving || undefined} onClick={onSave}>Save status</s-button>
+        <s-button variant="primary" disabled={!canSaveNow || undefined} loading={(saving && mine) || undefined} onClick={track(onSave)}>Save status</s-button>
       </s-stack>
     </s-section>
   );

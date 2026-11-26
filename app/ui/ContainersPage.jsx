@@ -58,7 +58,7 @@ export default function ContainersPage() {
   async function saveEdit() {
     const problem = containerProblem(editing.form, 0);
     if (problem) { setNotice({ tone: 'critical', text: problem }); return; }
-    setBusy(editing.id);
+    setBusy(`${editing.id}:save`);
     const res = await updateContainer(editing.id, editing.form);
     setBusy(null);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
@@ -68,7 +68,7 @@ export default function ContainersPage() {
   }
 
   async function remove(it) {
-    setBusy(it.id);
+    setBusy(`${it.id}:delete`);
     const res = await deleteContainer(it.id);
     setBusy(null);
     setDeleting(null);
@@ -230,7 +230,7 @@ export default function ContainersPage() {
                   <s-text-field label="Container range" value={editing.form.containerRange} onInput={setEdit('containerRange')} />
                 </s-grid>
                 <s-stack direction="inline" gap="base">
-                  <s-button variant="primary" onClick={saveEdit} loading={busy === it.id || undefined}>Save changes</s-button>
+                  <s-button variant="primary" onClick={saveEdit} loading={busy === `${it.id}:save` || undefined}>Save changes</s-button>
                   <s-button onClick={() => setEditing(null)}>Cancel</s-button>
                 </s-stack>
               </s-stack>
@@ -251,7 +251,7 @@ export default function ContainersPage() {
                 {deleting === it.id ? (
                   <s-stack direction="inline" gap="base" alignItems="center">
                     <s-text>Delete this item for good?</s-text>
-                    <s-button tone="critical" onClick={() => remove(it)} loading={busy === it.id || undefined}>Yes, delete</s-button>
+                    <s-button tone="critical" onClick={() => remove(it)} loading={busy === `${it.id}:delete` || undefined}>Yes, delete</s-button>
                     <s-button onClick={() => setDeleting(null)}>Cancel</s-button>
                   </s-stack>
                 ) : (

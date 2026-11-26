@@ -47,6 +47,7 @@ export default function CarrierOrdersPage({ carrier }) {
   const [notice, setNotice] = useState(null);
   const [link, setLink] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [busy, setBusy] = useState(false);
   const [picked, setPicked] = useState(new Set());
   const [mailOpen, setMailOpen] = useState(false);
@@ -70,7 +71,7 @@ export default function CarrierOrdersPage({ carrier }) {
   const lineIds = [...picked];
 
   async function download(print = false) {
-    setBusy(true);
+    setBusy(print ? 'pdf' : 'csv');
     const res = await carrierLink(applied, undefined, print);
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
@@ -89,7 +90,7 @@ export default function CarrierOrdersPage({ carrier }) {
   }, [mailOpen, picked]);
 
   async function sendMail() {
-    setBusy(true);
+    setBusy('mail');
     const res = await callBulkEmail({ lineIds, subject, message, key: crypto.randomUUID(), dryRun: false });
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
@@ -102,7 +103,7 @@ export default function CarrierOrdersPage({ carrier }) {
     <s-page heading={`${page.title}${data ? ` : (${data.total})` : ''}`}>
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="secondary-actions" href="/delivery-booked">Delivery Booked</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
       {error && <s-banner tone="critical" heading="Could not load the list">{error}</s-banner>}
       {notice && (
         <s-banner tone={notice.tone} dismissible onDismiss={() => setNotice(null)}>
@@ -143,8 +144,8 @@ export default function CarrierOrdersPage({ carrier }) {
 
           <s-stack direction="inline" gap="base" alignItems="center">
             {page.emailLabel && <s-button disabled={picked.size === 0 || undefined} onClick={() => { setNotice(null); setMailOpen(true); }}>{page.emailLabel}</s-button>}
-            {page.pdf && <s-button disabled={busy || undefined} loading={busy || undefined} onClick={() => download(true)}>Download PDF</s-button>}
-            <s-button disabled={busy || undefined} loading={busy || undefined} onClick={() => download(false)}>Download CSV</s-button>
+            {page.pdf && <s-button disabled={busy || undefined} loading={busy === 'pdf' || undefined} onClick={() => download(true)}>Download PDF</s-button>}
+            <s-button disabled={busy || undefined} loading={busy === 'csv' || undefined} onClick={() => download(false)}>Download CSV</s-button>
           </s-stack>
         </s-stack>
       </s-section>
@@ -167,7 +168,7 @@ export default function CarrierOrdersPage({ carrier }) {
             <s-text-area label="Message" rows={10} value={message} onInput={(e) => setMessage(e.currentTarget.value)} />
             <s-text color="subdued">Placeholders: {'{{customer_name}}'}, {'{{order_numbers}}'}</s-text>
             <s-stack direction="inline" gap="small">
-              <s-button variant="primary" disabled={!preview?.ok || !message.trim() || busy || undefined} loading={busy || undefined} onClick={sendMail}>
+              <s-button variant="primary" disabled={!preview?.ok || !message.trim() || busy || undefined} loading={busy === 'mail' || undefined} onClick={sendMail}>
                 {preview?.ok ? `Send ${preview.customers} email${preview.customers === 1 ? '' : 's'}` : 'Send Updates'}
               </s-button>
               <s-button disabled={busy || undefined} onClick={() => setMailOpen(false)}>Cancel</s-button>

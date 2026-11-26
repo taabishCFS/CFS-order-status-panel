@@ -6,6 +6,9 @@ import { emailRequest } from './emails';
 // Courier tracking number. "Save" records it; with the email tick on it is also sent to the customer.
 export default function TrackingSection({ orderId, detail, writer, setNotice, emails }) {
   const { ready, saving, write } = writer;
+  // The save state is shared by every section of the order page, so only the button pressed here shows loading.
+  const [mine, setMine] = useState(false);
+  const track = (fn) => async (...args) => { setMine(true); try { await fn(...args); } finally { setMine(false); } };
   const [number, setNumber] = useState('');
   const [emailIt, setEmailIt] = useState(false);
   const current = detail.state.tracking;
@@ -31,7 +34,7 @@ export default function TrackingSection({ orderId, detail, writer, setNotice, em
         {current && <s-text>Current tracking number: {current.number} (saved by {current.by.name} on {new Date(current.at).toLocaleString('en-GB')})</s-text>}
         <s-text-field label="Tracking number" value={number} onInput={(e) => setNumber(e.currentTarget.value)} />
         <EmailTick emails={emails} checked={emailIt} onChange={setEmailIt} />
-        <s-button variant="primary" disabled={!ready || !number.trim() || undefined} loading={saving || undefined} onClick={run}>{emailIt ? 'Save and email' : 'Save'}</s-button>
+        <s-button variant="primary" disabled={!ready || !number.trim() || undefined} loading={(saving && mine) || undefined} onClick={track(run)}>{emailIt ? 'Save and email' : 'Save'}</s-button>
       </s-stack>
     </s-section>
   );

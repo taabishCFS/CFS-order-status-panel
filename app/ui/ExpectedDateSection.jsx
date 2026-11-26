@@ -12,6 +12,9 @@ export default function ExpectedDateSection({ id, orderId, detail, verified, pic
   const [emailIt, setEmailIt] = useState(false);
   const [condition, setCondition] = useState(detail.state.condition?.value ?? '');
   const [conditionError, setConditionError] = useState(null);
+  // The save state is shared by every section of the order page, so only the button pressed here shows loading.
+  const [action, setAction] = useState(null);
+  const track = (name, fn) => async () => { setAction(name); try { await fn(); } finally { setAction(null); } };
   const fullyPaid = detail.breakdown.balance !== null && Number(detail.breakdown.balance.amount) === 0;
   const percent = delayRefundPercent(condition);
   const conditionChanged = condition !== '' && condition !== (detail.state.condition?.value ?? '');
@@ -59,14 +62,14 @@ export default function ExpectedDateSection({ id, orderId, detail, verified, pic
           {percent && <s-text color="subdued">Saving this also adds a {percent}% refund request for £{moneyText(delayRefundMinor(Math.round(Number(detail.totals.total?.amount ?? '0') * 100), percent))} (reason: Delay Refund).</s-text>}
           {conditionError && <s-banner tone="critical" dismissible onDismiss={() => setConditionError(null)}>{conditionError}</s-banner>}
           {percent && !verified && <s-text color="subdued">A refund condition needs a verified Shopify staff sign-in.</s-text>}
-          <s-button disabled={!ready || !conditionChanged || (percent && !verified) || undefined} loading={saving || undefined} onClick={saveCondition}>Save condition</s-button>
+          <s-button disabled={!ready || !conditionChanged || (percent && !verified) || undefined} loading={(saving && action === 'condition') || undefined} onClick={track('condition', saveCondition)}>Save condition</s-button>
         </s-stack>
         <s-divider />
         <s-date-field label="Expected date" value={date} onChange={(e) => setDate(e.currentTarget.value)} />
         {picked.length === 0 && <s-text>Tick at least one item in the table first.</s-text>}
         <EmailTick emails={emails} checked={emailIt} onChange={setEmailIt} />
         <s-stack direction="inline" gap="small">
-          <s-button variant="primary" disabled={!ready || picked.length === 0 || !date || undefined} loading={saving || undefined} onClick={() => run(date)}>Save date</s-button>
+          <s-button variant="primary" disabled={!ready || picked.length === 0 || !date || undefined} loading={(saving && action === 'date') || undefined} onClick={track('date', () => run(date))}>Save date</s-button>
           <s-button disabled={!ready || picked.length === 0 || undefined} onClick={() => run(null)}>Clear date</s-button>
         </s-stack>
       </s-stack>

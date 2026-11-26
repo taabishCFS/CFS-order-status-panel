@@ -8,6 +8,9 @@ import { emailRequest } from './emails';
 // delivery date, which this app does not hold yet, so "Confirm" never emails.
 export default function DeliverySection({ orderId, picked, writer, setNotice, emails }) {
   const { ready, saving, write } = writer;
+  // The save state is shared by every section of the order page, so only the button pressed here shows loading.
+  const [mine, setMine] = useState(false);
+  const track = (fn) => async (...args) => { setMine(true); try { await fn(...args); } finally { setMine(false); } };
   const [emailIt, setEmailIt] = useState(false);
   const run = async (outcome) => {
     let changeId = '';
@@ -30,7 +33,7 @@ export default function DeliverySection({ orderId, picked, writer, setNotice, em
         <s-text>Only "Delivery Not Confirm" can send an email (the delivery update). Confirming never emails.</s-text>
         {picked.length === 0 && <s-text>Tick at least one item in the table first.</s-text>}
         <s-stack direction="inline" gap="small">
-          <s-button variant="primary" disabled={off} loading={saving || undefined} onClick={() => run('confirmed')}>Delivery Confirm</s-button>
+          <s-button variant="primary" disabled={off} loading={(saving && mine) || undefined} onClick={track(() => run('confirmed'))}>Delivery Confirm</s-button>
           <s-button disabled={off} onClick={() => run('declined')}>Delivery Not Confirm</s-button>
         </s-stack>
       </s-stack>

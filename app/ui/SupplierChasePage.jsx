@@ -33,6 +33,7 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [picked, setPicked] = useState(() => new Set());
   const [notice, setNotice] = useState(null);
   const [busy, setBusy] = useState(null);
@@ -85,7 +86,7 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="secondary-actions" href="/suppliers">Suppliers</s-button>
       <s-button slot="secondary-actions" href={kind === 'chaseup' ? '/date-lapsed' : '/supplier-chaseup'}>{kind === 'chaseup' ? 'Date Lapsed' : 'Supplier Chaseup'}</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
 
       {error && <s-banner tone="critical" heading="Could not load the list">{error}</s-banner>}
       {notice && (

@@ -18,6 +18,7 @@ export default function MaxproPage() {
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [search, setSearch] = useState('');
   const [applied, setApplied] = useState({ q: '', brand: '', whiteGlove: false, all: false, page: 1 });
   const [picked, setPicked] = useState(new Set());
@@ -45,7 +46,7 @@ export default function MaxproPage() {
 
   async function makeFile(kind, label) {
     if (picked.size === 0) { setNotice({ tone: 'warning', text: 'Please Select Record(s) to Export.' }); return; }
-    setBusy(true);
+    setBusy(kind);
     const res = await maxproLink(kind, [...picked]);
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
@@ -64,7 +65,7 @@ export default function MaxproPage() {
   }, [mailOpen, picked]);
 
   async function sendMail() {
-    setBusy(true);
+    setBusy('mail');
     const res = await callBulkEmail({ lineIds, subject, message, key: crypto.randomUUID(), dryRun: false });
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
@@ -78,7 +79,7 @@ export default function MaxproPage() {
   return (
     <s-page heading={title}>
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
       {error && <s-banner tone="critical" heading="Could not load the list">{error}</s-banner>}
       {staff === null && <s-banner tone="warning">Sending emails needs a verified Shopify staff sign-in.</s-banner>}
       {notice && (
@@ -107,8 +108,8 @@ export default function MaxproPage() {
           <s-stack direction="inline" gap="base" alignItems="center">
             <s-button tone={applied.whiteGlove ? undefined : 'critical'} onClick={() => change({ whiteGlove: !applied.whiteGlove, page: 1, all: false })}>{applied.whiteGlove ? 'Back to all orders' : 'White Glove Orders'}</s-button>
             <s-button disabled={picked.size === 0 || staff === undefined || busy || undefined} onClick={() => { setNotice(null); setMailOpen(true); }}>Send Bulk Email</s-button>
-            <s-button variant="primary" disabled={busy || undefined} loading={busy || undefined} onClick={() => makeFile('maxpro-order', 'MaxPro_Orderwise.csv')}>Export Order Wise</s-button>
-            <s-button variant="primary" disabled={busy || undefined} onClick={() => makeFile('maxpro-product', 'MaxPro_Productwise.csv')}>Export Product Wise</s-button>
+            <s-button variant="primary" disabled={busy || undefined} loading={busy === 'maxpro-order' || undefined} onClick={() => makeFile('maxpro-order', 'MaxPro_Orderwise.csv')}>Export Order Wise</s-button>
+            <s-button variant="primary" disabled={busy || undefined} loading={busy === 'maxpro-product' || undefined} onClick={() => makeFile('maxpro-product', 'MaxPro_Productwise.csv')}>Export Product Wise</s-button>
           </s-stack>
         </s-stack>
       </s-section>
@@ -131,7 +132,7 @@ export default function MaxproPage() {
             <s-text-area label="Message" rows={10} value={message} onInput={(e) => setMessage(e.currentTarget.value)} />
             <s-text color="subdued">Placeholders: {'{{customer_name}}'}, {'{{order_numbers}}'}</s-text>
             <s-stack direction="inline" gap="small">
-              <s-button variant="primary" disabled={!preview?.ok || !message.trim() || busy || staff === undefined || undefined} loading={busy || undefined} onClick={sendMail}>
+              <s-button variant="primary" disabled={!preview?.ok || !message.trim() || busy || staff === undefined || undefined} loading={busy === 'mail' || undefined} onClick={sendMail}>
                 {preview?.ok ? `Send ${preview.customers} email${preview.customers === 1 ? '' : 's'}` : 'Send Updates'}
               </s-button>
               <s-button disabled={busy || undefined} onClick={() => setMailOpen(false)}>Cancel</s-button>

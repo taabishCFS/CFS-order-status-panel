@@ -54,6 +54,7 @@ export default function OrderDetailPage({ id }) {
   const orderId = `gid://shopify/Order/${id}`;
   const { detail, customer, loading, loadFailed, notice, setNotice, refresh } = useOrderDetail(orderId);
   const emails = useEmails(id);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [older, setOlder] = useState({ entries: [], cursor: null, hasNext: true, loading: false, error: null });
   const [picked, setPicked] = useState([]);
   const [showHistory, setShowHistory] = useState(true);
@@ -129,7 +130,7 @@ export default function OrderDetailPage({ id }) {
       <s-link href="/">← Orders</s-link>
         <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="primary-action" href={`shopify://admin/orders/${id}`}>Open in Shopify</s-button>
-      <s-button slot="secondary-actions" onClick={reload} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="secondary-actions" onClick={async () => { setRefreshClicked(true); try { await reload(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
 
       {notice && (
         <s-banner tone={notice.tone}>

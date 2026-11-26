@@ -38,7 +38,7 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
   const nameOf = (lineId) => lines.find((l) => l.id === lineId)?.title ?? 'Item';
 
   async function book(emailCustomer, allowDuplicate = false) {
-    setBusy(true);
+    setBusy(allowDuplicate ? 'book-anyway' : emailCustomer ? 'book-email' : 'book-save');
     if (!allowDuplicate && own && form.vanId && form.drop) {
       const chk = await checkDrop(id, picked, form);
       if (chk.ok && chk.duplicates.length > 0) { setWarn({ names: chk.duplicates, email: emailCustomer }); setBusy(false); return; }
@@ -53,7 +53,7 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
   }
 
   async function reschedule() {
-    setBusy(true);
+    setBusy('reschedule');
     const res = await rescheduleLines(id, bookedPicked.map((b) => b.lineId), reason, emailIt);
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
@@ -110,14 +110,14 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
         {warn && (
           <s-banner tone="warning" heading="This drop is already taken">
             {warn.names.join(', ')} already {warn.names.length === 1 ? 'has' : 'have'} this van and drop on that day. Booking anyway gives this order the drop and moves them down one place.
-            <s-button slot="primary-action" disabled={busy || undefined} onClick={() => book(warn.email, true)}>Book anyway</s-button>
+            <s-button slot="primary-action" disabled={busy || undefined} loading={busy === 'book-anyway' || undefined} onClick={() => book(warn.email, true)}>Book anyway</s-button>
             <s-button slot="secondary-actions" onClick={() => setWarn(null)}>Change it</s-button>
           </s-banner>
         )}
 
         <s-stack direction="inline" gap="base" alignItems="center">
-          <s-button variant="primary" disabled={!ready || busy || undefined} loading={busy || undefined} onClick={() => book(true)}>BOOK &amp; EMAIL</s-button>
-          <s-button variant="primary" disabled={!ready || busy || undefined} onClick={() => book(false)}>BOOK &amp; SAVE</s-button>
+          <s-button variant="primary" disabled={!ready || busy || undefined} loading={busy === 'book-email' || undefined} onClick={() => book(true)}>BOOK &amp; EMAIL</s-button>
+          <s-button variant="primary" disabled={!ready || busy || undefined} loading={busy === 'book-save' || undefined} onClick={() => book(false)}>BOOK &amp; SAVE</s-button>
           <s-button tone="critical" disabled={bookedPicked.length === 0 || !staff || busy || undefined} onClick={() => setRescheduling(true)}>RESCHEDULE</s-button>
           <s-link onClick={() => setShowHistory(!showHistory)}>Delivery Update History</s-link>
         </s-stack>
@@ -129,7 +129,7 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
               <s-text-field label="Reason (the customer is told this)" value={reason} onInput={(e) => setReason(e.currentTarget.value)} />
               <s-checkbox label="Email the customer" checked={emailIt} onChange={(e) => setEmailIt(e.currentTarget.checked)} />
             </s-stack>
-            <s-button slot="primary-action" disabled={!reason.trim() || busy || undefined} loading={busy || undefined} onClick={reschedule}>Reschedule</s-button>
+            <s-button slot="primary-action" disabled={!reason.trim() || busy || undefined} loading={busy === 'reschedule' || undefined} onClick={reschedule}>Reschedule</s-button>
             <s-button slot="secondary-actions" onClick={() => setRescheduling(false)}>Cancel</s-button>
           </s-banner>
         )}

@@ -19,6 +19,7 @@ export default function BookDeliveryPage() {
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [search, setSearch] = useState('');
   const [applied, setApplied] = useState({ q: '', brand: '', page: 1 });
   const [picked, setPicked] = useState(new Set());
@@ -90,7 +91,7 @@ export default function BookDeliveryPage() {
   return (
     <s-page heading="Book Delivery">
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
       {error && <s-banner tone="critical" heading="Could not load the list">{error}</s-banner>}
       {staff === null && <s-banner tone="warning">Marking and booking deliveries needs a verified Shopify staff sign-in.</s-banner>}
       {notice && <s-banner tone={notice.tone} dismissible onDismiss={() => setNotice(null)}>{notice.text}</s-banner>}

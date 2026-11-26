@@ -4,6 +4,9 @@ import { INSTRUCTIONS_MAX, NOTE_MAX, applyInstructions, applyNote } from '../../
 // Internal notes (kept in the history) and the order/delivery instructions text. No attachments.
 export default function NotesSection({ detail, writer }) {
   const { ready, saving, write } = writer;
+  // The save state is shared by every section of the order page, so only the button pressed here shows loading.
+  const [mine, setMine] = useState(false);
+  const track = (fn) => async (...args) => { setMine(true); try { await fn(...args); } finally { setMine(false); } };
   const [note, setNote] = useState('');
   const [instructions, setInstructions] = useState(detail.state.instructions?.text ?? '');
 
@@ -17,7 +20,7 @@ export default function NotesSection({ detail, writer }) {
       <s-stack direction="block" gap="base">
         <s-text-area label="Internal note" rows={3} value={note} onInput={(e) => setNote(e.currentTarget.value)} />
         <s-text>{note.length} / {NOTE_MAX}</s-text>
-        <s-button disabled={!ready || !note.trim() || note.length > NOTE_MAX || undefined} loading={saving || undefined} onClick={addNote}>Add note</s-button>
+        <s-button disabled={!ready || !note.trim() || note.length > NOTE_MAX || undefined} loading={(saving && mine) || undefined} onClick={track(addNote)}>Add note</s-button>
         <s-divider />
         <s-text-area label="Order / delivery instructions" rows={3} value={instructions} onInput={(e) => setInstructions(e.currentTarget.value)} />
         <s-text>{instructions.length} / {INSTRUCTIONS_MAX}</s-text>

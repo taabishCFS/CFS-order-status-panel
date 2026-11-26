@@ -19,6 +19,7 @@ export default function OrdersByOrder() {
   const [brands, setBrands] = useState([]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [error, setError] = useState(null);
   const [picked, setPicked] = useState(() => new Set());
   const [confirming, setConfirming] = useState(false);
@@ -73,7 +74,7 @@ export default function OrdersByOrder() {
       <s-button slot="secondary-actions" href="/reports">Reports</s-button>
       <s-button slot="secondary-actions" href="/email-templates">Email templates</s-button>
       <s-button slot="secondary-actions" onClick={refreshOrderData} loading={refreshing || undefined}>Refresh order data</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
 
       {error && <s-banner tone="critical" heading="Could not load orders">{error}</s-banner>}
       {notice && <s-banner tone={notice.tone} dismissible onDismiss={() => setNotice(null)}>{notice.text}</s-banner>}

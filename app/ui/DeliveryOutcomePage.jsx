@@ -18,6 +18,7 @@ export default function DeliveryOutcomePage({ kind }) {
   const [notice, setNotice] = useState(null);
   const [link, setLink] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -46,7 +47,7 @@ export default function DeliveryOutcomePage({ kind }) {
     <s-page heading={TITLES[kind]}>
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
       <s-button slot="secondary-actions" href="/delivery-booked">Delivery Booked</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
       {error && <s-banner tone="critical" heading="Could not load the list">{error}</s-banner>}
       {notice && (
         <s-banner tone={notice.tone} dismissible onDismiss={() => setNotice(null)}>

@@ -20,6 +20,7 @@ export default function RefundsPage() {
   const [draft, setDraft] = useState({ from: '', to: '', q: '' });
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null); // { tone, text, link? }
   const [picked, setPicked] = useState(() => new Set());
@@ -101,7 +102,7 @@ export default function RefundsPage() {
 
   async function exportByDate() {
     if (!draft.from || !draft.to) { setNotice({ tone: 'warning', text: 'Select Start & End Date.' }); return; }
-    setBusy('export');
+    setBusy('export-csv');
     const res = await loadRefundExportLink({ kind: 'xero', from: draft.from, to: draft.to });
     setBusy(null);
     setNotice(res.ok ? { tone: 'success', text: 'The refund list for Xero is ready (refunds dated in that range; the link works for 5 minutes).', link: res.data } : { tone: 'critical', text: res.message });
@@ -113,7 +114,7 @@ export default function RefundsPage() {
       <s-button slot="secondary-actions" href="/">Orders</s-button>
       <s-button slot="secondary-actions" href="/orders-by-brand">Orders by Brand</s-button>
       <s-button slot="secondary-actions" href="/reports">Reports</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
 
       {error && <s-banner tone="critical" heading="Could not load the refund list">{error}</s-banner>}
       {staff === null && <s-banner tone="warning">Changing the refund list needs a verified Shopify staff sign-in.</s-banner>}
@@ -143,7 +144,7 @@ export default function RefundsPage() {
           <s-search-field label="Search" placeholder="Search order no" value={draft.q} onInput={(e) => setDraft({ ...draft, q: e.currentTarget.value })} onChange={(e) => search(e.currentTarget.value)} />
         </s-stack>
         <s-stack direction="inline" gap="base" alignItems="center">
-          <s-button onClick={exportCsv} loading={busy === 'export' || undefined}>Export CSV ({picked.size} ticked)</s-button>
+          <s-button onClick={exportCsv} loading={busy === 'export-csv' || undefined}>Export CSV ({picked.size} ticked)</s-button>
           <s-button tone="critical" disabled={picked.size === 0 || !verified || undefined} onClick={() => setConfirming(true)}>Remove selected ({picked.size})</s-button>
           <s-button variant="primary" disabled={!verified || undefined} onClick={() => setAdding(!adding)}>Add Order</s-button>
         </s-stack>

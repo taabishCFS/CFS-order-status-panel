@@ -21,6 +21,7 @@ export default function OrdersByBrand({ initialStatusId = null, title = null }) 
   const [brands, setBrands] = useState([]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [error, setError] = useState(null);
   const [picked, setPicked] = useState(() => new Set());
   const [find, setFind] = useState('');
@@ -124,7 +125,7 @@ export default function OrdersByBrand({ initialStatusId = null, title = null }) 
       <s-button slot="secondary-actions" href="/refunds">Refund Orders List</s-button>
       <s-button slot="secondary-actions" href="/reports">Reports</s-button>
       <s-button slot="secondary-actions" href="/email-templates">Email templates</s-button>
-      <s-button slot="primary-action" onClick={load} loading={loading || undefined}>Refresh</s-button>
+      <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
 
       {error && <s-banner tone="critical" heading="Could not load lines">{error}</s-banner>}
       {data?.capped && <s-banner tone="warning">Showing the newest 5,000 of {summary.lines} lines. Narrow the filters to see the rest.</s-banner>}
