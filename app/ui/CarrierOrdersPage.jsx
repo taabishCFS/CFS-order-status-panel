@@ -5,10 +5,35 @@ import Pager from './Pager.jsx';
 import { callBulkEmail } from './bulkEmail';
 import { DELIVERY_UPDATE_MESSAGE, DELIVERY_UPDATE_SUBJECT } from './maxpro';
 import { formatDate, formatMoney, rangeText, statusTone } from './orderList';
-import { PAGES, carrierLink, loadCarrier } from './carrierOrders';
+import { COLUMN_NAMES, PAGES, carrierLink, loadCarrier } from './carrierOrders';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const dmy = (iso) => (iso ? iso.slice(0, 10).split('-').reverse().join('/') : '');
+
+function cellFor(column, r) {
+  switch (column) {
+    case 'orderDate': return formatDate(r.orderDate);
+    case 'orderNo': return <s-link href={orderUrl(r.orderId)}>{r.orderName}</s-link>;
+    case 'brand': return r.brand;
+    case 'postcode': return r.postcode;
+    case 'item': return r.size ? <s-stack direction="block" gap="small-500"><s-text>{r.product}</s-text><s-text color="subdued">{r.size}</s-text></s-stack> : r.product;
+    case 'code': return r.code;
+    case 'qty': return r.quantity;
+    case 'custDate': return dmy(r.custDate) || '—';
+    case 'expDate': return dmy(r.expectedDate) || '—';
+    case 'delDate': return dmy(r.date) || '—';
+    case 'van': return r.van;
+    case 'driver': return r.driver;
+    case 'drop': return r.drop ? `Drop ${r.drop}` : '';
+    case 'slot': return r.slot;
+    case 'delType': return r.deliveryType;
+    case 'confirm': return r.confirmed === 'confirmed' ? <s-badge tone="success">Confirmed</s-badge> : r.confirmed === 'declined' ? <s-badge tone="critical">Declined</s-badge> : '';
+    case 'status': return r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : '';
+    case 'emailed': return r.emailed ? 'Yes' : 'No';
+    case 'total': return formatMoney(r.amountMinor, 'GBP');
+    default: return '';
+  }
+}
 
 // The Carrier Deliveries pages, laid out like the old ones: filters, a list of lines, a delivery-update email to the ticked
 // customers and a download of everything shown. `carrier` picks the page: tnt, pallet, furdeco, dhd, white-glove or allocated.
@@ -44,13 +69,13 @@ export default function CarrierOrdersPage({ carrier }) {
   const reset = () => { setDraft(start); setApplied(start); setPicked(new Set()); setLink(null); };
   const lineIds = [...picked];
 
-  async function download() {
+  async function download(print = false) {
     setBusy(true);
-    const res = await carrierLink(applied);
+    const res = await carrierLink(applied, undefined, print);
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
     setLink(res.data);
-    setNotice({ tone: 'success', text: 'Your file is ready (the link works for 5 minutes).' });
+    setNotice({ tone: 'success', text: print ? 'Your PDF page is ready (the link works for 5 minutes). It opens the print box: choose Save as PDF.' : 'Your file is ready (the link works for 5 minutes).' });
   }
 
   useEffect(() => {
@@ -82,7 +107,7 @@ export default function CarrierOrdersPage({ carrier }) {
       {notice && (
         <s-banner tone={notice.tone} dismissible onDismiss={() => setNotice(null)}>
           {notice.text}
-          {link && notice.tone === 'success' && notice.text.startsWith('Your file') && <s-link href={link.url} target="_blank">Download the file</s-link>}
+          {link && notice.tone === 'success' && notice.text.startsWith('Your ') && <s-link href={link.url} target="_blank">{page.pdf && notice.text.startsWith('Your PDF') ? 'Open the PDF' : 'Download the file'}</s-link>}
         </s-banner>
       )}
 
@@ -93,33 +118,38 @@ export default function CarrierOrdersPage({ carrier }) {
             {data && data.pageCount > 1 && <Pager page={data.page} pageCount={data.pageCount} all={applied.all} onPage={(p) => setApplied({ ...applied, page: p, all: false })} onAll={() => setApplied({ ...applied, all: true })} />}
           </s-stack>
 
-          <s-stack direction="inline" gap="base" alignItems="end">
-            <s-select label="Brand / vendor" value={draft.brand} onChange={(e) => setDraft({ ...draft, brand: e.currentTarget.value })}>
-              <s-option value="">All brands</s-option>
-              {(data?.brands ?? []).map((b) => <s-option key={b} value={b}>{b}</s-option>)}
-            </s-select>
-            {page.vanFilter && (
-              <s-select label="Van" value={draft.van} onChange={(e) => setDraft({ ...draft, van: e.currentTarget.value })}>
-                <s-option value="">All Van</s-option>
-                {(data?.vans ?? []).map((v) => <s-option key={v.id} value={v.id}>{v.name}</s-option>)}
-              </s-select>
-            )}
-            <s-date-field label="Delivery date from" value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.currentTarget.value })} />
-            <s-date-field label="To" value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.currentTarget.value })} />
-            <s-search-field label="Search" placeholder="Order No., postcode or email" value={draft.q} onInput={(e) => setDraft({ ...draft, q: e.currentTarget.value })} onKeyDown={(e) => { if (e.key === 'Enter') go(); }} />
-            <s-button variant="primary" onClick={() => go()}>GO</s-button>
-            <s-button onClick={() => { setDraft({ ...draft, from: '', to: '' }); go({ from: '', to: '' }); }}>All dates</s-button>
-            <s-button onClick={reset}>RESET</s-button>
-          </s-stack>
+          {(page.brand || page.van || page.dates || page.search) && (
+            <s-stack direction="inline" gap="base" alignItems="end">
+              {page.brand && (
+                <s-select label="Brand / vendor" value={draft.brand} onChange={(e) => setDraft({ ...draft, brand: e.currentTarget.value })}>
+                  <s-option value="">All brands</s-option>
+                  {(data?.brands ?? []).map((b) => <s-option key={b} value={b}>{b}</s-option>)}
+                </s-select>
+              )}
+              {page.van && (
+                <s-select label="Van" value={draft.van} onChange={(e) => setDraft({ ...draft, van: e.currentTarget.value })}>
+                  <s-option value="">All Van</s-option>
+                  {(data?.vans ?? []).map((v) => <s-option key={v.id} value={v.id}>{v.name}</s-option>)}
+                </s-select>
+              )}
+              {page.dates && <s-date-field label="Delivery date from" value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.currentTarget.value })} />}
+              {page.dates && <s-date-field label="To" value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.currentTarget.value })} />}
+              {page.search && <s-search-field label="Search" placeholder="Order No., postcode or email" value={draft.q} onInput={(e) => setDraft({ ...draft, q: e.currentTarget.value })} onKeyDown={(e) => { if (e.key === 'Enter') go(); }} />}
+              <s-button variant="primary" onClick={() => go()}>GO</s-button>
+              {page.dates && <s-button onClick={() => { setDraft({ ...draft, from: '', to: '' }); go({ from: '', to: '' }); }}>All dates</s-button>}
+              <s-button onClick={reset}>RESET</s-button>
+            </s-stack>
+          )}
 
           <s-stack direction="inline" gap="base" alignItems="center">
-            <s-button disabled={picked.size === 0 || undefined} onClick={() => { setNotice(null); setMailOpen(true); }}>{page.emailLabel}</s-button>
-            <s-button disabled={busy || undefined} loading={busy || undefined} onClick={download}>Download CSV</s-button>
+            {page.emailLabel && <s-button disabled={picked.size === 0 || undefined} onClick={() => { setNotice(null); setMailOpen(true); }}>{page.emailLabel}</s-button>}
+            {page.pdf && <s-button disabled={busy || undefined} loading={busy || undefined} onClick={() => download(true)}>Download PDF</s-button>}
+            <s-button disabled={busy || undefined} loading={busy || undefined} onClick={() => download(false)}>Download CSV</s-button>
           </s-stack>
         </s-stack>
       </s-section>
 
-      {mailOpen && (
+      {mailOpen && page.emailLabel && (
         <s-section heading={page.emailLabel}>
           <s-stack direction="block" gap="base">
             <s-text>One delivery update per customer, covering all the selected lines they have.</s-text>
@@ -153,33 +183,13 @@ export default function CarrierOrdersPage({ carrier }) {
           <s-table>
             <s-table-header-row>
               <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allPicked} onChange={(e) => setPicked(e.currentTarget.checked ? new Set(rows.map((r) => r.lineId)) : new Set())} /></s-table-header>
-              <s-table-header>Order Date</s-table-header>
-              <s-table-header listSlot="primary">Order No</s-table-header>
-              <s-table-header>Brand</s-table-header>
-              <s-table-header>Post Code</s-table-header>
-              <s-table-header>Item</s-table-header>
-              <s-table-header format="numeric">Qty</s-table-header>
-              <s-table-header>Cust.Date</s-table-header>
-              {page.vanFilter && <s-table-header>Van</s-table-header>}
-              <s-table-header>Status</s-table-header>
-              <s-table-header>Email?</s-table-header>
-              <s-table-header format="numeric">Unit Total</s-table-header>
+              {page.columns.map((c) => <s-table-header key={c} listSlot={c === 'orderNo' ? 'primary' : undefined} format={c === 'qty' || c === 'total' ? 'numeric' : undefined}>{COLUMN_NAMES[c]}</s-table-header>)}
             </s-table-header-row>
             <s-table-body>
               {rows.map((r) => (
                 <s-table-row key={r.lineId}>
                   <s-table-cell><s-checkbox label={`Select ${r.orderName} ${r.product}`} labelAccessibilityVisibility="exclusive" checked={picked.has(r.lineId)} onChange={(e) => tick(r.lineId, e.currentTarget.checked)} /></s-table-cell>
-                  <s-table-cell>{formatDate(r.orderDate)}</s-table-cell>
-                  <s-table-cell><s-link href={orderUrl(r.orderId)}>{r.orderName}</s-link></s-table-cell>
-                  <s-table-cell>{r.brand}</s-table-cell>
-                  <s-table-cell>{r.postcode}</s-table-cell>
-                  <s-table-cell>{r.product}</s-table-cell>
-                  <s-table-cell>{r.quantity}</s-table-cell>
-                  <s-table-cell>{dmy(r.custDate) || '—'}</s-table-cell>
-                  {page.vanFilter && <s-table-cell>{r.van}</s-table-cell>}
-                  <s-table-cell>{r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : ''}</s-table-cell>
-                  <s-table-cell>{r.emailed ? 'Yes' : 'No'}</s-table-cell>
-                  <s-table-cell>{formatMoney(r.amountMinor, 'GBP')}</s-table-cell>
+                  {page.columns.map((c) => <s-table-cell key={c}>{cellFor(c, r)}</s-table-cell>)}
                 </s-table-row>
               ))}
             </s-table-body>

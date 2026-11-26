@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 28 (6 December 2026)
+**Guide version:** 29 (6 December 2026)
 
 ## Before you start
 
@@ -588,9 +588,16 @@ Open them from the **Dashboard**, in the **Delivery** group. Each is a list of o
 - **White Glove Delivery Orders** lists items on orders that bought White Glove delivery.
 - **Allocated From Stock + Delivery Booked** lists **Part Order In Stock** and **Allocated From Stock** items that are already booked onto a van with a date. It also has a **Van** filter.
 
-**On every page.** Columns: order date, order number, brand, postcode, item, qty, the customer's date (the booked date, or the expected date if not booked yet), status, whether the customer has been emailed and the unit total. Filter by **Brand / vendor**, by **delivery date** (From and To; **All dates** clears them) or search by order number, postcode or email. **RESET** puts everything back.
-- **Send ... Email:** tick lines, press the button and check the box that opens. Each customer gets **one** delivery update covering their ticked lines, and you can change the wording first. Each order's **Emails** section shows the result.
-- **Download CSV:** a file of everything the filters match (all pages), with the columns the old exports shared (order, brand, product, qty, order date, expected date, last chase-up, delivery date, booked, confirmed, status).
+**Each page shows the columns of its old screen.**
+- **TNT** and **FurDeco:** order date, order number, brand, postcode, item, qty, the customer's date (booked date, or expected date if not booked yet), status and unit total. TNT also shows whether the customer was emailed. These two are the only pages with an email button (**Send TNT Email** and **Send Bulk Email**): tick lines, press it, check the box that opens (one update per customer, wording can be changed). Each order's **Emails** section shows the result.
+- **Pallet:** order date, order number, brand, item, delivery date, status.
+- **DHD:** the same, with both the expected date and the delivery date.
+- **White Glove:** also shows the product code and qty. It has no filters, just the page list.
+- **Allocated From Stock + Delivery Booked:** also shows code, qty, delivery date, van, driver, drop, delivery slot (AM/PM), delivery type and whether the customer confirmed. Items show their option (size, colour) under the name. Filter by **Van**, **From/To** dates or search by order number.
+
+**Filters** (where the old page had them): brand, delivery dates (**All dates** clears them), search. **RESET** puts everything back.
+
+**Downloads.** Every page has **Download CSV** for everything the filters match (all pages). **Allocated From Stock + Delivery Booked** also has **Download PDF**: it opens a landscape page with every column and the print box opens by itself. Choose **Save as PDF** there (or print it). Unlike the old PDF, nothing is cut off at the right.
 
 **Not on these pages:** the TNT tracking number, volume, weight and number of boxes (we do not hold them), and the FurDeco booking file for the carrier. **20Kg TNT** is not built because it depends on item weights we do not hold. The **Panther**, **Prebook** and **Kinetic** pages are not being built because they are not used.
 
@@ -662,6 +669,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 29 | Carrier pages now match the old screens: each shows its own columns, only TNT and FurDeco have the email button, and Allocated + Booked has driver, drop, slot, type, confirm and a landscape Download PDF |
 | 6 Dec 2026 | 28 | New carrier pages: TNT, Pallet, FurDeco, DHD, White Glove and Allocated From Stock + Delivery Booked, with filters, delivery update email and CSV download |
 | 6 Dec 2026 | 27 | New Completed Delivery, Failed Delivery/Collection and On Hold Delivery pages, with filters and CSV downloads |
 | 6 Dec 2026 | 26 | New Delivery Report CSV (Max) page: paid orders still to deliver with the Maxpro columns, search, brand filter, White Glove list, Send Bulk Email and the Order Wise and Product Wise files |

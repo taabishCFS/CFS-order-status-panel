@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { carrierRows, listCarrier } from "./carrier.server.js";
-import { carrierCsv, parseCarrierParams, statusWanted, CARRIERS } from "./carrier-rules.js";
+import { carrierCsv, carrierPrintHtml, parseCarrierParams, statusWanted, CARRIERS } from "./carrier-rules.js";
 
 const SHOP = "s.myshopify.com";
 const O = (n) => `gid://shopify/Order/${n}`;
@@ -71,6 +71,16 @@ describe("filters, page and file", () => {
     expect(parseCarrierParams(new URLSearchParams("key=zzz")).key).toBe("tnt");
     expect(statusWanted(CARRIERS.pallet, 6)).toBe(false);
     expect(statusWanted(CARRIERS.pallet, 4)).toBe(true);
+  });
+  it("adds driver, drop, slot and delivery type for booked lines, and prints every column", async () => {
+    const rows = await carrierRows(db, SHOP, { ...base, key: "allocated" });
+    expect(rows[0]).toMatchObject({ driver: "", drop: null, slot: "", deliveryType: "Free Door Delivery" });
+    const html = carrierPrintHtml("Allocated", [{ ...rows[0], product: "A <b>", size: "6 x Chairs", driver: "Sam", drop: 3, slot: "AM", confirmed: "confirmed" }], "2026-11-26");
+    expect(html).toContain("A &lt;b&gt;");
+    expect(html).toContain("<small>6 x Chairs</small>");
+    expect(html).toContain("Drop 3");
+    expect(html).toContain("Confirmed");
+    expect(html).toContain("size:A4 landscape");
   });
   it("writes the CSV with the shared columns", async () => {
     const out = carrierCsv(await carrierRows(db, SHOP, base)).slice(1).split("\r\n");

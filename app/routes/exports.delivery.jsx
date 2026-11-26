@@ -2,7 +2,7 @@ import db from "../db.server";
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
 import { listBooked, onlyLines } from "../delivery/booked-delivery.server";
 import { carrierRows } from "../delivery/carrier.server";
-import { CARRIERS, carrierCsv, parseCarrierParams } from "../delivery/carrier-rules";
+import { CARRIERS, carrierCsv, carrierPrintHtml, parseCarrierParams } from "../delivery/carrier-rules";
 import { outcomeRows } from "../delivery/outcome.server";
 import { KINDS, outcomeCsv, parseOutcomeParams } from "../delivery/outcome-rules";
 import { maxproRowsFor } from "../delivery/maxpro.server";
@@ -40,6 +40,13 @@ export const loader = async ({ request }) => {
     const rows = await maxproRowsFor(db, link.shop, ids);
     if (rows.length === 0) return refuse(404, "Nothing to export. The orders may have been booked or changed since the list was loaded.");
     return link.kind === "delivery-maxpro-order" ? file(orderWiseCsv(rows), "MaxPro_Orderwise.csv") : file(productWiseCsv(rows), "MaxPro_Productwise.csv");
+  }
+  if (link.kind === "delivery-carrier-print") {
+    const params = { ...parseCarrierParams(query), all: true };
+    const rows = await carrierRows(db, link.shop, params);
+    if (rows.length === 0) return refuse(404, "Nothing to export.");
+    const stamp = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/London" });
+    return new Response(carrierPrintHtml(CARRIERS[params.key].title.replace(/[^A-Za-z0-9]+/g, "_"), rows, stamp), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
   }
   if (link.kind === "delivery-carrier") {
     const params = { ...parseCarrierParams(query), all: true };

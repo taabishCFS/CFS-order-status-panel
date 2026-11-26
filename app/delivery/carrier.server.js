@@ -1,5 +1,6 @@
 // The Carrier Deliveries lists: order lines for one carrier (or White Glove, DHD, or allocated and booked), with their booking.
 import { listFleet } from "./delivery.server.js";
+import { deliveryTypeOf } from "./bulk-delivery-rules.js";
 import { orderIsWhiteGlove } from "./maxpro-rules.js";
 import { ALL_SIZE, CARRIERS, PAGE_SIZE, matchesCarrierSearch, statusWanted } from "./carrier-rules.js";
 
@@ -26,12 +27,13 @@ export async function carrierRows(db, shop, params) {
     bookings ?? db.deliveryBooking.findMany({ where: { shop, orderId: { in: orderIds } } }),
     db.lineChase.findMany({ where: { shop, lineId: { in: lines.map((l) => l.lineId) } } }),
     listFleet(db, shop),
-    cfg.whiteGlove ? db.orderLine.findMany({ where: { shop, orderId: { in: orderIds } } }) : [],
+    cfg.whiteGlove || cfg.booked ? db.orderLine.findMany({ where: { shop, orderId: { in: orderIds } } }) : [],
   ]);
   const orderOf = new Map(orders.map((o) => [o.orderId, o]));
   const bookingOf = new Map(allBookings.map((b) => [b.lineId, b]));
   const chaseOf = new Map(chases.map((c) => [c.lineId, c.lastChasedAt]));
-  const vanOf = new Map(fleet.vans.map((v) => [v.id, v.name]));
+  const vanOf = new Map(fleet.vans.map((v) => [v.id, v]));
+  const driverOf = new Map(fleet.drivers.map((d) => [d.id, d.name]));
   const titles = new Map();
   for (const l of siblings) titles.set(l.orderId, [...(titles.get(l.orderId) ?? []), l.title]);
 
@@ -48,7 +50,9 @@ export async function carrierRows(db, shop, params) {
       lineId: l.lineId, orderId: l.orderId, orderName: o.name, orderDate: o.createdAt.toISOString(), email: o.email ?? "",
       brand: brandOf(l.vendor), postcode: o.postcode ?? "", product: l.title, code: l.sku ?? "", quantity: l.quantity,
       custDate: b?.date ?? l.expectedDate ?? null, expectedDate: l.expectedDate ?? null, lastChaseDate: chaseOf.get(l.lineId)?.toISOString?.() ?? null,
-      date: b?.date ?? null, van: b?.partner === OWN ? vanOf.get(b.vanId) ?? "" : "", confirmed: l.deliveryOutcome ?? null, emailed: Boolean(b?.emailed),
+      date: b?.date ?? null, van: b?.partner === OWN ? vanOf.get(b.vanId)?.name ?? "" : "",
+      driver: b?.partner === OWN ? driverOf.get(b.driverId ?? vanOf.get(b.vanId)?.driverId) ?? "" : "", drop: b?.partner === OWN ? b.drop ?? null : null,
+      slot: b?.amPm === "AM" || b?.amPm === "PM" ? b.amPm : "", size: l.variantTitle ?? "", deliveryType: cfg.booked ? deliveryTypeOf(titles.get(l.orderId) ?? []) : "", confirmed: l.deliveryOutcome ?? null, emailed: Boolean(b?.emailed),
       lineStatusId: l.lineStatusId, amountMinor: Math.max(0, (l.priceMinor ?? 0) * (l.quantity ?? 1) - (l.discountMinor ?? 0)),
     });
   }

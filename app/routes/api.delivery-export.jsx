@@ -32,7 +32,7 @@ export const loader = async ({ request }) => {
     const van = search.get("van");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || !van) return json({ error: "bad_request" }, 400);
     query = new URLSearchParams({ date, van }).toString();
-  } else if (kind === "carrier") {
+  } else if (kind === "carrier" || kind === "carrier-print") {
     const p = parseCarrierParams(search);
     const q = new URLSearchParams({ key: p.key });
     for (const k of ["from", "to", "q", "brand", "van"]) if (p[k]) q.set(k, p[k]);

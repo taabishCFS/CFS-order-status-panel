@@ -54,7 +54,7 @@ const cell = (v) => {
 const line = (cells) => cells.map(cell).join(",");
 const dmy = (v) => (v ? String(v).slice(0, 10).split("-").reverse().join("/") : "");
 const BOM = "﻿";
-const confirmText = (r) => (r.confirmed === "confirmed" ? "Confirmed" : "Not Confirmed");
+const confirmText = (r) => (r.confirmed === "confirmed" ? "Confirmed" : r.confirmed === "declined" ? "Declined" : "Not Confirmed");
 
 /** The CSV of a carrier list: the columns the old exports share (tracking, volume, weight and box are not held). */
 export function carrierCsv(rows) {
@@ -62,4 +62,23 @@ export function carrierCsv(rows) {
     line(["Order No", "Brand", "Product Name", "Qty", "Order Date", "Expected Delivery Date", "Last Chaseup Date", "Delivery Date", "Delivery Booked", "Delivery Confirmed?", "Order Status"]),
     ...rows.map((r) => line([r.orderName, r.brand, r.product, r.quantity, dmy(r.orderDate), dmy(r.expectedDate), dmy(r.lastChaseDate), dmy(r.date), r.date ? "Yes" : "No", confirmText(r), label.get(r.lineStatusId) ?? ""])),
   ].join("\r\n");
+}
+
+const esc = (v) => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const confirmLabel = (r) => (r.confirmed === "confirmed" ? "Confirmed" : r.confirmed === "declined" ? "Declined" : "");
+const PRINT_COLUMNS = [
+  ["Order Date", (r) => dmy(r.orderDate), 7], ["Order No.", (r) => r.orderName, 8], ["Brand", (r) => r.brand, 7],
+  ["Item", (r) => `${esc(r.product)}${r.size ? `<br><small>${esc(r.size)}</small>` : ""}`, 24, true], ["Code", (r) => r.code, 9], ["Qty", (r) => r.quantity, 3],
+  ["Delv. Date", (r) => dmy(r.date), 7], ["Van", (r) => r.van, 6], ["Driver", (r) => r.driver, 7], ["Drop", (r) => (r.drop ? `Drop ${r.drop}` : ""), 4],
+  ["Slot", (r) => r.slot, 3], ["Del. Type", (r) => r.deliveryType, 8], ["Del. Confirm", confirmLabel, 6], ["Status", (r) => label.get(r.lineStatusId) ?? "", 8],
+];
+
+/** A print-ready A4 landscape page (Save as PDF in the print box): every column of Allocated From Stock + Delivery Booked. */
+export function carrierPrintHtml(title, rows, stamp) {
+  const head = PRINT_COLUMNS.map(([name, , width]) => `<th style="width:${width}%">${esc(name)}</th>`).join("");
+  const body = rows.map((r) => `<tr>${PRINT_COLUMNS.map(([, get, , raw]) => `<td>${raw ? get(r) : esc(get(r))}</td>`).join("")}</tr>`).join("");
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}_${esc(stamp)}</title><style>
+@page{size:A4 landscape;margin:8mm}body{font:9px/1.3 Arial,sans-serif;color:#111;margin:0}h1{font-size:14px;margin:0 0 4px}p{margin:0 0 6px;color:#555}
+table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #bbb;padding:2px 3px;text-align:left;vertical-align:top;word-wrap:break-word}th{background:#eee}thead{display:table-header-group}tr{page-break-inside:avoid}small{color:#555}
+</style></head><body><h1>${esc(title)}</h1><p>${rows.length} lines &middot; printed ${esc(stamp)}</p><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table><script>window.onload=function(){window.print()}</script></body></html>`;
 }

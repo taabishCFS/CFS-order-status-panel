@@ -4,18 +4,24 @@ import { callBackendResult } from './backend';
 export type CarrierKey = 'tnt' | 'pallet' | 'furdeco' | 'dhd' | 'white-glove' | 'allocated';
 export interface CarrierRow {
   lineId: string; orderId: string; orderName: string; orderDate: string; email: string; brand: string; postcode: string; product: string; code: string; quantity: number;
-  custDate: string | null; expectedDate: string | null; lastChaseDate: string | null; date: string | null; van: string; confirmed: string | null; emailed: boolean; lineStatusId: number | null; amountMinor: number;
+  custDate: string | null; driver: string; drop: number | null; slot: string; size: string; deliveryType: string; expectedDate: string | null; lastChaseDate: string | null; date: string | null; van: string; confirmed: string | null; emailed: boolean; lineStatusId: number | null; amountMinor: number;
 }
 export interface CarrierList { rows: CarrierRow[]; total: number; page: number; pageCount: number; size: number; vans: { id: string; name: string }[]; brands: string[] }
 export interface CarrierFilter { key: CarrierKey; q: string; brand: string; van: string; from: string; to: string; page: number; all: boolean }
 
-export const PAGES: Record<CarrierKey, { title: string; emailLabel: string; vanFilter?: boolean }> = {
-  tnt: { title: 'TNT Orders', emailLabel: 'Send TNT Email' },
-  pallet: { title: 'Pallet Orders', emailLabel: 'Send Pallet Email' },
-  furdeco: { title: 'FurDeco Orders', emailLabel: 'Send FurDeco Email' },
-  dhd: { title: 'DHD Orders', emailLabel: 'Send Email' },
-  'white-glove': { title: 'White Glove Delivery Orders', emailLabel: 'Send Email' },
-  allocated: { title: 'Allocated From Stock + Delivery Booked', emailLabel: 'Send Email', vanFilter: true },
+export type ColumnKey = 'orderDate' | 'orderNo' | 'brand' | 'postcode' | 'item' | 'code' | 'qty' | 'custDate' | 'expDate' | 'delDate' | 'van' | 'driver' | 'drop' | 'slot' | 'delType' | 'confirm' | 'status' | 'emailed' | 'total';
+export const COLUMN_NAMES: Record<ColumnKey, string> = {
+  orderDate: 'Order Date', orderNo: 'Order No', brand: 'Brand', postcode: 'Post Code', item: 'Item', code: 'Code', qty: 'Qty', custDate: 'Cust.Date', expDate: 'Exp. Date', delDate: 'Delivery Date',
+  van: 'Van', driver: 'Driver', drop: 'Drop', slot: 'Delivery slot', delType: 'Del.Type', confirm: 'Del.Confirm', status: 'Status', emailed: 'Email?', total: 'Unit Total',
+};
+// Each page shows the columns of its old screen. emailLabel: the page can email the ticked customers. filters: which boxes sit above the list.
+export const PAGES: Record<CarrierKey, { title: string; emailLabel?: string; brand: boolean; dates: boolean; van: boolean; search: boolean; pdf?: boolean; columns: ColumnKey[] }> = {
+  tnt: { title: 'TNT Orders', emailLabel: 'Send TNT Email', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'status', 'emailed', 'total'] },
+  furdeco: { title: 'FurDeco Orders', emailLabel: 'Send Bulk Email', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'status', 'total'] },
+  pallet: { title: 'Pallet Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'delDate', 'status'] },
+  dhd: { title: 'DHD Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'expDate', 'delDate', 'status'] },
+  'white-glove': { title: 'White Glove Delivery Orders', brand: false, dates: false, van: false, search: false, columns: ['orderDate', 'orderNo', 'brand', 'item', 'code', 'qty', 'delDate', 'status'] },
+  allocated: { title: 'Allocated From Stock + Delivery Booked', brand: false, dates: true, van: true, search: true, pdf: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'code', 'qty', 'delDate', 'van', 'driver', 'drop', 'slot', 'delType', 'confirm', 'status'] },
 };
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string };
@@ -43,10 +49,10 @@ export async function loadCarrier(f: CarrierFilter, fetchFn: typeof fetch = fetc
 }
 
 /** A five-minute download link for everything the filters match (all pages). */
-export async function carrierLink(f: CarrierFilter, fetchFn: typeof fetch = fetch): Promise<Result<{ url: string }>> {
+export async function carrierLink(f: CarrierFilter, fetchFn: typeof fetch = fetch, print = false): Promise<Result<{ url: string }>> {
   try {
     const q = query(f);
-    q.set('kind', 'carrier');
+    q.set('kind', print ? 'carrier-print' : 'carrier');
     const res = await callBackendResult(`/api/delivery-export?${q}`, undefined, fetchFn);
     const b = res.body as ({ url?: string } & Body) | null;
     return res.ok && typeof b?.url === 'string' ? { ok: true, data: { url: b.url } } : { ok: false, message: explain(res.status, b) };
