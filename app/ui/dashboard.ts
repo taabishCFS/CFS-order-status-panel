@@ -43,6 +43,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/dhd-orders', title: 'DHD Orders', description: 'Lines with the DHD with Supplier status. Email the customers and download the list.', icon: 'delivery' },
       { href: '/white-glove-orders', title: 'White Glove Delivery Orders', description: 'Lines on orders that bought White Glove delivery. Email the customers and download the list.', icon: 'delivery' },
       { href: '/supplier-collection', title: 'Supplier Collection', description: 'Plan a pick-up from a supplier: choose the brand, the van and the day.', icon: 'delivery' },
+      { href: '/supplier-payments', title: 'Supplier Payments', description: 'Your own list of items to pay suppliers for, added with Add To Accounts on an order. Mark them Paid or Not Paid.', icon: 'cash-dollar' },
       { href: '/pay-to-supplier', title: 'Pay To Supplier', description: 'Lines we still owe a supplier for: check the cost, add the invoice number and mark them paid.', icon: 'cash-dollar' },
       { href: '/supplier-paid', title: 'Supplier Paid', description: 'Lines already paid to suppliers, grouped by batch invoice. Mark one unpaid if it was a mistake.', icon: 'receipt-refund' },
       { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },

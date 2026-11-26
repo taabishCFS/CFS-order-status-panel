@@ -134,6 +134,20 @@ model LinePayment {
   @@index([shop, orderId])
 }
 
+// Supplier Payments (legacy accounts_PayToSupplier): the lines a staff member put on their own list with "Add To Accounts" on the order page.
+model PayListLine {
+  id        String   @id @default(cuid())
+  shop      String
+  lineId    String
+  orderId   String
+  staffId   String
+  staffName String?
+  createdAt DateTime @default(now())
+
+  @@unique([shop, lineId])
+  @@index([shop, staffId, createdAt])
+}
+
 // One saved configuration of one configured order line. Version 1 is the original from the
 // configurator; later versions are staff changes. The newest applied version is the current one.
 model LineConfiguration {

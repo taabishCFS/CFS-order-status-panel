@@ -1,3 +1,4 @@
+import AccountsSection from './AccountsSection.jsx';
 import { useEffect, useState } from 'react';
 import { loadOlderViaServer } from './historyApi';
 import { describeEntry, scopeLabel } from '../../extensions/cfs-order-status/src/historyText';
@@ -238,6 +239,7 @@ export default function OrderDetailPage({ id }) {
       <ExpectedDateSection id={id} orderId={orderId} detail={detail} verified={verified} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
       <DeliveryBookingSection id={id} lines={lines} picked={picked} setNotice={setNotice} />
       <DeliverySection orderId={orderId} picked={picked} writer={writer} setNotice={setNotice} emails={emails} />
+      <AccountsSection picked={picked} setNotice={setNotice} />
       <StockAllocationSection id={id} lines={lines} verified={verified} />
       <StockAllocationSection id={id} lines={lines} verified={verified} kind="container" />
 

@@ -87,7 +87,7 @@ async function unitCosts(graphql, lines) {
   }
 }
 
-async function rowsFor(db, graphql, shop, lines, orderOf) {
+export async function rowsFor(db, graphql, shop, lines, orderOf) {
   const lineIds = lines.map((l) => l.lineId);
   const [invoices, payments, { costs, costLookup }] = await Promise.all([
     lineIds.length ? db.lineSupplierInvoice.findMany({ where: { shop, lineId: { in: lineIds } } }) : [],

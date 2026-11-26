@@ -61,3 +61,30 @@ export async function payLink(lineIds: string[], fetchFn: typeof fetch = fetch):
     return failure(e);
   }
 }
+
+/** Supplier Payments: the signed-in staff member's own list. */
+export async function loadPayList(f: PayFilter, fetchFn: typeof fetch = fetch): Promise<Result<PayList>> {
+  try {
+    const q = new URLSearchParams();
+    if (f.q) q.set('q', f.q);
+    if (f.all) q.set('all', '1');
+    else if (f.page > 1) q.set('page', String(f.page));
+    const res = await callBackendResult(`/api/pay-list?${q}`, undefined, fetchFn);
+    const b = res.body as (PayList & Body) | null;
+    return res.ok && Array.isArray(b?.rows) ? { ok: true, data: b as PayList } : { ok: false, message: explain(res.status, b) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+async function postList(body: object, fetchFn: typeof fetch): Promise<Result<{ added?: number; already?: number; removed?: number }>> {
+  try {
+    const res = await callBackendResult('/api/pay-list', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }, fetchFn);
+    const b = res.body as ({ added?: number; already?: number; removed?: number } & Body) | null;
+    return res.ok ? { ok: true, data: { added: b?.added, already: b?.already, removed: b?.removed } } : { ok: false, message: explain(res.status, b) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+export const addToPayList = (lineIds: string[], fetchFn: typeof fetch = fetch) => postList({ op: 'add', lineIds }, fetchFn);
+export const removeFromPayList = (lineIds: string[], fetchFn: typeof fetch = fetch) => postList({ op: 'remove', lineIds }, fetchFn);

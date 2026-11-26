@@ -4,14 +4,15 @@ import EmptyState from './EmptyState.jsx';
 import Pager from './Pager.jsx';
 import { useStaff } from './useStaff';
 import { formatDate, formatMoney, statusTone } from './orderList';
-import { loadPayable, markPaid, payLink, saveDhdCost, saveInvoiceNo, saveManualCost } from './paySupplier';
+import { loadPayList, loadPayable, markPaid, payLink, removeFromPayList, saveDhdCost, saveInvoiceNo, saveManualCost } from './paySupplier';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const pounds = (minor) => (minor == null ? '' : (minor / 100).toFixed(2));
 const money = (minor) => (minor == null ? '—' : formatMoney(minor, 'GBP'));
 
-// Pay To Supplier (paid=false: lines still to pay) and Supplier Paid (paid=true: lines already paid, grouped by batch invoice number).
-export default function PaySupplierPage({ paid = false }) {
+// Pay To Supplier (paid=false: lines still to pay), Supplier Paid (paid=true: lines already paid, grouped by batch invoice number)
+// and Supplier Payments (list=true: the signed-in person's own list, filled by Add To Accounts on the order page; Paid, Not Paid and Delete).
+export default function PaySupplierPage({ paid = false, list = false }) {
   const staff = useStaff();
   const start = { paid, brand: '', q: '', page: 1, all: false };
   const [draft, setDraft] = useState(start);
@@ -28,10 +29,10 @@ export default function PaySupplierPage({ paid = false }) {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await loadPayable(applied);
+    const res = await (list ? loadPayList : loadPayable)(applied);
     setLoading(false);
     if (res.ok) { setData(res.data); setError(null); } else setError(res.message);
-  }, [applied]);
+  }, [applied, list]);
   useEffect(() => { load(); }, [load]);
 
   const rows = data?.rows ?? [];
@@ -67,6 +68,19 @@ export default function PaySupplierPage({ paid = false }) {
     await load();
   }
 
+  const [confirming, setConfirming] = useState(false);
+  async function removeTicked() {
+    setBusy('delete');
+    const res = await removeFromPayList(ticked);
+    setBusy(null);
+    setConfirming(false);
+    if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
+    const n = res.data.removed ?? 0;
+    setNotice({ tone: 'success', text: `${n} line${n === 1 ? '' : 's'} taken off your list.` });
+    setPicked(new Set());
+    await load();
+  }
+
   async function download() {
     if (data && data.total === 0) { setLink(null); setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
     if (ticked.length === 0) { setLink(null); setNotice({ tone: 'warning', text: 'Please Select Record(s) to Export.' }); return; }
@@ -78,7 +92,7 @@ export default function PaySupplierPage({ paid = false }) {
     setNotice({ tone: 'success', text: 'Your file is ready (the link works for 5 minutes).' });
   }
 
-  const title = paid ? 'Supplier Paid' : 'Pay To Supplier';
+  const title = list ? 'Supplier Payments' : paid ? 'Supplier Paid' : 'Pay To Supplier';
   const first = data && data.total > 0 ? (applied.all ? 1 : (data.page - 1) * data.size + 1) : 0;
   const last = data ? (applied.all ? data.total : Math.min(data.page * data.size, data.total)) : 0;
   const cancelEdit = (field, r) => setEdits((e) => { const n = { ...e }; delete n[`${field}:${r.lineId}`]; return n; });
@@ -97,7 +111,7 @@ export default function PaySupplierPage({ paid = false }) {
   return (
     <s-page heading={`${title}${data ? ` : (${data.total})` : ''}`}>
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
-      <s-button slot="secondary-actions" href={paid ? '/pay-to-supplier' : '/supplier-paid'}>{paid ? 'Pay To Supplier' : 'Supplier Paid'}</s-button>
+      {list ? <s-button slot="secondary-actions" href="/pay-to-supplier">Pay To Supplier</s-button> : <s-button slot="secondary-actions" href={paid ? '/pay-to-supplier' : '/supplier-paid'}>{paid ? 'Pay To Supplier' : 'Supplier Paid'}</s-button>}
       <s-button slot="primary-action" onClick={async () => { setRefreshClicked(true); try { await load(); } finally { setRefreshClicked(false); } }} loading={(loading && refreshClicked) || undefined}>Refresh</s-button>
       {error && <s-banner tone="critical" heading="Could not load the list">{error}</s-banner>}
       {staff === null && <s-banner tone="warning">Changing costs, invoice numbers and payments needs a verified Shopify staff sign-in.</s-banner>}
@@ -113,10 +127,10 @@ export default function PaySupplierPage({ paid = false }) {
         <s-stack gap="base">
           <s-stack direction="inline" gap="base" alignItems="end">
             <s-text-field label="Order No" placeholder="Search by Order No" value={draft.q} onInput={(e) => setDraft({ ...draft, q: e.currentTarget.value })} />
-            <s-select label="Brand" value={draft.brand} onChange={(e) => { const brand = e.currentTarget.value; setDraft({ ...draft, brand }); setApplied({ ...draft, brand, page: 1, all: false }); setPicked(new Set()); setLink(null); }}>
+            {!list && <s-select label="Brand" value={draft.brand} onChange={(e) => { const brand = e.currentTarget.value; setDraft({ ...draft, brand }); setApplied({ ...draft, brand, page: 1, all: false }); setPicked(new Set()); setLink(null); }}>
               <s-option value="">All Brands</s-option>
               {(data?.brands ?? []).map((b) => <s-option key={b} value={b}>{b}</s-option>)}
-            </s-select>
+            </s-select>}
             <s-button onClick={() => go()}>Search</s-button>
             {(applied.q || applied.brand) && <s-button onClick={() => { setDraft(start); setApplied(start); setPicked(new Set()); setLink(null); }}>Reset</s-button>}
           </s-stack>
@@ -126,7 +140,13 @@ export default function PaySupplierPage({ paid = false }) {
           </s-stack>
           <s-stack direction="inline" gap="base" alignItems="center">
             <s-button disabled={(busy && busy !== 'export') || undefined} loading={busy === 'export' || undefined} onClick={download}>Export ticked</s-button>
-            {paid ? (
+            {list ? (
+              <>
+                <s-button variant="primary" disabled={!canEdit || (busy && busy !== 'paid') || undefined} loading={busy === 'paid' || undefined} onClick={() => setPaid(true)}>Paid</s-button>
+                <s-button disabled={!canEdit || (busy && busy !== 'unpaid') || undefined} loading={busy === 'unpaid' || undefined} onClick={() => setPaid(false)}>Not Paid</s-button>
+                <s-button tone="critical" disabled={!canEdit || busy || undefined} onClick={() => (ticked.length ? setConfirming(true) : setNotice({ tone: 'warning', text: 'Select Record(s) to delete.' }))}>Delete</s-button>
+              </>
+            ) : paid ? (
               <s-button tone="critical" disabled={!canEdit || (busy && busy !== 'unpaid') || undefined} loading={busy === 'unpaid' || undefined} onClick={() => setPaid(false)}>Mark Unpaid</s-button>
             ) : (
               <s-button variant="primary" disabled={!canEdit || (busy && busy !== 'paid') || undefined} loading={busy === 'paid' || undefined} onClick={() => setPaid(true)}>Mark Paid</s-button>
@@ -136,21 +156,32 @@ export default function PaySupplierPage({ paid = false }) {
         </s-stack>
       </s-section>
 
+      {confirming && (
+        <s-banner tone="critical" heading={`Take ${ticked.length} line${ticked.length === 1 ? '' : 's'} off your list?`}>
+          <s-stack direction="inline" gap="base">
+            <s-text>The order lines and their payment details are kept; only your list changes.</s-text>
+            <s-button tone="critical" disabled={(busy && busy !== 'delete') || undefined} loading={busy === 'delete' || undefined} onClick={removeTicked}>Yes, delete</s-button>
+            <s-button disabled={busy || undefined} onClick={() => setConfirming(false)}>Cancel</s-button>
+          </s-stack>
+        </s-banner>
+      )}
+
       <s-section padding="none">
         {data && rows.length === 0 ? (
-          <EmptyState title={paid ? 'No paid lines' : 'Nothing to pay'} hint={paid ? 'Lines marked paid will appear here.' : 'Lines that still need paying to a supplier will appear here.'} />
+          <EmptyState title={list ? 'Your list is empty' : paid ? 'No paid lines' : 'Nothing to pay'} hint={list ? 'Open an order, tick its items and press Add To Accounts to put them here.' : paid ? 'Lines marked paid will appear here.' : 'Lines that still need paying to a supplier will appear here.'} />
         ) : (
           <s-table>
             <s-table-header-row>
               <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allPicked} onChange={(e) => setPicked(e.currentTarget.checked ? new Set(rows.map((r) => r.lineId)) : new Set())} /></s-table-header>
               {paid && <s-table-header>Batch Invoice No.</s-table-header>}
-              <s-table-header listSlot="primary">Date</s-table-header>
-              <s-table-header>OrderNo</s-table-header>
-              {!paid && <s-table-header>Status</s-table-header>}
+              {!list && <s-table-header listSlot="primary">Date</s-table-header>}
+              <s-table-header listSlot={list ? 'primary' : undefined}>OrderNo</s-table-header>
+              {!paid && !list && <s-table-header>Status</s-table-header>}
               <s-table-header>Brand</s-table-header>
               <s-table-header>Item</s-table-header>
-              {paid && <s-table-header>Code</s-table-header>}
+              {(paid || list) && <s-table-header>Code</s-table-header>}
               <s-table-header format="numeric">Qty</s-table-header>
+              {list && <s-table-header format="numeric">Cost</s-table-header>}
               <s-table-header format="numeric">Final Cost</s-table-header>
               {!paid && <s-table-header format="numeric">Cost Diff.</s-table-header>}
               {!paid && <s-table-header>Update Cost</s-table-header>}
@@ -158,19 +189,21 @@ export default function PaySupplierPage({ paid = false }) {
               {!paid && <s-table-header format="numeric">Final Sale Price</s-table-header>}
               <s-table-header>{paid ? 'Supplier Invoice No.' : 'Invoice No.'}</s-table-header>
               {paid && <s-table-header>Paid Date</s-table-header>}
+              {list && <s-table-header>Paid/NotPaid</s-table-header>}
             </s-table-header-row>
             <s-table-body>
               {rows.map((r) => (
                 <s-table-row key={r.lineId}>
                   <s-table-cell><s-checkbox label={`Select ${r.orderName}`} labelAccessibilityVisibility="exclusive" checked={picked.has(r.lineId)} onChange={(e) => tick(r.lineId, e.currentTarget.checked)} /></s-table-cell>
                   {paid && <s-table-cell>{r.batchInvoiceNo || '—'}</s-table-cell>}
-                  <s-table-cell>{formatDate(r.orderDate)}</s-table-cell>
+                  {!list && <s-table-cell>{formatDate(r.orderDate)}</s-table-cell>}
                   <s-table-cell><s-link href={orderUrl(r.orderId)}>{r.orderName}</s-link></s-table-cell>
-                  {!paid && <s-table-cell>{r.statusId != null ? <s-badge tone={statusTone(r.statusId)}>{labelFor(r.statusId)}</s-badge> : ''}</s-table-cell>}
+                  {!paid && !list && <s-table-cell>{r.statusId != null ? <s-badge tone={statusTone(r.statusId)}>{labelFor(r.statusId)}</s-badge> : ''}</s-table-cell>}
                   <s-table-cell>{r.brand}</s-table-cell>
                   <s-table-cell>{r.variantTitle ? <s-stack direction="block" gap="small-500"><s-text>{r.title}</s-text><s-text color="subdued">{r.variantTitle}</s-text></s-stack> : r.title}</s-table-cell>
-                  {paid && <s-table-cell>{r.code}</s-table-cell>}
+                  {(paid || list) && <s-table-cell>{r.code}</s-table-cell>}
                   <s-table-cell>{r.quantity}</s-table-cell>
+                  {list && <s-table-cell>{money(r.calculatedMinor)}</s-table-cell>}
                   <s-table-cell><s-text type="strong">{money(r.finalMinor)}</s-text></s-table-cell>
                   {!paid && <s-table-cell>{r.diffMinor == null ? '' : money(r.diffMinor)}</s-table-cell>}
                   {!paid && <s-table-cell>{field('manual', r, pounds(r.manualMinor), saveManualCost, 'Manual cost')}</s-table-cell>}
@@ -178,6 +211,7 @@ export default function PaySupplierPage({ paid = false }) {
                   {!paid && <s-table-cell>{money(r.saleMinor)}</s-table-cell>}
                   <s-table-cell>{paid ? r.invoiceNumber || '—' : field('invoice', r, r.invoiceNumber, saveInvoiceNo, 'Supplier invoice number')}</s-table-cell>
                   {paid && <s-table-cell>{r.paidAt ? formatDate(r.paidAt) : '—'}</s-table-cell>}
+                  {list && <s-table-cell><s-badge tone={r.paid ? 'success' : 'neutral'}>{r.paid ? 'Paid' : 'Not Paid'}</s-badge></s-table-cell>}
                 </s-table-row>
               ))}
             </s-table-body>

@@ -21,7 +21,7 @@ Not yet seen: the Catalogue, Import, Export Catalog, Settings and Admin menus an
 13. Instock Balance Due and Instock Date Lapsed (may already be covered by Instock Delivery Not Booked and Date Lapsed; read the old pages to confirm)
 
 **Accounts menu**
-14. Supplier Payments
+14. Supplier Payments: BUILT (own list per staff member, Add To Accounts on the order page; the Minerva Supplier Orders entry made when paid is not copied)
 15. Proforma Payment Report
 16. Credit Payment Report
 17. Reschedule Delivery Orders
