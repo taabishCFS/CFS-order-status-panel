@@ -10,6 +10,7 @@ import { maxproRowsFor } from "../delivery/maxpro.server";
 import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
 import { payCsv, payRowsFor } from "../orders/pay-supplier.server";
+import { PAY_AGE, listPayAge, parsePayAgeParams, payAgeCsv } from "../orders/pay-age.server";
 import { unauthenticated } from "../shopify.server";
 import { verifyExportLink } from "../orders/export-link.server";
 
@@ -45,6 +46,14 @@ export const loader = async ({ request }) => {
     if (rows.length === 0) return refuse(404, "Nothing to export.");
     const stamp = new Date().toLocaleString("en-GB", { timeZone: "Europe/London", hour12: false }).replace(/[/:, ]+/g, "-");
     return file(payCsv(rows), `Pay-Balance${stamp}.csv`);
+  }
+  if (link.kind === "delivery-pay-age") {
+    const p = parsePayAgeParams(query);
+    if (p.lines.length === 0) return refuse(404, "Nothing to export.");
+    const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
+    const { rows } = await listPayAge(db, graphql, link.shop, { ...p, all: true });
+    if (rows.length === 0) return refuse(404, "Nothing to export. The items may have changed since the list was loaded.");
+    return file(payAgeCsv(rows), PAY_AGE[p.terms].file);
   }
   if (link.kind === "delivery-instock-balance") {
     const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x));

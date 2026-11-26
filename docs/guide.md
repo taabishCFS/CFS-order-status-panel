@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 35 (6 December 2026)
+**Guide version:** 39 (26 November 2026)
 
 ## Before you start
 
@@ -45,7 +45,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 35 | Area page (named groups of postcodes) | Ready, not yet tried |
 | 36 | Instock Balance Due (orders that still owe money while every item is in stock or on its way) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
-| 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready, not yet tried |
+| 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
+| 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -683,6 +684,18 @@ Booking and rescheduling need the **Book and reschedule deliveries** permission,
 
 ---
 
+### Proforma Payment Report and Credit Payment Report
+
+Open them from the **Dashboard**. They do the same job as the two payment reports on the old Accounts menu.
+
+- **Proforma Payment Report** lists the items of pro-forma brands that are **Awaiting Payment** or **Pre-Payment**: the supplier wants paying before they send.
+- **Credit Payment Report** lists the items of credit brands that are **In Stock**: the goods have arrived and the supplier is paid on credit.
+- Which brands count as pro-forma or credit comes from the **Brand terms** page. If no brand is set yet, a yellow message tells you so.
+- **Invoice Amt.** is the cost typed on Pay To Supplier (marked *manual*), or else the Shopify cost of the item times the quantity. **Invoice+VAT Amt.** adds 20%.
+- Choose a **Brand**, or type a **From** and **To** date and press **GO**. **Reset** clears the filters.
+- Tick items and press **Export ticked** to get a file with the same columns. The link works for 5 minutes.
+- These pages only show information; they change nothing.
+
 ## Not ready yet
 
 These will be added to this guide as soon as they are built:
@@ -706,6 +719,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 36 | Instock Balance Due page: orders with a balance owed where every item is Coming IN, In Stock or Allocated From Stock; tick orders and download the file |
 | 26 Nov 2026 | 37 | Pay To Supplier and Supplier Paid pages: lines we owe suppliers for, manual and DHD costs, invoice numbers, Mark Paid or Mark Unpaid, download of ticked lines; new permission Pay suppliers |
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
+| 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 6 Dec 2026 | 34 | Print Delivery Notes button on the Delivery Booked page (many orders on one page) |
 | 6 Dec 2026 | 33 | Delivery Booking list can now be narrowed by Area |
 | 6 Dec 2026 | 32 | New Area page (add, edit, switch on/off and delete named groups of postcodes) |

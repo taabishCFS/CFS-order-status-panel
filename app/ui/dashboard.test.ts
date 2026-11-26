@@ -3,7 +3,7 @@ import { DASHBOARD_GROUPS, dashboardLinks } from './dashboard';
 
 describe('dashboard', () => {
   it('links to every screen of the app once', () => {
-    expect(dashboardLinks().sort()).toEqual(['/', '/allocated-booked', '/areas', '/book-delivery', '/brand-terms', '/containers', '/date-lapsed', '/delivery-booked', '/delivery-completed', '/delivery-failed', '/dhd-orders', '/driver-management', '/email-templates', '/furdeco-orders', '/instock-balance', '/instock-not-booked', '/maxpro', '/on-hold-delivery', '/orders-by-brand', '/pallet-orders', '/pay-to-supplier', '/permissions', '/refunds', '/reports', '/sbts', '/stock', '/supplier-chaseup', '/supplier-collection', '/supplier-paid', '/supplier-payments', '/suppliers', '/tnt-orders', '/van-management', '/white-glove-orders']);
+    expect(dashboardLinks().sort()).toEqual(['/', '/allocated-booked', '/areas', '/book-delivery', '/brand-terms', '/containers', '/credit-payment-report', '/date-lapsed', '/delivery-booked', '/delivery-completed', '/delivery-failed', '/dhd-orders', '/driver-management', '/email-templates', '/furdeco-orders', '/instock-balance', '/instock-not-booked', '/maxpro', '/on-hold-delivery', '/orders-by-brand', '/pallet-orders', '/pay-to-supplier', '/permissions', '/proforma-payment-report', '/refunds', '/reports', '/sbts', '/stock', '/supplier-chaseup', '/supplier-collection', '/supplier-paid', '/supplier-payments', '/suppliers', '/tnt-orders', '/van-management', '/white-glove-orders']);
     expect(new Set(dashboardLinks()).size).toBe(dashboardLinks().length);
   });
   it('gives every card a title, a plain description and an icon, and every group a heading', () => {

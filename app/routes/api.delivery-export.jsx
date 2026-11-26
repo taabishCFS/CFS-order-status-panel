@@ -1,3 +1,4 @@
+import { parsePayAgeParams } from "../orders/pay-age.server";
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
 import { parseCarrierParams } from "../delivery/carrier-rules";
 import { parseOutcomeParams } from "../delivery/outcome-rules";
@@ -47,6 +48,11 @@ export const loader = async ({ request }) => {
     const lines = [...new Set((search.get("lines") ?? "").split(",").filter((x) => /^gid:\/\/shopify\/LineItem\/\d{1,20}$/.test(x)))];
     if (lines.length === 0 || lines.length > 500) return json({ error: "bad_request" }, 400);
     query = new URLSearchParams({ lines: lines.join(",") }).toString();
+  } else if (kind === "pay-age") {
+    const p = parsePayAgeParams(search);
+    if (p.lines.length === 0) return json({ error: "bad_request" }, 400);
+    const q = new URLSearchParams({ terms: p.terms, lines: p.lines.join(",") });
+    query = q.toString();
   } else if (kind === "instock-balance") {
     const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
     if (ids.length === 0 || ids.length > 2000) return json({ error: "bad_request" }, 400);
