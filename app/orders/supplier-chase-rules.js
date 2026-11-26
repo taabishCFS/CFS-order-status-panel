@@ -87,7 +87,8 @@ export function readContactInput(body) {
   const cc = cleanEmails(body.cc, 5);
   if (email === null || cc === null) return { error: "bad_email" };
   if (body.handOrdered !== undefined && typeof body.handOrdered !== "boolean") return { error: "bad_request" };
-  return { value: { brand, email, cc, handOrdered: body.handOrdered === true } };
+  const address = typeof body.address === "string" ? body.address.trim().slice(0, 500) : "";
+  return { value: { brand, email, cc, handOrdered: body.handOrdered === true, address } };
 }
 
 /** Reads a Process Order or chase-up request. Returns { value } or { error }. */

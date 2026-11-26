@@ -422,10 +422,25 @@ model SupplierContact {
   email       String?
   cc          String?
   handOrdered Boolean  @default(false)
+  address     String? // the supplier's collection address, shown on the Supplier Collection list
   updatedBy   String?
   updatedAt   DateTime @updatedAt
 
   @@unique([shop, brand])
+}
+
+// A planned collection from a supplier: one brand, one van, one day (the legacy "Supplier Collection" list). The same trio cannot be added twice.
+model SupplierCollection {
+  id            String   @id @default(cuid())
+  shop          String
+  brand         String
+  vanId         String
+  date          String // YYYY-MM-DD
+  createdByName String
+  createdAt     DateTime @default(now())
+
+  @@unique([shop, brand, vanId, date])
+  @@index([shop, createdAt])
 }
 
 // When a line was last chased with its supplier (the legacy "Last Chaseup" date).

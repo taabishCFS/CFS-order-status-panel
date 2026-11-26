@@ -49,13 +49,13 @@ export async function listSuppliers(db, shop) {
   const brands = [...new Set([...vendors.map((v) => brandOf(v.vendor)), ...saved.map((s) => s.brand)])].sort((a, b) => a.localeCompare(b));
   return brands.map((brand) => {
     const s = byBrand.get(brand);
-    return { brand, email: s?.email ?? "", cc: s?.cc ?? "", handOrdered: Boolean(s?.handOrdered) };
+    return { brand, email: s?.email ?? "", cc: s?.cc ?? "", handOrdered: Boolean(s?.handOrdered), address: s?.address ?? "" };
   });
 }
 
 /** Saves one brand's supplier details. */
 export async function saveSupplier(db, shop, input, actor) {
-  const data = { email: input.email || null, cc: input.cc || null, handOrdered: input.handOrdered, updatedBy: actor?.name ?? null };
+  const data = { email: input.email || null, cc: input.cc || null, handOrdered: input.handOrdered, address: input.address || null, updatedBy: actor?.name ?? null };
   await db.supplierContact.upsert({ where: { shop_brand: { shop, brand: input.brand } }, create: { shop, brand: input.brand, ...data }, update: data });
   return { ok: true };
 }

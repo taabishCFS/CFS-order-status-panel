@@ -32,7 +32,7 @@ export interface ChaseList {
   brands: string[];
 }
 export interface ChaseParams { kind: ChaseKind; brand?: string; from?: string; to?: string; page?: number }
-export interface Supplier { brand: string; email: string; cc: string; handOrdered: boolean }
+export interface Supplier { brand: string; email: string; cc: string; handOrdered: boolean; address?: string }
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string };
 interface Body { error?: string; code?: string }

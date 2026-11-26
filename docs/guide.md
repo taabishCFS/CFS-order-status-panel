@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 30 (6 December 2026)
+**Guide version:** 31 (6 December 2026)
 
 ## Before you start
 
@@ -42,6 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
+| 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
 | 31 | Completed Delivery, Failed Delivery/Collection and On Hold Delivery pages with filters and CSV downloads | Ready, not yet tried |
@@ -581,6 +582,15 @@ Open them from the **Dashboard**, in the **Delivery** group. They are the old pa
 
 The old Completed page also showed a tracking number. We do not hold tracking numbers per item, so it is left out for now.
 
+### Supplier Collection
+Open it from the **Dashboard**, in the **Delivery** group. It is the list of planned pick-ups from suppliers: which supplier, which van and which day.
+
+- **To add one:** choose a **Brand**, a **Van** and a **Date**, then press **Book**. The same brand, van and date cannot be added twice (you get "Duplicate Record Exists").
+- **The list** shows, newest first: S.No., Supplier, the supplier's **Address**, the Van and the Date.
+- **To remove some:** tick them and press **Delete selected**, then confirm. This cannot be undone.
+- **Supplier address:** the old system had an address for every brand. Here you type it once on the **Suppliers** page (new box "Collection address") and it shows on this list. Until it is filled in, the Address column shows a dash.
+- Changing the list needs the **Book and reschedule deliveries** permission.
+
 ### Instock Delivery Not Booked
 Open it from the **Dashboard**, in the **Delivery** group. It lists items that are **In Stock** (or on their way: Allocated From Stock, Part Order In Stock, Coming IN and similar) but **have no delivery date yet**. Items already booked onto a van with a date, or marked for TNT, Pallet or another carrier, are left out. A pre-booked item (a provisional date) still shows.
 
@@ -664,7 +674,7 @@ These will be added to this guide as soon as they are built:
 
 - Paying refunds straight from the system
 - Replacement orders, Add To Accounts and De-allocate
-- Supplier Collection, the 20Kg TNT page and the FurDeco carrier file, Area Management, and loading the Maxpro return file into Delivery Booking
+- the 20Kg TNT page and the FurDeco carrier file, Area Management, and loading the Maxpro return file into Delivery Booking
 - Review emails
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
@@ -677,6 +687,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 31 | New Supplier Collection page (book a pick-up by brand, van and date, delete ticked ones) and a Collection address box on the Suppliers page |
 | 6 Dec 2026 | 30 | New Instock Delivery Not Booked page (with payment filter, balance, booking status and a CSV of the ticked items) |
 | 6 Dec 2026 | 29 | Carrier pages now match the old screens: each shows its own columns, only TNT and FurDeco have the email button, and Allocated + Booked has driver, drop, slot, type, confirm and a landscape Download PDF |
 | 6 Dec 2026 | 28 | New carrier pages: TNT, Pallet, FurDeco, DHD, White Glove and Allocated From Stock + Delivery Booked, with filters, delivery update email and CSV download |

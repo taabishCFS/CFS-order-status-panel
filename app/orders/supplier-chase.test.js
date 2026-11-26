@@ -48,7 +48,7 @@ describe("reading requests", () => {
     expect(cleanEmails("a@x.com, b@x.com, c@x.com, d@x.com", 3)).toBeNull();
   });
   it("reads a supplier save", () => {
-    expect(readContactInput({ brand: " Actona ", email: "o@a.com", cc: "", handOrdered: true })).toEqual({ value: { brand: "Actona", email: "o@a.com", cc: "", handOrdered: true } });
+    expect(readContactInput({ brand: " Actona ", email: "o@a.com", cc: "", handOrdered: true })).toEqual({ value: { brand: "Actona", email: "o@a.com", cc: "", handOrdered: true, address: "" } });
     expect(readContactInput({ brand: "", email: "" })).toEqual({ error: "bad_request" });
     expect(readContactInput({ brand: "A", email: "nope" })).toEqual({ error: "bad_email" });
     expect(readContactInput({ brand: "A", handOrdered: "yes" })).toEqual({ error: "bad_request" });
@@ -126,9 +126,9 @@ describe("suppliers", () => {
     const db = chaseDb({ contacts: [{ brand: "Saved Only", email: "s@x.com", cc: null, handOrdered: false }] });
     db.orderLine.findMany = async () => [{ vendor: "Actona" }, { vendor: null }];
     expect(await listSuppliers(db, SHOP)).toEqual([
-      { brand: "Actona", email: "", cc: "", handOrdered: false },
-      { brand: "Saved Only", email: "s@x.com", cc: "", handOrdered: false },
-      { brand: "Unmapped", email: "", cc: "", handOrdered: false },
+      { brand: "Actona", email: "", cc: "", handOrdered: false, address: "" },
+      { brand: "Saved Only", email: "s@x.com", cc: "", handOrdered: false, address: "" },
+      { brand: "Unmapped", email: "", cc: "", handOrdered: false, address: "" },
     ]);
     await saveSupplier(db, SHOP, { brand: "Actona", email: "a@x.com", cc: "", handOrdered: true }, actor);
     expect(db.contacts.find((c) => c.brand === "Actona")).toMatchObject({ email: "a@x.com", cc: null, handOrdered: true, updatedBy: "Sam Patel" });

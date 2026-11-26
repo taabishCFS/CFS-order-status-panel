@@ -19,7 +19,7 @@ export default function SuppliersPage() {
 
   async function save(s) {
     setBusy(s.brand);
-    const res = await saveSupplier({ brand: s.brand, email: s.email, cc: s.cc, handOrdered: s.handOrdered });
+    const res = await saveSupplier({ brand: s.brand, email: s.email, cc: s.cc, handOrdered: s.handOrdered, address: s.address ?? '' });
     setBusy(null);
     if (!res.ok) { setNotice({ tone: 'critical', text: `${s.brand}: ${res.message}` }); return; }
     setNotice({ tone: 'success', text: `Saved ${s.brand}.` });
@@ -49,6 +49,7 @@ export default function SuppliersPage() {
                 <s-grid gridTemplateColumns="repeat(auto-fit, minmax(240px, 1fr))" gap="base">
                   <s-text-field label="Supplier email" value={s.email} onInput={(e) => edit(s.brand, { email: e.currentTarget.value })} />
                   <s-text-field label="Copy to (optional)" value={s.cc} onInput={(e) => edit(s.brand, { cc: e.currentTarget.value })} />
+                  <s-text-field label="Collection address (shown on Supplier Collection)" value={s.address ?? ''} onInput={(e) => edit(s.brand, { address: e.currentTarget.value })} />
                 </s-grid>
                 <s-stack direction="inline" gap="base" alignItems="center">
                   <s-checkbox label="Ordered by hand (no email)" checked={s.handOrdered} onChange={() => edit(s.brand, { handOrdered: !s.handOrdered })} />
