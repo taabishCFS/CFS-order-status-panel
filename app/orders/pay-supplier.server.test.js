@@ -5,7 +5,8 @@ const SHOP = "s.myshopify.com";
 const L = (n) => `gid://shopify/LineItem/${n}`;
 const O = (n) => `gid://shopify/Order/${n}`;
 
-function makeDb({ lines, orders, terms = [] }) {
+function makeDb({ lines, orders, terms = [], minerva = [] }) {
+  const minervaPaid = [];
   const invoices = [];
   const payments = [];
   const matcher = (w = {}) => (r) => Object.entries(w).every(([k, v]) => (v && typeof v === "object" && "in" in v ? v.in.includes(r[k]) : v && typeof v === "object" && "gt" in v ? r[k] > v.gt : r[k] === v));
@@ -24,6 +25,8 @@ function makeDb({ lines, orders, terms = [] }) {
     brandTerms: { findMany: async () => terms.map(([brand, t]) => ({ brand, terms: t })) },
     lineSupplierInvoice: table(invoices),
     linePayment: table(payments),
+    minervaBrand: { findMany: async () => minerva },
+    minervaPayment: { rows: minervaPaid, upsert: async ({ create }) => { minervaPaid.push(create); }, deleteMany: async ({ where }) => { const n = minervaPaid.length; minervaPaid.splice(0, n, ...minervaPaid.filter((r) => !where.lineId.in.includes(r.lineId))); return { count: n - minervaPaid.length }; } },
   };
 }
 const line = (n, extra = {}) => ({ shop: SHOP, orderId: O(1), lineId: L(n), vendor: "Duke Beds", title: `Bed ${n}`, variantTitle: null, sku: `S${n}`, variantId: null, quantity: 2, priceMinor: 10000, discountMinor: 500, lineStatusId: 4, stockedDate: null, orderCreatedAt: new Date("2026-11-20T10:00:00Z"), ...extra });
@@ -105,6 +108,14 @@ describe("paying", () => {
     await setPaid(db, SHOP, [L(1)], false, { name: "A" });
     expect((await listPayable(db, undefined, SHOP, {})).rows).toHaveLength(1);
     expect((await listPayable(db, undefined, SHOP, { paid: true })).rows).toEqual([]);
+  });
+  it("records a Minerva brand's paid line for the Minerva report, and takes it off on Not Paid", async () => {
+    const db = makeDb({ lines: [line(1), line(2, { vendor: "Other" })], orders: [order(1)], minerva: [{ shop: SHOP, brand: "Duke Beds", discHundredths: 500, fromDate: "2026-01-01", toDate: "2026-12-31" }] });
+    await saveCost(db, SHOP, { op: "manual", lineId: L(1), minor: 8000 }, { name: "A" });
+    await setPaid(db, SHOP, [L(1), L(2)], true, { name: "A" }, new Date("2026-11-26T09:00:00Z"));
+    expect(db.minervaPayment.rows).toEqual([expect.objectContaining({ lineId: L(1), brand: "Duke Beds", paidMinor: 8000, discHundredths: 500 })]);
+    await setPaid(db, SHOP, [L(1)], false, { name: "A" });
+    expect(db.minervaPayment.rows).toEqual([]);
   });
   it("refuses an unknown line", async () => {
     const db = makeDb({ lines: [], orders: [] });

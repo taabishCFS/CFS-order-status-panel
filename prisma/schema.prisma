@@ -597,3 +597,35 @@ model LineReschedule {
   @@unique([shop, lineId])
   @@index([shop, updatedAt])
 }
+
+// A Minerva supplier (legacy brand.minerva_supplier / minervaDisc / minervaFdate / minervaTdate): the brand gives a discount (in hundredths
+// of a percent, 250 = 2.50%) on what we pay it between the two dates.
+model MinervaBrand {
+  shop          String
+  brand         String
+  discHundredths Int
+  fromDate      String // YYYY-MM-DD
+  toDate        String // YYYY-MM-DD
+  updatedByName String?
+  updatedAt     DateTime @updatedAt
+
+  @@id([shop, brand])
+}
+
+// One record per paid line of a Minerva brand (legacy minerva_order), written when the line is marked Paid and removed when it is marked
+// Not Paid. The brand's discount and dates are copied at that moment, as the old app did.
+model MinervaPayment {
+  id             String   @id @default(cuid())
+  shop           String
+  orderId        String
+  lineId         String
+  brand          String
+  discHundredths Int
+  fromDate       String
+  toDate         String
+  paidMinor      Int
+  paidAt         DateTime
+
+  @@unique([shop, lineId])
+  @@index([shop, paidAt])
+}

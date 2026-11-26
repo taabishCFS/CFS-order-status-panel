@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 40 (26 November 2026)
+**Guide version:** 41 (26 November 2026)
 
 ## Before you start
 
@@ -47,7 +47,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
-| 40 | Reschedule Delivery Orders, and the Delivery attempted before? question when rescheduling on an order | Ready, not yet tried |
+| 40 | Reschedule Delivery Orders, and the Delivery attempted before? question when rescheduling on an order | Ready |
+| 41 | Minerva Supplier Orders (discount due from Minerva brands on what we paid them) | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -707,6 +708,26 @@ Open it from the **Accounts** group on the **Dashboard**. It lists every item th
 - Type part of a product name, brand or order number in **Search** and press **Search**. **Reset** clears the filters.
 - Tick items and press **Export ticked** for a file with the same columns as the old page. The link works for 5 minutes.
 
+### Minerva Supplier Orders
+
+Some brands (Minerva suppliers) give us a discount on what we pay them between two dates. Open this page from the **Accounts** group on the **Dashboard**.
+
+**Set up a Minerva brand** (the old admin did this on the brand page; here it is at the bottom of this page, under **Minerva brands**):
+
+1. Choose the **Brand**, type the **Minerva Disc. %** (for example 2.5) and choose the **From** and **To** dates.
+2. Press **Save**. The brand shows in the list above. Press **Edit** to change it, or **Remove** to stop recording it.
+3. You need the **Pay suppliers** permission to change Minerva brands.
+
+**How items get on the report:** when an item of a Minerva brand is marked **Paid** (on **Supplier Payments** or **Pay To Supplier**), its **Manual Cost** is recorded with the brand's discount and dates at that moment. Type the manual cost before you mark the item Paid. Marking it **Not Paid** takes it off again.
+
+**The report** has one row per brand:
+
+- **Applicable Order Amount:** what we paid for items marked Paid inside the brand's discount dates.
+- **Not Applicable Order Amount:** what we paid outside those dates.
+- **Discount %**, then **Amount** (the discount due on the applicable amount) and **Amount Not Eligible** (what the discount would have been on the rest).
+
+Type a **From** and **To** date and press **Go** to count only items paid in those days; **Reset** clears them. Press **Download** for the same report as a file (minerva_report.csv). The link works for 5 minutes.
+
 ## Not ready yet
 
 These will be added to this guide as soon as they are built:
@@ -732,6 +753,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 26 Nov 2026 | 41 | Minerva Supplier Orders page: set Minerva brands (discount % and dates); items of those brands marked Paid are added up inside and outside the dates, with the discount due; download |
 | 6 Dec 2026 | 34 | Print Delivery Notes button on the Delivery Booked page (many orders on one page) |
 | 6 Dec 2026 | 33 | Delivery Booking list can now be narrowed by Area |
 | 6 Dec 2026 | 32 | New Area page (add, edit, switch on/off and delete named groups of postcodes) |

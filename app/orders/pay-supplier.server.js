@@ -2,6 +2,7 @@
 // A line is "unpaid" until staff mark it paid. Which statuses count depends on how the brand's supplier is paid (credit or pro-forma).
 import statuses from "../../extensions/cfs-order-status/src/statuses.json" with { type: "json" };
 import { lookupCosts } from "./export-query.server.js";
+import { recordMinervaPayments } from "./minerva.server.js";
 
 export const PAGE_SIZE = 50;
 export const MAX_LINES = 5000;
@@ -182,7 +183,7 @@ export async function saveInvoiceNumber(db, shop, { lineId, invoiceNumber }, act
 
 /** Marks lines paid (with today's date) or unpaid (date cleared). { ok: true, changed } counts the lines found. */
 export async function setPaid(db, shop, lineIds, paid, actor, now = new Date()) {
-  const lines = await db.orderLine.findMany({ where: { shop, lineId: { in: lineIds } }, select: { lineId: true, orderId: true } });
+  const lines = await db.orderLine.findMany({ where: { shop, lineId: { in: lineIds } }, select: { lineId: true, orderId: true, vendor: true } });
   for (const l of lines) {
     await db.lineSupplierInvoice.upsert({
       where: { shop_lineId: { shop, lineId: l.lineId } },
@@ -195,6 +196,8 @@ export async function setPaid(db, shop, lineIds, paid, actor, now = new Date()) 
       update: { paidAt: paid ? now : null, updatedByName: actor?.name ?? null },
     });
   }
+  // A Minerva supplier's line is recorded for the Minerva Supplier Orders report when paid, and taken off when marked Not Paid (as the old app did on Paid).
+  await recordMinervaPayments(db, shop, lines, paid, now);
   return { ok: true, changed: lines.length };
 }
 

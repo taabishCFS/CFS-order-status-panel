@@ -12,6 +12,7 @@ import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName }
 import { payCsv, payRowsFor } from "../orders/pay-supplier.server";
 import { PAY_AGE, listPayAge, parsePayAgeParams, payAgeCsv } from "../orders/pay-age.server";
 import { listReschedules, parseRescheduleParams, rescheduleCsv } from "../orders/reschedule-orders.server";
+import { minervaCsv, minervaReport, parseMinervaParams } from "../orders/minerva.server";
 import { unauthenticated } from "../shopify.server";
 import { verifyExportLink } from "../orders/export-link.server";
 
@@ -62,6 +63,11 @@ export const loader = async ({ request }) => {
     const { rows } = await listReschedules(db, link.shop, { ...p, all: true });
     if (rows.length === 0) return refuse(404, "Nothing to export.");
     return file(rescheduleCsv(rows), "rescheduleDeliveryOrder.csv");
+  }
+  if (link.kind === "delivery-minerva") {
+    const { rows } = await minervaReport(db, link.shop, parseMinervaParams(query));
+    if (rows.length === 0) return refuse(404, "Nothing to export.");
+    return file(minervaCsv(rows), "minerva_report.csv");
   }
   if (link.kind === "delivery-instock-balance") {
     const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x));
