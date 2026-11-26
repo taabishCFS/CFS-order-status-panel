@@ -21,7 +21,7 @@ export default function BookDeliveryPage() {
   const [loading, setLoading] = useState(false);
   const [refreshClicked, setRefreshClicked] = useState(false); // so only Refresh spins when it is pressed, not on other reloads
   const [search, setSearch] = useState('');
-  const [applied, setApplied] = useState({ q: '', brand: '', page: 1 });
+  const [applied, setApplied] = useState({ q: '', brand: '', area: '', page: 1 });
   const [picked, setPicked] = useState(new Set());
   const [confirm, setConfirm] = useState(null); // { kind: 'mark', key, label } | { kind: 'book' }
   const [csv, setCsv] = useState(null); // { name, text }
@@ -110,6 +110,10 @@ export default function BookDeliveryPage() {
               <s-option value="">All brands</s-option>
               {(data?.brands ?? []).map((b) => <s-option key={b} value={b}>{b}</s-option>)}
             </s-select>
+            <s-select label="Area" value={applied.area} onChange={(e) => { setApplied({ ...applied, area: e.currentTarget.value, page: 1 }); setPicked(new Set()); }}>
+              <s-option value="">All areas</s-option>
+              {(data?.areas ?? []).map((a) => <s-option key={a.id} value={a.id}>{a.name}</s-option>)}
+            </s-select>
           </s-stack>
 
           <s-stack direction="inline" gap="base" alignItems="center">
@@ -143,7 +147,7 @@ export default function BookDeliveryPage() {
 
       <s-section padding="none">
         {data && rows.length === 0 ? (
-          <EmptyState title="Nothing to book" hint={applied.q || applied.brand ? 'No lines match that search. Clear it to see everything ready to book.' : 'No lines are ready to book. Lines appear here when they are in stock (or collection/exchange), the order is paid and every line is ready.'} />
+          <EmptyState title="Nothing to book" hint={applied.q || applied.brand || applied.area ? 'No lines match that search. Clear it to see everything ready to book.' : 'No lines are ready to book. Lines appear here when they are in stock (or collection/exchange), the order is paid and every line is ready.'} />
         ) : (
           <s-table>
             <s-table-header-row>

@@ -44,6 +44,19 @@ export async function listAreas(db, shop, pageParam = 1) {
   return { rows, total, page, pageCount };
 }
 
+/** Does the postcode start with one of the area's postcode beginnings (spaces and case ignored, like the old "NE%" match)? */
+export function postcodeInArea(postcode, postcodes) {
+  const zip = String(postcode ?? "").replace(/\s+/g, "").toUpperCase();
+  if (!zip) return false;
+  return String(postcodes ?? "").split(",").map((p) => p.replace(/\s+/g, "").toUpperCase()).filter(Boolean).some((p) => zip.startsWith(p));
+}
+
+/** The Active areas for a filter: [{ id, name }] in ID order. */
+export async function activeAreas(db, shop) {
+  const all = await db.area.findMany({ where: { shop } });
+  return all.filter((a) => a.active).sort((a, b) => a.seq - b.seq).map((a) => ({ id: a.id, name: a.name }));
+}
+
 const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
 
 /** Returns { ok: true } or { ok: false, code: "duplicate" | "not_found" }. */

@@ -5,6 +5,7 @@ import { queueOrderEmails } from "../email/queue-order-emails.server";
 import { runEmailTick } from "../email/worker.server";
 import { MARKS, parseBulkParams, readBulkRequest } from "../delivery/bulk-delivery-rules";
 import { bulkBook, bulkReschedule, listBookable, loadForBooking, markLines } from "../delivery/bulk-delivery.server";
+import { activeAreas } from "../delivery/area.server";
 import { listBrands } from "../orders/list-query.server";
 import { authenticate } from "../shopify.server";
 import { can } from "../staff/permissions.server";
@@ -13,15 +14,15 @@ import { staffFromSession } from "../staff/staff.server";
 const STATUS = { no_lines: 404, not_booked: 409, unknown_van: 422, duplicate: 409 };
 const dmy = (iso) => iso.split("-").reverse().join("/");
 
-// GET ?q=&brand=&page=: the Book Delivery list (lines ready to book) and the brands for the filter.
+// GET ?q=&brand=&area=&page=: the Book Delivery list (lines ready to book) and the brands for the filter.
 // POST { action: mark | load | book | reschedule, ... }: Mark TNT/Pallet/FurDeco, load the Delivery Booking page, book (and email the customers), reschedule.
 // Everything except GET needs a verified staff member with the Book Delivery permission.
 // This loader also answers the browser's OPTIONS preflight.
 export const loader = async ({ request }) => {
   const { session, cors } = await authenticate.admin(request);
   const params = parseBulkParams(new URL(request.url).searchParams);
-  const [list, brands] = await Promise.all([listBookable(db, session.shop, params), listBrands(db, session.shop)]);
-  return cors(Response.json({ ...list, brands }));
+  const [list, brands, areas] = await Promise.all([listBookable(db, session.shop, params), listBrands(db, session.shop), activeAreas(db, session.shop)]);
+  return cors(Response.json({ ...list, brands, areas }));
 };
 
 export const action = async ({ request }) => {

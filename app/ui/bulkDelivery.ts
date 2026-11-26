@@ -6,7 +6,7 @@ export interface BookableRow {
   lineId: string; orderId: string; orderName: string; orderCreatedAt: string; brand: string; product: string; code: string;
   quantity: number; lineStatusId: number | null; postcode: string; deliveryType: string; prebook: boolean;
 }
-export interface BookableList { rows: BookableRow[]; summary: { lines: number; orders: number }; total: number; page: number; pageCount: number; brands: string[] }
+export interface BookableList { rows: BookableRow[]; summary: { lines: number; orders: number }; total: number; page: number; pageCount: number; brands: string[]; areas?: { id: string; name: string }[] }
 export interface BookingRow {
   lineId: string; orderId: string; orderName: string; orderCreatedAt: string | null; product: string; code: string; quantity: number;
   lineStatusId: number | null; postcode: string; deliveryType: string; deliveryDate: string | null; drop: number | null; amPm: '' | 'AM' | 'PM'; prebook: boolean; emailed: boolean;
@@ -24,11 +24,12 @@ const explain = (status: number, body: Body | null): string => body?.message ?? 
 const failure = (e: unknown) => ({ ok: false as const, message: e instanceof Error ? e.message : String(e) });
 const post = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 
-export async function loadBookable(p: { q?: string; brand?: string; page?: number }, fetchFn: typeof fetch = fetch): Promise<Result<BookableList>> {
+export async function loadBookable(p: { q?: string; brand?: string; area?: string; page?: number }, fetchFn: typeof fetch = fetch): Promise<Result<BookableList>> {
   try {
     const q = new URLSearchParams();
     if (p.q) q.set('q', p.q);
     if (p.brand) q.set('brand', p.brand);
+    if (p.area) q.set('area', p.area);
     if (p.page && p.page > 1) q.set('page', String(p.page));
     const res = await callBackendResult(`/api/delivery-bulk${q.size ? `?${q}` : ''}`, undefined, fetchFn);
     const b = res.body as (BookableList & Body) | null;

@@ -42,6 +42,7 @@ export function parseBulkParams(searchParams) {
   return {
     q: (searchParams.get("q") ?? "").slice(0, 20000),
     brand: brand ? brand.slice(0, 200) : null,
+    area: (searchParams.get("area") ?? "").trim().slice(0, 80) || null,
     page: Number.isInteger(page) && page >= 1 ? Math.min(page, 100000) : 1,
   };
 }

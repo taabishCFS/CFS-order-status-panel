@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 32 (6 December 2026)
+**Guide version:** 33 (6 December 2026)
 
 ## Before you start
 
@@ -591,7 +591,7 @@ Open it from the **Dashboard**, in the **Delivery** group. An area is a name plu
 - **Inactive / Active:** tick areas and press the button to switch them off or on.
 - **Delete:** tick areas, press **Delete** and confirm. This cannot be undone.
 - Changing areas needs the **Edit drivers, vans and slots** permission.
-- For now this is the list only. Using an area to narrow the Delivery Booking list is not built yet.
+- **Where it is used:** on the **Delivery Booking** list there is now an **Area** box next to Brand. Pick an area to see only orders whose postcode starts with one of its codes (spaces and capitals do not matter). Only **Active** areas appear in the box. An area with no postcodes shows nothing.
 
 ### Supplier Collection
 Open it from the **Dashboard**, in the **Delivery** group. It is the list of planned pick-ups from suppliers: which supplier, which van and which day.
@@ -698,6 +698,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 33 | Delivery Booking list can now be narrowed by Area |
 | 6 Dec 2026 | 32 | New Area page (add, edit, switch on/off and delete named groups of postcodes) |
 | 6 Dec 2026 | 31 | New Supplier Collection page (book a pick-up by brand, van and date, delete ticked ones) and a Collection address box on the Suppliers page |
 | 6 Dec 2026 | 30 | New Instock Delivery Not Booked page (with payment filter, balance, booking status and a CSV of the ticked items) |

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { cleanPostcodes, deleteAreas, listAreas, readAreaInput, saveArea, setAreasActive } from "./area.server.js";
+import { activeAreas, cleanPostcodes, postcodeInArea, deleteAreas, listAreas, readAreaInput, saveArea, setAreasActive } from "./area.server.js";
 
 const SHOP = "s.myshopify.com";
 function makeDb() {
@@ -24,6 +24,21 @@ describe("postcodes", () => {
   it("are upper-cased, trimmed and de-duplicated", () => {
     expect(cleanPostcodes(" ne, DH ,,sr, NE")).toBe("NE, DH, SR");
     expect(cleanPostcodes(undefined)).toBe("");
+  });
+});
+describe("matching a postcode", () => {
+  it("ignores spaces and case and matches the beginning only", () => {
+    expect(postcodeInArea("ne1 4ab", "NE, DH")).toBe(true);
+    expect(postcodeInArea("N E1 4AB", "ne")).toBe(true);
+    expect(postcodeInArea("DL1 4AB", "NE, DH")).toBe(false);
+    expect(postcodeInArea("ANE1", "NE")).toBe(false);
+    expect(postcodeInArea("", "NE")).toBe(false);
+    expect(postcodeInArea("NE1", "")).toBe(false);
+  });
+  it("lists only active areas for the filter", async () => {
+    await saveArea(db, SHOP, { op: "add", name: "On", postcodes: "A", active: true });
+    await saveArea(db, SHOP, { op: "add", name: "Off", postcodes: "B", active: false });
+    expect(await activeAreas(db, SHOP)).toEqual([{ id: "a1", name: "On" }]);
   });
 });
 describe("reading a request", () => {

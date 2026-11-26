@@ -41,13 +41,14 @@ beforeEach(() => {
     driver: table(), van: table(), deliverySlot: table(), deliveryBooking: table(), deliveryHistory: table(),
     orderLine: table([line(O(1), 1), line(O(1), 2), line(O(2), 3), line(O(3), 4, { vendor: "Zed" }), line(O(4), 5), line(O(5), 6, { lineStatusId: 3 })]),
     order: table([order(1), order(2), order(3), order(4, { outstandingMinor: 5000 }), order(5, { lineStatusIds: [3] })]),
+    area: table([{ id: "ar1", shop: SHOP, name: "North", postcodes: "AB1, ab3", active: true }, { id: "ar2", shop: SHOP, name: "Empty", postcodes: "", active: true }]),
   };
 });
 
 describe("rules", () => {
   it("reads search text, params and delivery types", () => {
     expect(splitKeywords(" UD3163, CF43 4LT ,, ")).toEqual(["UD3163", "CF43 4LT"]);
-    expect(parseBulkParams(new URLSearchParams("q=ab&brand=Acme&page=3"))).toEqual({ q: "ab", brand: "Acme", page: 3 });
+    expect(parseBulkParams(new URLSearchParams("q=ab&brand=Acme&page=3"))).toEqual({ q: "ab", brand: "Acme", area: null, page: 3 });
     expect(keywordIndex(["zz", "ab2"], { name: "UD1", postcode: "AB2 1CD" })).toBe(1);
     expect(deliveryTypeOf(["Sofa", "Two Man Delivery [svc:two_man]", "Peace Of Mind [svc:peace_of_mind]"])).toBe("Peace Of Mind");
     expect(deliveryTypeOf(["Sofa"])).toBe("Free Door Delivery");
@@ -64,6 +65,16 @@ describe("rules", () => {
     expect(readBulkRequest({ ...book, rows: [{ lineId: "a", drop: 17, amPm: "AM" }] }).error).toBe("drop_required");
     expect(readBulkRequest({ ...book, rows: [{ lineId: "a", drop: 1, amPm: "" }] }).error).toBe("slot_required");
     expect(readBulkRequest({ action: "reschedule", lineIds: ["a"] }).value).toEqual({ action: "reschedule", lineIds: ["a"], reason: "" });
+  });
+});
+
+describe("the Book Delivery list by area", () => {
+  it("keeps only orders whose postcode starts with one of the area's codes", async () => {
+    expect((await listBookable(db, SHOP, { q: "", brand: null, area: "ar1", page: 1 })).rows.map((x) => x.lineId)).toEqual(["L4", "L1", "L2"]);
+  });
+  it("shows nothing for an area with no postcodes or one that does not exist", async () => {
+    expect((await listBookable(db, SHOP, { q: "", brand: null, area: "ar2", page: 1 })).rows).toEqual([]);
+    expect((await listBookable(db, SHOP, { q: "", brand: null, area: "gone", page: 1 })).rows).toEqual([]);
   });
 });
 

@@ -1,4 +1,5 @@
 // The bulk Book Delivery pages: the list of lines ready to book, Mark TNT/Pallet/..., and booking many lines (many orders) at once.
+import { postcodeInArea } from "./area.server.js";
 import { duplicateOrders, listFleet } from "./delivery.server.js";
 import { pmFollowers } from "./delivery-rules.js";
 import { placeOnVan } from "./drop-shift.server.js";
@@ -17,7 +18,7 @@ function readyOrder(o) {
 
 /**
  * One page of the Book Delivery list: { rows, summary: { lines, orders }, total, page, pageCount }.
- * params: { q (order numbers or postcodes, comma separated), brand, page }.
+ * params: { q (order numbers or postcodes, comma separated), brand, area (an Area id: only orders whose postcode starts with one of its codes), page }.
  */
 export async function listBookable(db, shop, params) {
   const lines = await db.orderLine.findMany({ where: { shop, lineStatusId: { in: BOOKABLE_STATUSES }, orderArchived: false } });
@@ -25,6 +26,7 @@ export async function listBookable(db, shop, params) {
   const orders = orderIds.length ? await db.order.findMany({ where: { shop, orderId: { in: orderIds } } }) : [];
   const byOrder = new Map(orders.filter(readyOrder).map((o) => [o.orderId, o]));
   const keywords = splitKeywords(params.q);
+  const area = params.area ? await db.area.findFirst({ where: { shop, id: params.area } }) : null;
   const booked = lines.length ? await db.deliveryBooking.findMany({ where: { shop, orderId: { in: [...byOrder.keys()] } } }) : [];
   const booking = new Map(booked.map((b) => [b.lineId, b]));
   const all = orderIds.length ? await db.orderLine.findMany({ where: { shop, orderId: { in: [...byOrder.keys()] } } }) : [];
@@ -38,6 +40,7 @@ export async function listBookable(db, shop, params) {
     const b = booking.get(l.lineId);
     if (b && leavesList(b)) continue;
     if (params.brand && brandOf(l.vendor) !== params.brand) continue;
+    if (params.area && !(area && postcodeInArea(order.postcode, area.postcodes))) continue;
     const at = keywords.length ? keywordIndex(keywords, order) : 0;
     if (at < 0) continue;
     picked.push({ l, order, at, prebook: Boolean(b?.prebook) });
