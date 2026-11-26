@@ -52,7 +52,7 @@ export const loader = async ({ request }) => {
     const params = { ...parseCarrierParams(query), all: true };
     const rows = await carrierRows(db, link.shop, params);
     if (rows.length === 0) return refuse(404, "Nothing to export.");
-    return file(carrierCsv(rows), CARRIERS[params.key].file);
+    return file(carrierCsv(rows, params.key), CARRIERS[params.key].file);
   }
   if (link.kind === "delivery-outcome-completed" || link.kind === "delivery-outcome-failed") {
     const params = { ...parseOutcomeParams(query), all: true };

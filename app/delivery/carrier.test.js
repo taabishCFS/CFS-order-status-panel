@@ -19,16 +19,19 @@ beforeEach(() => {
     van: table([{ id: "v1", shop: SHOP, name: "Van 1", driverId: null, active: true }]),
     driver: table([]),
     deliverySlot: table([]),
-    order: table([1, 2, 3, 4, 5, 6].map((n) => order(n))),
+    order: table([1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => order(n, n === 8 ? { outstandingMinor: 5000 } : {}))),
     orderLine: table([
       line(1), line(2, { lineStatusId: 6 }), line(3, { vendor: "Zed" }), line(4, { lineStatusId: 36 }),
       line(5, { lineStatusId: 5 }), line(6, { title: "White Glove [svc:white_glove]" }),
       { ...line(6, { lineId: "L6b", title: "Wardrobe" }) },
+      line(7, { lineStatusId: 14, stockedDate: "2026-11-05" }), line(8, { lineStatusId: 4 }), line(9, { lineStatusId: 4 }),
     ]),
     deliveryBooking: table([
       booking(1), booking(2), booking(3, { partner: "Pallet" }),
       booking(5, { partner: "CFS", date: "2026-11-30", vanId: "v1", emailed: true }),
+      booking(7, { partner: "CFS", date: "2026-12-02", prebook: true }), booking(9, { partner: "CFS", date: "2026-12-03", vanId: "v1" }),
     ]),
+    deliveryHistory: table([{ shop: SHOP, orderId: O(7), lineId: "L7", action: "prebooked", partner: "CFS", createdAt: new Date(Date.UTC(2026, 10, 7)) }, { shop: SHOP, orderId: O(7), lineId: "L7", action: "rescheduled", partner: "CFS", createdAt: new Date(Date.UTC(2026, 10, 9)) }]),
     lineChase: table([{ shop: SHOP, lineId: "L1", lastChasedAt: new Date(Date.UTC(2026, 10, 20)) }]),
   };
 });
@@ -52,6 +55,25 @@ describe("which lines each page lists", () => {
     const [r] = await carrierRows(db, SHOP, { ...base, key: "allocated" });
     expect(r).toMatchObject({ orderName: "#1005", van: "Van 1", date: "2026-11-30", emailed: true });
     expect(await names({ key: "allocated", van: "v1", from: "2026-12-01" })).toEqual([]);
+  });
+});
+
+describe("Instock Delivery Not Booked", () => {
+  it("lists in-stock lines without a booked date or carrier (a prebook still counts), with balance and booking status", async () => {
+    const rows = await carrierRows(db, SHOP, { ...base, key: "instock" });
+    expect(rows.map((r) => r.orderName).sort()).toEqual(["#1006", "#1006", "#1007", "#1008"]);
+    const seven = rows.find((r) => r.orderName === "#1007");
+    expect(seven).toMatchObject({ bookingStatus: "Rescheduled", stockedDate: "2026-11-05", allStatuses: [14] });
+    expect(rows.find((r) => r.orderName === "#1008")).toMatchObject({ balanceMinor: 5000 });
+  });
+  it("filters by payment and by ticked lines, and writes the short CSV", async () => {
+    const part = await carrierRows(db, SHOP, { ...base, key: "instock", pay: "PART" });
+    expect(part.map((r) => r.orderName)).toEqual(["#1008"]);
+    expect((await carrierRows(db, SHOP, { ...base, key: "instock", pay: "FULL" })).length).toBe(3);
+    expect((await carrierRows(db, SHOP, { ...base, key: "instock", lines: ["L7"] })).map((r) => r.orderName)).toEqual(["#1007"]);
+    const csv = carrierCsv(part, "instock").slice(1).split("\r\n");
+    expect(csv[0]).toBe("Order Date,Order Number,Brand Name,Item,Code,Qty,Balance");
+    expect(csv[1]).toBe("08/11/2026,#1008,Acme,Bed,S8,2,50.00");
   });
 });
 

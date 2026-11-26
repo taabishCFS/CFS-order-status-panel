@@ -35,7 +35,8 @@ export const loader = async ({ request }) => {
   } else if (kind === "carrier" || kind === "carrier-print") {
     const p = parseCarrierParams(search);
     const q = new URLSearchParams({ key: p.key });
-    for (const k of ["from", "to", "q", "brand", "van"]) if (p[k]) q.set(k, p[k]);
+    for (const k of ["from", "to", "q", "brand", "van", "pay"]) if (p[k]) q.set(k, p[k]);
+    if (p.lines.length) q.set("lines", p.lines.join(","));
     query = q.toString();
   } else if (kind === "outcome-completed" || kind === "outcome-failed") {
     const p = parseOutcomeParams(new URLSearchParams([...search.entries()].filter(([k]) => k !== "kind")));

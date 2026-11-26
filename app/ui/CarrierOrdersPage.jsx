@@ -30,6 +30,10 @@ function cellFor(column, r) {
     case 'confirm': return r.confirmed === 'confirmed' ? <s-badge tone="success">Confirmed</s-badge> : r.confirmed === 'declined' ? <s-badge tone="critical">Declined</s-badge> : '';
     case 'status': return r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : '';
     case 'emailed': return r.emailed ? 'Yes' : 'No';
+    case 'balance': return r.balanceMinor > 0 ? <s-text tone="critical">{formatMoney(r.balanceMinor, 'GBP')}</s-text> : '';
+    case 'instockDate': return dmy(r.stockedDate) || '—';
+    case 'bookingStatus': return r.bookingStatus;
+    case 'allStatus': return <s-stack direction="inline" gap="small-500">{r.allStatuses.map((id, i) => (id != null ? <s-badge key={i} tone={statusTone(id)}>{labelFor(id)}</s-badge> : null))}</s-stack>;
     case 'total': return formatMoney(r.amountMinor, 'GBP');
     default: return '';
   }
@@ -39,7 +43,7 @@ function cellFor(column, r) {
 // customers and a download of everything shown. `carrier` picks the page: tnt, pallet, furdeco, dhd, white-glove or allocated.
 export default function CarrierOrdersPage({ carrier }) {
   const page = PAGES[carrier];
-  const start = { key: carrier, q: '', brand: '', van: '', from: '', to: '', page: 1, all: false };
+  const start = { key: carrier, q: '', brand: '', van: '', from: '', to: '', pay: '', page: 1, all: false };
   const [draft, setDraft] = useState(start);
   const [applied, setApplied] = useState(start);
   const [data, setData] = useState(null);
@@ -72,8 +76,9 @@ export default function CarrierOrdersPage({ carrier }) {
 
   async function download(print = false) {
     if (data && data.total === 0) { setLink(null); setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
+    if (page.exportTicked && picked.size === 0) { setLink(null); setNotice({ tone: 'warning', text: 'Please Select Record(s) to Export.' }); return; }
     setBusy(print ? 'pdf' : 'csv');
-    const res = await carrierLink(applied, undefined, print);
+    const res = await carrierLink(page.exportTicked ? { ...applied, lines: [...picked] } : applied, undefined, print);
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
     setLink(res.data);
@@ -120,7 +125,7 @@ export default function CarrierOrdersPage({ carrier }) {
             {data && data.pageCount > 1 && <Pager page={data.page} pageCount={data.pageCount} all={applied.all} onPage={(p) => setApplied({ ...applied, page: p, all: false })} onAll={() => setApplied({ ...applied, all: true })} />}
           </s-stack>
 
-          {(page.brand || page.van || page.dates || page.search) && (
+          {(page.brand || page.van || page.dates || page.search || page.pay) && (
             <s-stack direction="inline" gap="base" alignItems="end">
               {page.brand && (
                 <s-select label="Brand / vendor" value={draft.brand} onChange={(e) => setDraft({ ...draft, brand: e.currentTarget.value })}>
@@ -132,6 +137,13 @@ export default function CarrierOrdersPage({ carrier }) {
                 <s-select label="Van" value={draft.van} onChange={(e) => setDraft({ ...draft, van: e.currentTarget.value })}>
                   <s-option value="">All Van</s-option>
                   {(data?.vans ?? []).map((v) => <s-option key={v.id} value={v.id}>{v.name}</s-option>)}
+                </s-select>
+              )}
+              {page.pay && (
+                <s-select label="Payment" value={draft.pay} onChange={(e) => setDraft({ ...draft, pay: e.currentTarget.value })}>
+                  <s-option value="">--- Payment ---</s-option>
+                  <s-option value="FULL">Without Balance</s-option>
+                  <s-option value="PART">With Balance</s-option>
                 </s-select>
               )}
               {page.dates && <s-date-field label="Delivery date from" value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.currentTarget.value })} />}

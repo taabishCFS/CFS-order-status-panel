@@ -14,6 +14,7 @@ export const CARRIERS = {
   furdeco: { title: "FurDeco Orders", partner: "Fur Deco", statuses: [4, 14, 43, 61, 31, 46, 45, 44, 82, 47, 48, 49, 55], file: "furdeco_orders.csv", emailLabel: "Send FurDeco Email" },
   dhd: { title: "DHD Orders", statuses: [36], file: "dhd_orders.csv", emailLabel: "Send Email" },
   "white-glove": { title: "White Glove Delivery Orders", whiteGlove: true, statuses: [4, 14, 31, 33, 40, 43, 44, 45, 46, 47, 48, 49], file: "white_glove_delivery_orders.csv", emailLabel: "Send Email" },
+  instock: { title: "Instock Delivery Not Booked", unbooked: true, statuses: [4, 14, 31, 33, 43, 44, 45, 46, 61], file: "orders_instock_delivery_not_booked.csv" },
   allocated: { title: "Allocated From Stock + Delivery Booked", booked: true, statuses: [5, 43], file: "allocated_from_stock_with_delivery_booked.csv", emailLabel: "Send Email" },
 };
 export const PAGE_SIZE = 100;
@@ -35,6 +36,8 @@ export function parseCarrierParams(searchParams) {
   return {
     key: Object.hasOwn(CARRIERS, searchParams.get("key")) ? searchParams.get("key") : "tnt",
     from, to, q: text("q"), brand: text("brand") || null, van: text("van") || null,
+    pay: ["FULL", "PART"].includes(searchParams.get("pay")) ? searchParams.get("pay") : "",
+    lines: (searchParams.get("lines") ?? "").split(",").filter(Boolean).slice(0, 500),
     all: searchParams.get("all") === "1",
     page: Number.isInteger(page) && page >= 1 ? Math.min(page, 100000) : 1,
   };
@@ -57,7 +60,13 @@ const BOM = "﻿";
 const confirmText = (r) => (r.confirmed === "confirmed" ? "Confirmed" : r.confirmed === "declined" ? "Declined" : "Not Confirmed");
 
 /** The CSV of a carrier list: the columns the old exports share (tracking, volume, weight and box are not held). */
-export function carrierCsv(rows) {
+export function carrierCsv(rows, key = "tnt") {
+  if (key === "instock") {
+    return BOM + [
+      line(["Order Date", "Order Number", "Brand Name", "Item", "Code", "Qty", "Balance"]),
+      ...rows.map((r) => line([dmy(r.orderDate), r.orderName, r.brand, r.product, r.code, r.quantity, r.balanceMinor > 0 ? (r.balanceMinor / 100).toFixed(2) : ""])),
+    ].join("\r\n");
+  }
   return BOM + [
     line(["Order No", "Brand", "Product Name", "Qty", "Order Date", "Expected Delivery Date", "Last Chaseup Date", "Delivery Date", "Delivery Booked", "Delivery Confirmed?", "Order Status"]),
     ...rows.map((r) => line([r.orderName, r.brand, r.product, r.quantity, dmy(r.orderDate), dmy(r.expectedDate), dmy(r.lastChaseDate), dmy(r.date), r.date ? "Yes" : "No", confirmText(r), label.get(r.lineStatusId) ?? ""])),

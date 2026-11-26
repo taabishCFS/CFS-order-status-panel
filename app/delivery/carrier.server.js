@@ -6,13 +6,18 @@ import { ALL_SIZE, CARRIERS, PAGE_SIZE, matchesCarrierSearch, statusWanted } fro
 
 const OWN = "CFS";
 const brandOf = (vendor) => vendor?.trim() || "Unmapped";
+// What the old "Booking Status" column called each kind of delivery history entry.
+const BOOKING_LABEL = { booked: () => "DeliveryBooked", prebooked: () => "Prebook", rescheduled: () => "Rescheduled", marked: (h) => (h.partner === "CFS" ? null : h.partner) };
 
 /** Every matching row, newest order first. */
 export async function carrierRows(db, shop, params) {
   const cfg = CARRIERS[params.key];
   let lines;
   let bookings;
-  if (cfg.partner || cfg.booked) {
+  if (cfg.unbooked) {
+    lines = await db.orderLine.findMany({ where: { shop, lineStatusId: { in: cfg.statuses } } });
+    bookings = [];
+  } else if (cfg.partner || cfg.booked) {
     bookings = (await db.deliveryBooking.findMany({ where: { shop, ...(cfg.partner ? { partner: cfg.partner } : { partner: OWN }) } })).filter((b) => (cfg.booked ? b.vanId && b.date && !b.prebook : true));
     lines = bookings.length ? await db.orderLine.findMany({ where: { shop, lineId: { in: bookings.map((b) => b.lineId) } } }) : [];
   } else {
@@ -22,12 +27,13 @@ export async function carrierRows(db, shop, params) {
   if (lines.length === 0) return [];
 
   const orderIds = [...new Set(lines.map((l) => l.orderId))];
-  const [orders, allBookings, chases, fleet, siblings] = await Promise.all([
+  const [orders, allBookings, chases, fleet, siblings, history] = await Promise.all([
     db.order.findMany({ where: { shop, orderId: { in: orderIds } } }),
-    bookings ?? db.deliveryBooking.findMany({ where: { shop, orderId: { in: orderIds } } }),
+    cfg.unbooked || !bookings ? db.deliveryBooking.findMany({ where: { shop, orderId: { in: orderIds } } }) : bookings,
     db.lineChase.findMany({ where: { shop, lineId: { in: lines.map((l) => l.lineId) } } }),
     listFleet(db, shop),
-    cfg.whiteGlove || cfg.booked ? db.orderLine.findMany({ where: { shop, orderId: { in: orderIds } } }) : [],
+    cfg.whiteGlove || cfg.booked || cfg.unbooked ? db.orderLine.findMany({ where: { shop, orderId: { in: orderIds } } }) : [],
+    cfg.unbooked ? db.deliveryHistory.findMany({ where: { shop, orderId: { in: orderIds } } }) : [],
   ]);
   const orderOf = new Map(orders.map((o) => [o.orderId, o]));
   const bookingOf = new Map(allBookings.map((b) => [b.lineId, b]));
@@ -35,12 +41,25 @@ export async function carrierRows(db, shop, params) {
   const vanOf = new Map(fleet.vans.map((v) => [v.id, v]));
   const driverOf = new Map(fleet.drivers.map((d) => [d.id, d.name]));
   const titles = new Map();
-  for (const l of siblings) titles.set(l.orderId, [...(titles.get(l.orderId) ?? []), l.title]);
+  const statusesOf = new Map();
+  for (const l of siblings) {
+    titles.set(l.orderId, [...(titles.get(l.orderId) ?? []), l.title]);
+    statusesOf.set(l.orderId, [...(statusesOf.get(l.orderId) ?? []), l.lineStatusId]);
+  }
+  const latest = new Map();
+  for (const h of [...history].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))) if (BOOKING_LABEL[h.action]) latest.set(h.lineId, BOOKING_LABEL[h.action](h));
 
   const rows = [];
   for (const l of lines) {
     const o = orderOf.get(l.orderId);
     if (!o || o.cancelledAt || !matchesCarrierSearch(params.q, o)) continue;
+    if (params.lines?.length && !params.lines.includes(l.lineId)) continue;
+    const balance = o.outstandingMinor ?? 0;
+    if ((params.pay === "PART" && balance <= 0) || (params.pay === "FULL" && balance > 0)) continue;
+    if (cfg.unbooked) {
+      const own = bookingOf.get(l.lineId);
+      if (own && (own.partner !== OWN || (own.date && !own.prebook))) continue;
+    }
     if (cfg.whiteGlove && !orderIsWhiteGlove(titles.get(l.orderId) ?? [])) continue;
     if (params.brand && brandOf(l.vendor) !== params.brand) continue;
     const b = bookingOf.get(l.lineId);
@@ -53,6 +72,7 @@ export async function carrierRows(db, shop, params) {
       date: b?.date ?? null, van: b?.partner === OWN ? vanOf.get(b.vanId)?.name ?? "" : "",
       driver: b?.partner === OWN ? driverOf.get(b.driverId ?? vanOf.get(b.vanId)?.driverId) ?? "" : "", drop: b?.partner === OWN ? b.drop ?? null : null,
       slot: b?.amPm === "AM" || b?.amPm === "PM" ? b.amPm : "", size: l.variantTitle ?? "", deliveryType: cfg.booked ? deliveryTypeOf(titles.get(l.orderId) ?? []) : "", confirmed: l.deliveryOutcome ?? null, emailed: Boolean(b?.emailed),
+      balanceMinor: balance, stockedDate: l.stockedDate ?? null, bookingStatus: cfg.unbooked ? latest.get(l.lineId) ?? "" : "", allStatuses: cfg.unbooked ? statusesOf.get(l.orderId) ?? [] : [],
       lineStatusId: l.lineStatusId, amountMinor: Math.max(0, (l.priceMinor ?? 0) * (l.quantity ?? 1) - (l.discountMinor ?? 0)),
     });
   }
