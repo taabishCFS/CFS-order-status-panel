@@ -46,6 +46,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/instock-not-booked', title: 'Instock Delivery Not Booked', description: 'Items that are in stock or on their way but have no delivery date yet. Filter by payment and download the ticked ones.', icon: 'delivery' },
       { href: '/allocated-booked', title: 'Allocated From Stock + Delivery Booked', description: 'Part-order-in-stock lines that are already booked onto a van, with the date and van.', icon: 'delivery' },
       { href: '/maxpro', title: 'Delivery Report CSV (Max)', description: 'Every paid order still to deliver, with the Maxpro columns. Filter by brand, send a delivery update email, and export the Order Wise or Product Wise file for Maxpro.', icon: 'delivery' },
+      { href: '/areas', title: 'Area', description: 'Name groups of postcodes (such as NE, DH, SR) so delivery lists can be narrowed by area.', icon: 'delivery' },
       { href: '/van-management', title: 'Van Management', description: 'The vans, with their driver and co-driver, that you choose from when booking a delivery.', icon: 'delivery' },
       { href: '/driver-management', title: 'Driver Management', description: 'The drivers, with their mobile numbers, who go on the vans.', icon: 'delivery' },
     ],

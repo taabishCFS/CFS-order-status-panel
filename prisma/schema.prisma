@@ -534,3 +534,18 @@ model DeliveryHistory {
 
   @@index([shop, orderId, createdAt])
 }
+
+// A delivery area (legacy "Area"): a name plus the postcode beginnings it covers, e.g. "NE, DH, SR". Used to narrow the delivery lists.
+model Area {
+  id        String   @id @default(cuid())
+  shop      String
+  seq       Int // the number shown as ID, counting up per shop
+  name      String
+  postcodes String   @default("") // comma separated postcode beginnings
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([shop, name])
+  @@unique([shop, seq])
+}

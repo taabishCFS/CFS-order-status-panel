@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 31 (6 December 2026)
+**Guide version:** 32 (6 December 2026)
 
 ## Before you start
 
@@ -42,6 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
+| 35 | Area page (named groups of postcodes) | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -582,6 +583,16 @@ Open them from the **Dashboard**, in the **Delivery** group. They are the old pa
 
 The old Completed page also showed a tracking number. We do not hold tracking numbers per item, so it is left out for now.
 
+### Area
+Open it from the **Dashboard**, in the **Delivery** group. An area is a name plus the beginnings of the postcodes it covers, for example "North East" = NE, DH, SR.
+
+- **Add new:** type the Area name, the Postcodes separated by commas, and the Status, then press **Add**. Postcodes are tidied for you (capital letters, no gaps or repeats). The same name cannot be added twice.
+- **Change one:** click its name, edit, and press **Update**.
+- **Inactive / Active:** tick areas and press the button to switch them off or on.
+- **Delete:** tick areas, press **Delete** and confirm. This cannot be undone.
+- Changing areas needs the **Edit drivers, vans and slots** permission.
+- For now this is the list only. Using an area to narrow the Delivery Booking list is not built yet.
+
 ### Supplier Collection
 Open it from the **Dashboard**, in the **Delivery** group. It is the list of planned pick-ups from suppliers: which supplier, which van and which day.
 
@@ -687,6 +698,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 32 | New Area page (add, edit, switch on/off and delete named groups of postcodes) |
 | 6 Dec 2026 | 31 | New Supplier Collection page (book a pick-up by brand, van and date, delete ticked ones) and a Collection address box on the Suppliers page |
 | 6 Dec 2026 | 30 | New Instock Delivery Not Booked page (with payment filter, balance, booking status and a CSV of the ticked items) |
 | 6 Dec 2026 | 29 | Carrier pages now match the old screens: each shows its own columns, only TNT and FurDeco have the email button, and Allocated + Booked has driver, drop, slot, type, confirm and a landscape Download PDF |
