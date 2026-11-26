@@ -110,3 +110,22 @@ describe("filters, page and file", () => {
     expect(out[1]).toBe("#1001,Acme,Bed,2,01/11/2026,01/12/2026,20/11/2026,,No,Not Confirmed,In Stock");
   });
 });
+
+describe("the FurDeco booking file", () => {
+  it("has the old file's 32 columns, one row per line, COLLECT for collection statuses, and the shipping details", async () => {
+    db.order = table([order(1, { customerName: "Alex Customer", phone: "0116", shippingAddress: JSON.stringify({ address1: "12 High St", address2: "Flat 2", city: "Leicester", zip: "LE1 3LR", phone: "0777" }) }), order(2)]);
+    db.orderLine = table([line(1), line(2, { lineStatusId: 31, title: "Sofa, 3 seat" })]);
+    db.deliveryBooking = table([booking(1, { partner: "Fur Deco" }), booking(2, { partner: "Fur Deco" })]);
+    const rows = await carrierRows(db, SHOP, { ...base, key: "furdeco", lines: ["L1", "L2"] });
+    const out = carrierCsv(rows, "furdeco").split("\r\n");
+    expect(out[0].split(",")).toHaveLength(32);
+    expect(out[0].startsWith("Trading Name,Order Number,Recipient Reference,Recipient Name,Address 1")).toBe(true);
+    expect(out[0].endsWith("Collect Disposal,CONFIRMED DELIVERY DATE")).toBe(true);
+    expect(out[2]).toContain("CFS,#1001,,Alex Customer,12 High St,Flat 2,Leicester,LE1 3LR,0116,,0777,c1@x.com,DELIVER,2,S1,Bed");
+    expect(out[1]).toContain("COLLECT,2,S2,\"Sofa, 3 seat\"");
+    expect(out).toHaveLength(3);
+  });
+  it("is the file named like the old one", () => {
+    expect(CARRIERS.furdeco.file).toBe("Furdeco-Orders.csv");
+  });
+});

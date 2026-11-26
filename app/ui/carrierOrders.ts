@@ -17,7 +17,7 @@ export const COLUMN_NAMES: Record<ColumnKey, string> = {
 // Each page shows the columns of its old screen. emailLabel: the page can email the ticked customers. filters: which boxes sit above the list.
 export const PAGES: Record<CarrierKey, { title: string; emailLabel?: string; brand: boolean; dates: boolean; van: boolean; search: boolean; pdf?: boolean; pay?: boolean; exportTicked?: boolean; columns: ColumnKey[] }> = {
   tnt: { title: 'TNT Orders', emailLabel: 'Send TNT Email', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'status', 'emailed', 'total'] },
-  furdeco: { title: 'FurDeco Orders', emailLabel: 'Send Bulk Email', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'status', 'total'] },
+  furdeco: { title: 'FurDeco Orders', emailLabel: 'Send Bulk Email', exportTicked: true, brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'status', 'total'] },
   pallet: { title: 'Pallet Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'delDate', 'status'] },
   dhd: { title: 'DHD Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'expDate', 'delDate', 'status'] },
   'white-glove': { title: 'White Glove Delivery Orders', brand: false, dates: false, van: false, search: false, columns: ['orderDate', 'orderNo', 'brand', 'item', 'code', 'qty', 'delDate', 'status'] },

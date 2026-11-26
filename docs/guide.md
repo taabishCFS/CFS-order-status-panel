@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 34 (6 December 2026)
+**Guide version:** 35 (6 December 2026)
 
 ## Before you start
 
@@ -626,9 +626,9 @@ Open them from the **Dashboard**, in the **Delivery** group. Each is a list of o
 
 **Filters** (where the old page had them): brand, delivery dates (**All dates** clears them), search. **RESET** puts everything back.
 
-**Downloads.** Every page has **Download CSV** for everything the filters match (all pages). **Allocated From Stock + Delivery Booked** also has **Download PDF**: it opens a landscape page with every column and the print box opens by itself. Choose **Save as PDF** there (or print it). Unlike the old PDF, nothing is cut off at the right.
+**Downloads.** Every page has **Download CSV** for everything the filters match (all pages), except **FurDeco Orders**: its download is the **FurDeco booking file** for the carrier. Tick the lines to send, press **Download CSV** (it says "Please Select Record(s) to Export" if nothing is ticked) and you get `Furdeco-Orders.csv` with the same 32 columns as the old file: trading name, order number, recipient name and address, phone numbers, email, DELIVER or COLLECT, qty, code, description and so on. **Parts, Cube, Weight and the instructions columns are empty** because we do not hold that data yet. **Allocated From Stock + Delivery Booked** also has **Download PDF**: it opens a landscape page with every column and the print box opens by itself. Choose **Save as PDF** there (or print it). Unlike the old PDF, nothing is cut off at the right.
 
-**Not on these pages:** the TNT tracking number, volume, weight and number of boxes (we do not hold them), and the FurDeco booking file for the carrier. **20Kg TNT** is not built because it depends on item weights we do not hold. The **Panther**, **Prebook** and **Kinetic** pages are not being built because they are not used.
+**Not on these pages:** the TNT tracking number, volume, weight and number of boxes (we do not hold them). **20Kg TNT** is not built because it depends on item weights we do not hold. The **Panther**, **Prebook** and **Kinetic** pages are not being built because they are not used.
 
 ### Delivery Report CSV (Max) page (Maxpro)
 Open it from the **Dashboard**: **Delivery Report CSV (Max)** in the **Delivery** group. It is the old Maxpro page. Use it to make the files you send to Maxpro, which plans the routes.
@@ -686,7 +686,7 @@ These will be added to this guide as soon as they are built:
 
 - Paying refunds straight from the system
 - Replacement orders, Add To Accounts and De-allocate
-- the 20Kg TNT page and the FurDeco carrier file, Area Management, and loading the Maxpro return file into Delivery Booking
+- the 20Kg TNT page, Area Management, and loading the Maxpro return file into Delivery Booking
 - Review emails
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
@@ -699,6 +699,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 35 | FurDeco Orders download is now the carrier booking file (tick lines, 32 columns like the old file) |
 | 6 Dec 2026 | 34 | Print Delivery Notes button on the Delivery Booked page (many orders on one page) |
 | 6 Dec 2026 | 33 | Delivery Booking list can now be narrowed by Area |
 | 6 Dec 2026 | 32 | New Area page (add, edit, switch on/off and delete named groups of postcodes) |

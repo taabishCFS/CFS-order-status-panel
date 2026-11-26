@@ -11,7 +11,7 @@ const label = new Map(statuses.map((s) => [s.id, s.label]));
 export const CARRIERS = {
   tnt: { title: "TNT Orders", partner: "TNT", statuses: [4, 14, 43, 61, 31, 46, 45, 44], file: "tnt_orders.csv", emailLabel: "Send TNT Email" },
   pallet: { title: "Pallet Orders", partner: "Pallet", except: [6, 7, 9, 32, 58, 50], file: "pallet_orders.csv", emailLabel: "Send Pallet Email" },
-  furdeco: { title: "FurDeco Orders", partner: "Fur Deco", statuses: [4, 14, 43, 61, 31, 46, 45, 44, 82, 47, 48, 49, 55], file: "furdeco_orders.csv", emailLabel: "Send FurDeco Email" },
+  furdeco: { title: "FurDeco Orders", partner: "Fur Deco", statuses: [4, 14, 43, 61, 31, 46, 45, 44, 82, 47, 48, 49, 55], file: "Furdeco-Orders.csv", emailLabel: "Send FurDeco Email" },
   dhd: { title: "DHD Orders", statuses: [36], file: "dhd_orders.csv", emailLabel: "Send Email" },
   "white-glove": { title: "White Glove Delivery Orders", whiteGlove: true, statuses: [4, 14, 31, 33, 40, 43, 44, 45, 46, 47, 48, 49], file: "white_glove_delivery_orders.csv", emailLabel: "Send Email" },
   instock: { title: "Instock Delivery Not Booked", unbooked: true, statuses: [4, 14, 31, 33, 43, 44, 45, 46, 61], file: "orders_instock_delivery_not_booked.csv" },
@@ -59,8 +59,23 @@ const dmy = (v) => (v ? String(v).slice(0, 10).split("-").reverse().join("/") : 
 const BOM = "﻿";
 const confirmText = (r) => (r.confirmed === "confirmed" ? "Confirmed" : r.confirmed === "declined" ? "Declined" : "Not Confirmed");
 
+const FURDECO_HEAD = ["Trading Name", "Order Number", "Recipient Reference", "Recipient Name", "Address 1", "Address 2", "Town/City", "Postcode", "Home Number", "Work Number", "Mobile Number", "Email Address", "Action", "QTY", "Code", "Description", "Parts", "Cube", "Weight (KG)", "Delivery Charge", "Delivery Instructions", "Other Instructions", "Timed Service", "Service Type", "Service Level", "Delivery Point", "Unpack Items", "Packaging Disposal", "Assemble", "Dis-assemble", "Collect Disposal", "CONFIRMED DELIVERY DATE"];
+const COLLECT_STATUSES = [31, 44, 45, 46];
+
+/** The FurDeco booking file the old page's download icon made (furdeco_orders_add.php): one row per ticked line. Parts, cube, weight and instructions are not held, so they stay empty. */
+export function furdecoCsv(rows) {
+  return [
+    line(FURDECO_HEAD),
+    ...rows.map((r) => {
+      const s = r.ship ?? {};
+      return line(["CFS", r.orderName, "", s.name, s.address1, s.address2, s.city, s.zip, s.phone, "", s.shipPhone, s.email, COLLECT_STATUSES.includes(r.lineStatusId) ? "COLLECT" : "DELIVER", r.quantity, r.code, r.product, "", "", "", 0, "", "", "", "", "", "", "", "", "", "", "", ""]);
+    }),
+  ].join("\r\n");
+}
+
 /** The CSV of a carrier list: the columns the old exports share (tracking, volume, weight and box are not held). */
 export function carrierCsv(rows, key = "tnt") {
+  if (key === "furdeco") return furdecoCsv(rows);
   if (key === "instock") {
     return BOM + [
       line(["Order Date", "Order Number", "Brand Name", "Item", "Code", "Qty", "Balance"]),
