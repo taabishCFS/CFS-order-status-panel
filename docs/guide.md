@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 27 (6 December 2026)
+**Guide version:** 28 (6 December 2026)
 
 ## Before you start
 
@@ -42,6 +42,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 23 | Email the supplier an order form (Process Order) and set lines to Order in Progress, from the order, the Orders list and Orders by Brand | Ready, not yet tried |
 | 24 | Supplier Chaseup and Date Lapsed lists, with a chase-up email to the supplier | Ready, not yet tried |
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
+| 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
 | 31 | Completed Delivery, Failed Delivery/Collection and On Hold Delivery pages with filters and CSV downloads | Ready, not yet tried |
 | 30 | Delivery Report CSV (Max) page (Maxpro): paid orders still to deliver, brand filter, White Glove list, Send Bulk Email, Order Wise and Product Wise files | Ready, not yet tried |
 | 29 | Delivery Booked page: every booked delivery by day, van and driver in drop order; change drops, reschedule, download the day, a Pick List or a Driver Sheet | Ready, not yet tried |
@@ -579,6 +580,20 @@ Open them from the **Dashboard**, in the **Delivery** group. They are the old pa
 
 The old Completed page also showed a tracking number. We do not hold tracking numbers per item, so it is left out for now.
 
+### Carrier pages: TNT, Pallet, FurDeco, DHD, White Glove, Allocated From Stock + Delivery Booked
+Open them from the **Dashboard**, in the **Delivery** group. Each is a list of order lines, like the old pages.
+
+- **TNT Orders**, **Pallet Orders** and **FurDeco Orders** list the items you marked for that carrier on Book Delivery (or on the order). TNT and FurDeco show only items that are ready or on their way (In Stock, Coming IN, Allocated and similar); Pallet shows every item except finished ones (Completed, Cancelled and so on).
+- **DHD Orders** lists items with the **DHD with Supplier** status.
+- **White Glove Delivery Orders** lists items on orders that bought White Glove delivery.
+- **Allocated From Stock + Delivery Booked** lists **Part Order In Stock** and **Allocated From Stock** items that are already booked onto a van with a date. It also has a **Van** filter.
+
+**On every page.** Columns: order date, order number, brand, postcode, item, qty, the customer's date (the booked date, or the expected date if not booked yet), status, whether the customer has been emailed and the unit total. Filter by **Brand / vendor**, by **delivery date** (From and To; **All dates** clears them) or search by order number, postcode or email. **RESET** puts everything back.
+- **Send ... Email:** tick lines, press the button and check the box that opens. Each customer gets **one** delivery update covering their ticked lines, and you can change the wording first. Each order's **Emails** section shows the result.
+- **Download CSV:** a file of everything the filters match (all pages), with the columns the old exports shared (order, brand, product, qty, order date, expected date, last chase-up, delivery date, booked, confirmed, status).
+
+**Not on these pages:** the TNT tracking number, volume, weight and number of boxes (we do not hold them), and the FurDeco booking file for the carrier. **20Kg TNT** is not built because it depends on item weights we do not hold. The **Panther**, **Prebook** and **Kinetic** pages are not being built because they are not used.
+
 ### Delivery Report CSV (Max) page (Maxpro)
 Open it from the **Dashboard**: **Delivery Report CSV (Max)** in the **Delivery** group. It is the old Maxpro page. Use it to make the files you send to Maxpro, which plans the routes.
 
@@ -634,7 +649,7 @@ These will be added to this guide as soon as they are built:
 
 - Paying refunds straight from the system
 - Replacement orders, Add To Accounts and De-allocate
-- The other delivery lists (Supplier Collection, Instock Delivery Not Booked, the carrier pages), Area Management, and loading the Maxpro return file into Delivery Booking
+- Supplier Collection, Instock Delivery Not Booked, the 20Kg TNT page and the FurDeco carrier file, Area Management, and loading the Maxpro return file into Delivery Booking
 - Review emails
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
@@ -647,6 +662,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 28 | New carrier pages: TNT, Pallet, FurDeco, DHD, White Glove and Allocated From Stock + Delivery Booked, with filters, delivery update email and CSV download |
 | 6 Dec 2026 | 27 | New Completed Delivery, Failed Delivery/Collection and On Hold Delivery pages, with filters and CSV downloads |
 | 6 Dec 2026 | 26 | New Delivery Report CSV (Max) page: paid orders still to deliver with the Maxpro columns, search, brand filter, White Glove list, Send Bulk Email and the Order Wise and Product Wise files |
 | 5 Dec 2026 | 25 | Delivery Booked page: MARK COMPLETED button (sets Completed on the ticked lines, with an option to email the customers) |

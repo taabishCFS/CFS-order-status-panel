@@ -28,7 +28,7 @@ All of these pages are needed. Every Delivery page that lists orders (Book Deliv
 19. DHD Orders
 20. FurDeco Orders
 
-Note: Panther, Prebook and Kinetic are removed from the order page partner list and the Mark buttons, but their Carrier Deliveries menu pages stay.
+Note: Panther, Prebook and Kinetic are removed from the order page partner list and the Mark buttons. **Decision 2026-11-26: their menu pages (13 Panther, 14 Prebook, 15 Kinetic) are NOT being built, because they are not used right now.**
 
 ## Delivery Report CSV (Max) page (the Maxpro page)
 Top: search "Find order / customer", page numbers and ALL, a download icon.
