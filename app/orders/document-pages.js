@@ -143,8 +143,8 @@ const NOTE_CSS = `
   .sig{display:flex;justify-content:space-between;margin-top:14px;font-family:"Times New Roman",serif;font-size:14px;line-height:1.9}.sig>div:first-child{border-right:1px solid #333;padding-right:150px;flex:1}.sig .ty{text-align:right;font-weight:700;align-self:center}
   h3{font-size:12px;margin:18px 0 4px}table.d{width:100%;border-collapse:collapse}table.d th,table.d td{border:1px solid #333;padding:4px 8px;font-size:11px;text-align:left}`;
 
-/** The delivery note, as in the sample: only lines in a printable status, delivered items listed apart. */
-export function deliveryNoteHtml(doc, site) {
+/** The inside of one delivery note page, as in the sample: only lines in a printable status, delivered items listed apart. */
+function deliveryNoteBody(doc, site) {
   const onNote = doc.lines.filter((l) => DELIVERY_NOTE_STATUS_IDS.includes(l.statusId));
   const delivered = doc.lines.filter((l) => l.statusId === DELIVERED_STATUS_ID);
   const rows = onNote
@@ -155,19 +155,26 @@ export function deliveryNoteHtml(doc, site) {
     .join("");
   const done = delivered.map((l, i) => `<tr><td>${i + 1}</td><td>${esc(l.title)}</td><td>${l.qty}</td><td></td></tr>`).join("");
   const phone = doc.shippingPhone;
-  const invoiceDate = longDate(doc.createdAt).replace(/^(\d+) (\w+) (\d+)$/, "$2 $1, $3");
-  return shell(
-    `Details of Invoice# ${num(doc)}  [Invoice Date : ${invoiceDate}] ${site.name}`,
-    NOTE_CSS,
-    `<div class="pg">
+  return `<div class="pg">
     <div class="hd"><div>${site.logoUrl ? `<img src="${esc(site.logoUrl)}" alt="${esc(site.name)}">` : ""}<div class="co">${esc(site.name)}<br>${esc(COMPANY.address)}.<br>${esc(dashPhone(site.phone))}</div></div>
       <div><h2>Delivery Note</h2><table class="dt"><tr><td>Date</td><td>Invoice #</td></tr><tr><td>${esc(mdyDate(doc.createdAt))}</td><td>${esc(num(doc))}</td></tr></table></div></div>
     <div class="grid"><div><div class="t">Shipping Address</div><div class="c">${doc.shipping.map(esc).join("<br>")}${phone ? `<br><br>Phone : ${esc(phone)}` : ""}${doc.email ? `<br>Email : ${esc(doc.email)}` : ""}</div></div>
       <div><div class="t">Delivery Instruction</div><div class="c"><div style="font-size:13px">${esc(doc.deliveryMethod)}</div><p style="font-size:13px"><b>Assigned Container / Freestock Info :</b></p>${doc.note ? `<p>Customer Instruction : ${esc(doc.note)}</p>` : ""}${doc.instructions ? `<p>Other Instructions : ${esc(doc.instructions)}</p>` : ""}</div></div></div>
     <table class="n"><tr><th style="text-align:left">Item</th><th>Product Code</th><th>Quantity</th><th>Order Status</th></tr>${rows}</table>
     ${delivered.length ? `<h3>Already Delivered Items</h3><table class="d"><tr><th>S.No.</th><th>Item</th><th>Qty.</th><th>Date.</th></tr>${done}</table>` : ""}
-    <div class="sig"><div>Signature :<br>Name &nbsp;&nbsp;&nbsp;&nbsp;: <b>${esc(doc.shipping[0] ?? "")}</b><br>Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<br>Time &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<br><b>Total No.of Boxes :</b></div><div class="ty">Thank You<br>${esc(site.name)}</div></div></div>`,
-  );
+    <div class="sig"><div>Signature :<br>Name &nbsp;&nbsp;&nbsp;&nbsp;: <b>${esc(doc.shipping[0] ?? "")}</b><br>Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<br>Time &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<br><b>Total No.of Boxes :</b></div><div class="ty">Thank You<br>${esc(site.name)}</div></div></div>`;
+}
+
+/** The delivery note for one order. */
+export function deliveryNoteHtml(doc, site) {
+  const invoiceDate = longDate(doc.createdAt).replace(/^(\d+) (\w+) (\d+)$/, "$2 $1, $3");
+  return shell(`Details of Invoice# ${num(doc)}  [Invoice Date : ${invoiceDate}] ${site.name}`, NOTE_CSS, deliveryNoteBody(doc, site));
+}
+
+/** Several delivery notes in one printable page, one order per sheet. items: [{ doc, site }]. */
+export function deliveryNotesHtml(items) {
+  const pages = items.map(({ doc, site }) => deliveryNoteBody(doc, site).replace('<div class="pg">', '<div class="pg" style="break-after:page">')).join("");
+  return shell(`Delivery Notes (${items.length})`, NOTE_CSS, pages);
 }
 
 // ----- Labels -----

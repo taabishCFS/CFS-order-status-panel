@@ -1,5 +1,5 @@
 import db from "../db.server";
-import { deliveryNoteHtml, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml } from "../orders/document-pages";
+import { deliveryNoteHtml, deliveryNotesHtml, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml } from "../orders/document-pages";
 import { loadDocument } from "../orders/documents.server";
 import { verifyExportLink } from "../orders/export-link.server";
 import { unauthenticated } from "../shopify.server";
@@ -14,6 +14,23 @@ export const loader = async ({ request }) => {
   if (!kind.startsWith("doc-")) return refuse(400, "Unknown document.");
 
   const query = new URLSearchParams(link.query);
+  if (kind === "doc-delivery-notes") {
+    const numbers = (query.get("orders") ?? "").split(",").filter(Boolean);
+    if (numbers.length === 0 || numbers.length > 50 || !numbers.every((n) => /^\d{1,20}$/.test(n))) return refuse(400, "Unknown document.");
+    try {
+      const { admin } = await unauthenticated.admin(link.shop);
+      const items = [];
+      for (const n of numbers) {
+        const found = await loadDocument(admin.graphql, db, { shop: link.shop, orderId: `gid://shopify/Order/${n}` });
+        if (found) items.push(found);
+      }
+      if (items.length === 0) return refuse(404, "Order not found.");
+      return new Response(deliveryNotesHtml(items), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
+    } catch (error) {
+      console.error("Delivery notes page failed", error?.message ?? error);
+      return refuse(502, "Shopify could not be read just now. Try again shortly.");
+    }
+  }
   const orderNumber = query.get("order") ?? "";
   if (!/^\d{1,20}$/.test(orderNumber)) return refuse(400, "Unknown document.");
 

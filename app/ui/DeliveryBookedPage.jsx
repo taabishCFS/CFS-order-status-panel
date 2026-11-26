@@ -3,7 +3,7 @@ import { labelFor } from '../../extensions/cfs-order-status/src/statuses';
 import EmptyState from './EmptyState.jsx';
 import { useStaff } from './useStaff';
 import { formatDate, statusTone } from './orderList';
-import { changedDrops, downloadLink, groupByDay, loadBooked, markCompletedLines, poundsText, rescheduleBooked, runTitle, saveDropsForRun } from './bookedDelivery';
+import { changedDrops, downloadLink, groupByDay, loadBooked, markCompletedLines, poundsText, printDeliveryNotes, rescheduleBooked, runTitle, saveDropsForRun } from './bookedDelivery';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
@@ -25,6 +25,8 @@ export default function DeliveryBookedPage() {
   const [reason, setReason] = useState('');
   const [emailDone, setEmailDone] = useState(false); // Mark Completed: also email the customers
   const [busy, setBusy] = useState(false);
+  const [printing, setPrinting] = useState(false); // so only Print Delivery Notes spins when it is pressed
+  const [notes, setNotes] = useState(null); // { url, printed, skipped } after Print Delivery Notes
   const [link, setLink] = useState(null);
 
   const load = useCallback(async () => {
@@ -56,6 +58,18 @@ export default function DeliveryBookedPage() {
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
     setLink(res.data);
     setNotice({ tone: 'success', text: 'Your file is ready (the link works for 5 minutes).' });
+  }
+  async function printNotes() {
+    if (picked.size === 0) { setNotice({ tone: 'warning', text: 'Please Select Record(s) to Print Delivery Notes.' }); return; }
+    setBusy(true);
+    setPrinting(true);
+    setNotes(null);
+    const res = await printDeliveryNotes([...picked]);
+    setPrinting(false);
+    setBusy(false);
+    if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
+    setNotes(res.data);
+    setNotice({ tone: res.data.skipped.length ? 'warning' : 'success', text: `${res.data.printed} delivery note${res.data.printed === 1 ? ' is' : 's are'} ready (the link works for 5 minutes).${res.data.skipped.length ? ` Skipped: ${res.data.skipped.map((s) => `${s.order} (${s.reason})`).join('; ')}` : ''}` });
   }
   const exportAll = () => fetchLink({ kind: 'booked', filter: applied });
   const exportPicked = () => {
@@ -108,6 +122,7 @@ export default function DeliveryBookedPage() {
       {notice && (
         <s-banner tone={notice.tone} dismissible onDismiss={() => setNotice(null)}>
           {notice.text}
+          {notes && <s-link href={notes.url} target="_blank">Open the delivery notes to print</s-link>}
           {link && notice.tone === 'success' && notice.text.startsWith('Your file') && <s-link href={link.url} target="_blank">Download the file</s-link>}
         </s-banner>
       )}
@@ -127,6 +142,7 @@ export default function DeliveryBookedPage() {
           <s-text color="subdued">{summary}</s-text>
           <s-stack direction="inline" gap="base" alignItems="center">
             <s-button onClick={exportPicked} disabled={busy || runs.length === 0 || undefined}>Export selected</s-button>
+            <s-button onClick={printNotes} disabled={!canWrite || busy || undefined} loading={printing || undefined}>Print Delivery Notes</s-button>
             <s-button onClick={exportAll} disabled={busy || runs.length === 0 || undefined}>Download All</s-button>
             <s-button tone="critical" onClick={() => ask('reschedule')} disabled={!canWrite || busy || undefined}>RESCHEDULE DELIVERY</s-button>
             <s-button onClick={() => ask('complete')} disabled={!canWrite || busy || undefined}>MARK COMPLETED</s-button>

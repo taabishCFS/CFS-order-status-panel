@@ -59,6 +59,20 @@ export const rescheduleBooked = (lineIds: string[], reason: string, fetchFn: typ
 export const markCompletedLines = (lineIds: string[], email: boolean, fetchFn: typeof fetch = fetch) =>
   act<{ text: string; failed: number }>({ action: 'complete', lineIds, email }, (b) => (typeof b.text === 'string' ? { text: b.text, failed: Array.isArray(b.failed) ? b.failed.length : 0 } : null), fetchFn);
 
+export interface NotesResult { url: string; printed: number; skipped: { order: string; reason: string }[] }
+/** Delivery notes for the orders of the ticked lines: a link to one printable page, plus the orders that were skipped and why. */
+export async function printDeliveryNotes(lineIds: string[], fetchFn: typeof fetch = fetch): Promise<Result<NotesResult>> {
+  try {
+    const res = await callBackendResult('/api/delivery-notes', post({ lineIds }), fetchFn);
+    const b = res.body as (Partial<NotesResult> & Body & { skipped?: NotesResult['skipped'] }) | null;
+    if (res.ok && typeof b?.url === 'string') return { ok: true, data: { url: b.url, printed: b.printed ?? 0, skipped: b.skipped ?? [] } };
+    const why = (b?.skipped ?? []).map((s) => `${s.order}: ${s.reason}`).join(' ');
+    return { ok: false, message: [explain(res.status, b), why].filter(Boolean).join(' ') };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
 /** A download link: the page export (all of it, or just the ticked lines), or one run's Pick List or Driver Sheet. */
 export async function downloadLink(
   what: { kind: 'booked'; filter: BookedFilter; lineIds?: string[] } | { kind: 'picklist' | 'driversheet'; date: string; vanId: string },

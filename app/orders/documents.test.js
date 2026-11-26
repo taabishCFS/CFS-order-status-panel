@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deliveryNoteHtml, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml } from "./document-pages";
+import { deliveryNoteHtml, deliveryNotesHtml, invoiceHtml, labelHtml, returnLabelHtml, savePdfHtml } from "./document-pages";
 import { deliveryNoteAllowed, gbp, shapeDocOrder, siteCodeOf, siteDetails } from "./documents";
 
 const money = (amount) => ({ shopMoney: { amount, currencyCode: "GBP" } });
@@ -109,6 +109,13 @@ describe("documents", () => {
     expect(html).toContain("Free Door Delivery");
     expect(html).toContain("In Stock");
     expect(html).toContain("Call first");
+    expect(html).toContain("Leave with neighbour");
+  });
+  it("several delivery notes share one page, one sheet per order", () => {
+    const html = deliveryNotesHtml([{ doc, site }, { doc, site }]);
+    expect(html.match(/class="pg"/g)).toHaveLength(2);
+    expect(html.match(/break-after:page/g)).toHaveLength(2);
+    expect(html).toContain("Delivery Notes (2)");
     expect(html).toContain("Leave with neighbour");
   });
   it("the labels carry the address; the return label lists the ticked lines with quantity and type", () => {

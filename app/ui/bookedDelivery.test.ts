@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { changedDrops, downloadLink, groupByDay, loadBooked, poundsText, rescheduleBooked, runTitle, saveDropsForRun, type BookedRow, type BookedRun } from './bookedDelivery';
+import { changedDrops, downloadLink, printDeliveryNotes, groupByDay, loadBooked, poundsText, rescheduleBooked, runTitle, saveDropsForRun, type BookedRow, type BookedRun } from './bookedDelivery';
 
 const capture = (body: unknown, status = 200) => {
   const calls: { url: string; body: unknown }[] = [];
@@ -11,6 +11,18 @@ const capture = (body: unknown, status = 200) => {
 };
 const row = (id: string, drop: number | null): BookedRow => ({ lineId: id, orderId: 'o', orderName: 'UD1', orderDate: '2026-11-07', brand: 'A', product: 'p', code: 'c', size: '', quantity: 1, box: null, delivery: null, lineStatusId: 4, amPm: 'AM', drop, deliveryType: 'Free Door Delivery', postcode: 'E1', amountMinor: 100, emailed: true });
 const run = (date: string, van: string): BookedRun => ({ key: `${date}|${van}`, date, vanId: van, vanName: van, driverName: 'Driver1', rows: [], totalMinor: 0, currency: 'GBP' });
+
+describe('printing delivery notes', () => {
+  it('posts the ticked lines and returns the link with what was skipped', async () => {
+    const { calls, f } = capture({ url: 'https://x/notes', printed: 2, skipped: [{ order: '#1', reason: 'A balance is still owed on this order.' }] });
+    expect(await printDeliveryNotes(['l1', 'l2'], f)).toEqual({ ok: true, data: { url: 'https://x/notes', printed: 2, skipped: [{ order: '#1', reason: 'A balance is still owed on this order.' }] } });
+    expect(calls[0]).toEqual({ url: expect.stringMatching(/\/api\/delivery-notes$/), body: { lineIds: ['l1', 'l2'] } });
+  });
+  it('explains a refusal and names the skipped orders', async () => {
+    const { f } = capture({ error: 'none_allowed', message: 'No delivery note can be printed for the selected orders.', skipped: [{ order: '#1', reason: 'A balance is still owed on this order.' }] }, 422);
+    expect(await printDeliveryNotes(['l1'], f)).toEqual({ ok: false, message: 'No delivery note can be printed for the selected orders. #1: A balance is still owed on this order.' });
+  });
+});
 
 describe('Delivery Booked helpers', () => {
   it('titles a run like the old page', () => {

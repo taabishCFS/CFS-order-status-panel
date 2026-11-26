@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 33 (6 December 2026)
+**Guide version:** 34 (6 December 2026)
 
 ## Before you start
 
@@ -660,6 +660,7 @@ Open it from the **Dashboard**: **Delivery Booked** in the **Delivery** group. I
 - **Download All** gives one file for everything shown, run by run with a total for each. **Export selected** gives only the ticked lines. The file is named by day, van and drop, for example `25-11-2026_Van1_DropWise.csv`.
 - **Pick List** (one run): the run listed from the last drop back to the first, with the order total.
 - **Driver Sheet** (one run): the run in drop order, with the delivery type.
+- **Print Delivery Notes:** tick lines and press it. You get one **delivery note per order** (several ticked lines of the same order give one note) on one page, each starting a new sheet. Press **Open the delivery notes to print** and then **Print / Save as PDF**. An order is skipped, and named in the message, if a balance is still owed, it is on a 50% or 75% refund condition, or nothing on it can go on a note. Each note printed is added to that order's delivery notes log. Up to 50 orders at a time. Needs the **Print delivery notes** permission.
 - A link appears for five minutes; open it to save the file.
 
 **Not on the page yet:** Mark Completed, the **Box** numbers (we do not hold box data) and the greyed rows for other staff.
@@ -698,6 +699,7 @@ These will be added to this guide as soon as they are built:
 
 | Date | Version | What changed |
 |---|---|---|
+| 6 Dec 2026 | 34 | Print Delivery Notes button on the Delivery Booked page (many orders on one page) |
 | 6 Dec 2026 | 33 | Delivery Booking list can now be narrowed by Area |
 | 6 Dec 2026 | 32 | New Area page (add, edit, switch on/off and delete named groups of postcodes) |
 | 6 Dec 2026 | 31 | New Supplier Collection page (book a pick-up by brand, van and date, delete ticked ones) and a Collection address box on the Suppliers page |
