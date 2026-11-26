@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DELIVERY_HEADERS, XERO_HEADERS, deliveryCsv, parseReportRange, readyForDelivery, reportFilename, xeroCsv, xeroRow } from "./report-rules.js";
+import { DELIVERY_HEADERS, XERO_HEADERS, deliveryCsv, parseReportRange, readyForDelivery, reportFilename, xeroCsv, xeroIncluded, xeroRow } from "./report-rules.js";
 
 const order = (over = {}) => ({
   orderId: "gid://shopify/Order/1", name: "#1038", createdAt: new Date("2026-11-20T12:40:00Z"), cancelledAt: null, customerName: "Spike Test",
@@ -62,6 +62,17 @@ describe("xeroRow", () => {
   });
   it("copes with unreadable addresses", () => {
     expect(xeroRow(order({ billingAddress: "{bad", shippingAddress: null }), [line()])[0]).toBe("Spike Test");
+  });
+});
+
+describe("xeroIncluded", () => {
+  it("leaves out cancelled, Deleted, Failed, Awaiting Payment, Awaiting V12 and cash-at-store orders", () => {
+    expect(xeroIncluded(order({ orderStatusId: 4, gateway: "kody" }))).toBe(true);
+    expect(xeroIncluded(order({ orderStatusId: null, gateway: null }))).toBe(true);
+    for (const id of [9, 32, 50, 58]) expect(xeroIncluded(order({ orderStatusId: id }))).toBe(false);
+    expect(xeroIncluded(order({ cancelledAt: new Date() }))).toBe(false);
+    expect(xeroIncluded(order({ gateway: "cash" }))).toBe(false);
+    expect(xeroIncluded(order({ gateway: "Pay By Cash Store" }))).toBe(false);
   });
 });
 

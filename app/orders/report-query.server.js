@@ -7,14 +7,14 @@ import { containerCsv, containerSampleCsv } from "./container-stock-rules.js";
 import { allContainerStock } from "./container-stock.server.js";
 import { lookupCosts } from "./export-query.server.js";
 import {
-  DELIVERY_STATUS_IDS, DHD_WITH_SUPPLIER, MAX_REPORT_ORDERS, OUTSTANDING_STATUS_IDS, STOCK_REPORTS, brandTermsCsv, deliveryCsv, outstandingCsv, outstandingRow, stockCsv, stockRow, xeroCsv,
+  DELIVERY_STATUS_IDS, DHD_WITH_SUPPLIER, MAX_REPORT_ORDERS, OUTSTANDING_STATUS_IDS, STOCK_REPORTS, brandTermsCsv, deliveryCsv, outstandingCsv, outstandingRow, stockCsv, stockRow, xeroCsv, xeroIncluded,
 } from "./report-rules.js";
 
 const statusLabels = new Map(statuses.map((s) => [s.id, s.label]));
 
 const ORDER_FIELDS = {
   orderId: true, name: true, createdAt: true, cancelledAt: true, customerName: true, email: true, currency: true, totalMinor: true,
-  outstandingMinor: true, phone: true, billingAddress: true, shippingAddress: true,
+  outstandingMinor: true, orderStatusId: true, gateway: true, phone: true, billingAddress: true, shippingAddress: true,
 };
 
 /**
@@ -127,8 +127,9 @@ export async function buildReport({ db, graphql, shop, kind, range, terms }) {
       ? { shop, cancelledAt: null, createdAt: { gte: range.gte, lte: range.lte } }
       : { shop, cancelledAt: null, archivedAt: null, outstandingMinor: { lte: 0 }, lineStatusIds: { hasSome: DELIVERY_STATUS_IDS } };
   const found = await db.order.findMany({ where, select: ORDER_FIELDS, orderBy: kind === "xero" ? { createdAt: "asc" } : { createdAt: "desc" }, take: MAX_REPORT_ORDERS + 1 });
-  const capped = found.length > MAX_REPORT_ORDERS;
-  const orders = capped ? found.slice(0, MAX_REPORT_ORDERS) : found;
+  const kept = kind === "xero" ? found.filter(xeroIncluded) : found;
+  const capped = kept.length > MAX_REPORT_ORDERS;
+  const orders = capped ? kept.slice(0, MAX_REPORT_ORDERS) : kept;
 
   const lines = orders.length
     ? await db.orderLine.findMany({ where: { shop, orderId: { in: orders.map((o) => o.orderId) } }, select: { orderId: true, lineId: true, sku: true, title: true, vendor: true, lineStatusId: true }, orderBy: { lineId: "asc" } })

@@ -36,7 +36,7 @@ Not yet seen: the Catalogue, Import, Export Catalog, Settings and Admin menus an
 - 20Kg TNT Orders (blocked, see B).
 - Panther, Prebook and Kinetic Logistics Orders: skipped by decision (not used).
 
-## B. Blocked on staff answers (docs/questions-for-admin-head.pdf, now 18 questions)
+## B. Blocked on staff answers (docs/questions-for-admin-head.pdf, now 15 questions)
 
 Answered 2026-11-26 (recorded in docs/staff-questions-order-detail.md): Maxpro/Maxoptra sample files, the drivers and vans list, reschedule reason (free text, old email wording), main admins (Junaid Khan and Sohail Khan; Taabish while testing), the permission list (proposed list accepted), Maxpro Country (use GB). "Other menus" skipped for now.
 
@@ -48,7 +48,7 @@ Still open:
 25. Brands that order by hand, supplier sending address and copy, Trustpilot link.
 26. Xero codes, Delivery Date on Outstanding Payments, container freight, container dollar rate and date format.
 27. Scotland charge rule, the 12 areas and their postcodes, supplier collection addresses, delivery notes per line or per order.
-28. Which Order, Accounts and Downloads menu pages are still used.
+28. (Closed) Brand ID 215 is Urban Deco; the menu-pages question is closed too: build the old pages as they are.
 
 Now unblocked by the answers (build, no more input needed):
 - Load the Maxpro return file (`Taabish.csv` format) into Delivery Booking.
@@ -87,6 +87,6 @@ Now unblocked by the answers (build, no more input needed):
 4. **Customer service pages**: Service Issue Reports, Feedback Calling; then Paypal Orders and Add Marketplace Orders.
 5. **Downloads menu reports** not yet built.
 6. **Non-admin permissions check**, then the security audit, then going-live work (E).
-7. As soon as staff answer the 18 open questions, do the weights, volume, tracking and boxes fields, then 20Kg TNT, the FurDeco empty columns, the Maxpro return file and the Scotland rule.
+7. As soon as staff answer the 15 open questions, do the weights, volume, tracking and boxes fields, then 20Kg TNT, the FurDeco empty columns, the Maxpro return file and the Scotland rule.
 
 Why this order: the Accounts pages were already decided and need no staff input; the permissions check is best done after the new pages exist, so it covers them too. Pages marked "still used?" in the staff questions should be confirmed before building them, so we do not build pages nobody uses.

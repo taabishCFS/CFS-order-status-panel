@@ -97,6 +97,13 @@ export const XERO_HEADERS = [
   "AccountCode", "TaxType", "TaxAmount", "TrackingName1", "TrackingOption1", "TrackingName2", "TrackingOption2", "Currency", "BrandingTheme",
 ];
 
+/** Order statuses the legacy Xero report left out: Deleted, Order Failed, Awaiting Payment, Awaiting V12 Approval. */
+export const XERO_SKIP_STATUS_IDS = [9, 32, 50, 58];
+
+/** Does the order belong in the Xero report? Not cancelled, not in a skipped status, and not paid in cash at the store. */
+export const xeroIncluded = (order) =>
+  !order.cancelledAt && !XERO_SKIP_STATUS_IDS.includes(order.orderStatusId) && !/^(cash|paybycashstore)$/i.test(String(order.gateway ?? "").replace(/[\s_-]+/g, ""));
+
 /** One Xero invoice row per order. VAT is one sixth of the total (20% included in the price), as in the legacy report. */
 export function xeroRow(order, lines) {
   const address = parseAddress(order.billingAddress) ?? parseAddress(order.shippingAddress) ?? {};
