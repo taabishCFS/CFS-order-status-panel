@@ -164,6 +164,19 @@ export async function bookDelivery(db, { shop, orderId, request, actor, queueEma
   return { ok: true, saved: request.lineIds.length, duplicates, pmChanged, shifted, email };
 }
 
+/** Delivery attempted before ("Yes"): every rescheduled line's count goes up by one, and the charge the customer agreed to (if any)
+ *  is recorded once, against the first line. The charge itself is put on the Shopify order by the caller. */
+async function recordReschedules(db, { shop, orderId, lineIds, chargeMinor, actor }) {
+  for (const [i, lineId] of lineIds.entries()) {
+    const add = i === 0 ? chargeMinor ?? 0 : 0;
+    await db.lineReschedule.upsert({
+      where: { shop_lineId: { shop, lineId } },
+      create: { shop, orderId, lineId, chargeMinor: add, count: 1, updatedByName: actor.name },
+      update: { chargeMinor: { increment: add }, count: { increment: 1 }, updatedByName: actor.name },
+    });
+  }
+}
+
 /** Clear the booking for the ticked lines, log why, and (optionally) email the customer. */
 export async function rescheduleDelivery(db, { shop, orderId, request, actor, queueEmail }) {
   const lines = await ownedLines(db, shop, orderId, request.lineIds);
@@ -177,10 +190,12 @@ export async function rescheduleDelivery(db, { shop, orderId, request, actor, qu
     });
   }
   await db.deliveryBooking.deleteMany({ where: { shop, orderId, lineId: { in: booked.map((b) => b.lineId) } } });
+  if (request.attempted) await recordReschedules(db, { shop, orderId, lineIds: request.lineIds.filter((id) => booked.some((b) => b.lineId === id)), chargeMinor: request.chargeMinor, actor });
+  const chargedMinor = request.attempted ? request.chargeMinor ?? 0 : 0;
   let email = "not_requested";
   if (request.emailCustomer) {
     const sent = await queueEmail({ orderId, lineIds: booked.map((b) => b.lineId), reason: request.reason });
     email = sent.ok ? "queued" : sent.code;
   }
-  return { ok: true, cleared: booked.length, email };
+  return { ok: true, cleared: booked.length, chargedMinor, email };
 }

@@ -1,7 +1,7 @@
 // Reads and changes the service charges on a Shopify order. A service is a custom line whose title carries its marker;
 // changes go through one order edit, committed without telling the customer. VAT is included in the amount entered.
 import { BEGIN, COMMIT, OrderEditError, run } from "./order-edit.server.js";
-import { serviceTitle } from "./services.js";
+import { RESCHEDULE_TITLE, serviceTitle } from "./services.js";
 
 const READ = `#graphql
   query CfsServices($id: ID!) {
@@ -53,4 +53,14 @@ export async function applyServices(graphql, { orderId, currency, plan, note }) 
   }
   await run(graphql, "commit", COMMIT, { id, notifyCustomer: false, staffNote: note }, "orderEditCommit");
   return { changed: true };
+}
+
+/** Puts the reschedule charge the customer agreed to on the order (one custom line, VAT included), without telling the customer. Throws OrderEditError. */
+export async function addRescheduleCharge(graphql, { orderId, amountMinor, note }) {
+  const { currency } = await readServices(graphql, orderId);
+  const begin = await run(graphql, "begin", BEGIN, { id: orderId }, "orderEditBegin");
+  const id = begin.calculatedOrder.id;
+  const price = { amount: (amountMinor / 100).toFixed(2), currencyCode: currency };
+  await run(graphql, "add", ADD, { id, title: RESCHEDULE_TITLE, price, quantity: 1, taxable: true, requiresShipping: false }, "orderEditAddCustomItem");
+  await run(graphql, "commit", COMMIT, { id, notifyCustomer: false, staffNote: note }, "orderEditCommit");
 }

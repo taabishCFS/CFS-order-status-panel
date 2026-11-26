@@ -27,7 +27,7 @@ function table(rows = []) {
     update: async ({ where, data }) => { const r = rows.find((x) => x.id === where.id); Object.assign(r, data); return r; },
     updateMany: async ({ where, data }) => { const hit = rows.filter((r) => match(r, where)); hit.forEach((r) => Object.assign(r, data)); return { count: hit.length }; },
     deleteMany: async ({ where }) => { const keep = rows.filter((r) => !match(r, where)); const n = rows.length - keep.length; rows.splice(0, rows.length, ...keep); return { count: n }; },
-    upsert: async ({ where, create, update }) => { const r = rows.find((x) => match(x, where)); if (r) return Object.assign(r, update); return t.create({ data: create }); },
+    upsert: async ({ where, create, update }) => { const r = rows.find((x) => match(x, where)); if (r) { for (const [k, v] of Object.entries(update)) r[k] = v && typeof v === "object" && "increment" in v ? r[k] + v.increment : v; return r; } return t.create({ data: create }); },
   };
   return t;
 }
@@ -35,8 +35,8 @@ function table(rows = []) {
 let db;
 beforeEach(() => {
   db = {
-    driver: table(), van: table(), deliverySlot: table(), deliveryBooking: table(), deliveryHistory: table(),
-    orderLine: table([1, 2, 3, 4].map((n) => ({ shop: SHOP, orderId: n < 4 ? O(1) : O(2), lineId: `L${n}`, lineStatusId: 4 }))),
+    driver: table(), van: table(), deliverySlot: table(), deliveryBooking: table(), deliveryHistory: table(), lineReschedule: table(),
+    orderLine: table([1, 2, 3, 4].map((n) => ({ shop: SHOP, orderId: n < 4 ? O(1) : O(2), lineId: `L${n}`, lineStatusId: 4, priceMinor: 12345, quantity: 2, deliveryOutcome: n === 1 ? "confirmed" : null }))),
     order: table([{ shop: SHOP, orderId: O(1), name: "#1001" }, { shop: SHOP, orderId: O(2), name: "#1002" }]),
   };
 });
@@ -70,7 +70,11 @@ describe("reading requests", () => {
     expect(readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", amPm: "noon" }).error).toBe("bad_am_pm");
     expect(readBookingRequest({ action: "book", lineIds: [], date: "2026-12-02" }).error).toBe("bad_request");
     expect(readBookingRequest({ action: "reschedule", lineIds: ["a"] }).error).toBe("reason_required");
-    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "Van broke down" }).value).toEqual({ action: "reschedule", lineIds: ["a"], reason: "Van broke down", emailCustomer: true });
+    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "Van broke down" }).error).toBe("attempted_required");
+    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "Van broke down", attempted: false, charge: "20" }).value).toEqual({ action: "reschedule", lineIds: ["a"], reason: "Van broke down", emailCustomer: true, attempted: false, chargeMinor: 0 });
+    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "x", attempted: true, charge: "£25.50" }).value.chargeMinor).toBe(2550);
+    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "x", attempted: true, charge: "" }).value.chargeMinor).toBe(0);
+    expect(readBookingRequest({ action: "reschedule", lineIds: ["a"], reason: "x", attempted: true, charge: "abc" }).error).toBe("bad_charge");
   });
   it("a carrier booking keeps only the date, and slots are All Day, AM or PM", () => {
     const r = readBookingRequest({ action: "book", lineIds: ["a"], date: "2026-12-02", partner: "TNT", vanId: "v", driverId: "d", drop: 4, amPm: "PM" });
@@ -203,7 +207,8 @@ describe("rescheduling", () => {
     await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ lineIds: ["L1", "L2"] }), actor });
     const queueEmail = vi.fn(async () => ({ ok: true }));
     const r = await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "Van broke down", emailCustomer: true }, actor, queueEmail });
-    expect(r).toEqual({ ok: true, cleared: 1, email: "queued" });
+    expect(r).toEqual({ ok: true, cleared: 1, chargedMinor: 0, email: "queued" });
+    expect(db.lineReschedule.rows).toEqual([]);
     expect(db.deliveryBooking.rows.map((b) => b.lineId)).toEqual(["L2"]);
     expect(db.deliveryHistory.rows.at(-1)).toMatchObject({ action: "rescheduled", reason: "Van broke down", lineId: "L1" });
     expect(queueEmail).toHaveBeenCalledWith({ orderId: O(1), lineIds: ["L1"], reason: "Van broke down" });
@@ -215,6 +220,23 @@ describe("rescheduling", () => {
     expect(queueEmail).not.toHaveBeenCalled();
     await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book(), actor });
     expect(await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "x", emailCustomer: true }, actor, queueEmail: async () => ({ ok: false, code: "email_off" }) })).toMatchObject({ ok: true, email: "email_off" });
+  });
+  it("delivery attempted before: every line's count goes up, the agreed charge is recorded once on the first line", async () => {
+    const again = async (chargeMinor) => {
+      await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book({ lineIds: ["L1", "L2"] }), actor });
+      return rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1", "L2"], reason: "x", emailCustomer: false, attempted: true, chargeMinor }, actor, queueEmail: vi.fn() });
+    };
+    expect(await again(2500)).toMatchObject({ cleared: 2, chargedMinor: 2500 });
+    expect(await again(0)).toMatchObject({ chargedMinor: 0 });
+    expect(db.lineReschedule.rows).toEqual([
+      expect.objectContaining({ lineId: "L1", orderId: O(1), chargeMinor: 2500, count: 2, updatedByName: "Sam" }),
+      expect.objectContaining({ lineId: "L2", chargeMinor: 0, count: 2 }),
+    ]);
+  });
+  it("No: nothing is recorded", async () => {
+    await bookDelivery(db, { shop: SHOP, orderId: O(1), request: book(), actor });
+    await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "x", emailCustomer: false, attempted: false, chargeMinor: 0 }, actor, queueEmail: vi.fn() });
+    expect(db.lineReschedule.rows).toEqual([]);
   });
   it("refuses lines that are not booked", async () => {
     expect((await rescheduleDelivery(db, { shop: SHOP, orderId: O(1), request: { lineIds: ["L1"], reason: "x", emailCustomer: false }, actor, queueEmail: vi.fn() })).code).toBe("not_booked");

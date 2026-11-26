@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 39 (26 November 2026)
+**Guide version:** 40 (26 November 2026)
 
 ## Before you start
 
@@ -47,6 +47,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
+| 40 | Reschedule Delivery Orders, and the Delivery attempted before? question when rescheduling on an order | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -680,6 +681,8 @@ The box is laid out like the old system. Tick the items in the **Items** table, 
 
 **RESCHEDULE** clears the booking on the ticked items. You must give a reason; the customer is emailed it (the **Email the customer** tick can be turned off). The email wording is the **Delivery rescheduled** template on the Email templates page, so you can change it.
 
+You must also answer **Delivery attempted before?**. Choose **No** when the delivery was never attempted. If you choose **Yes**, the ticked items go on **Reschedule Delivery Orders** (see below) and their reschedule count goes up by one, and a box appears for the **Reschedule charge agreed with the customer**. A charge is never added on its own: type an amount only if the customer agreed to pay (VAT included), otherwise leave it empty. A typed amount is added to the Shopify order as a **Reschedule Charge** line (the customer is not emailed about it), and it is shown once, against the first ticked item, on Reschedule Delivery Orders. Adding a charge also needs the **Delivery charges** permission.
+
 Booking and rescheduling need the **Book and reschedule deliveries** permission, and Van Management needs **Edit drivers, vans and slots** (see Permissions).
 
 ---
@@ -695,6 +698,14 @@ Open them from the **Dashboard**. They do the same job as the two payment report
 - Choose a **Brand**, or type a **From** and **To** date and press **GO**. **Reset** clears the filters.
 - Tick items and press **Export ticked** to get a file with the same columns. The link works for 5 minutes.
 - These pages only show information; they change nothing.
+
+### Reschedule Delivery Orders
+
+Open it from the **Accounts** group on the **Dashboard**. It lists every item that was rescheduled after a delivery attempt (see **RESCHEDULE** in the Book Delivery box), with **Price**, **Reschedule Charge** (the amount the customer agreed to, often none) and **Reschedule Count**. Cancelled and deleted items are left out.
+
+- Choose a **Brand**, or type a **From** and **To** order date and press **GO**.
+- Type part of a product name, brand or order number in **Search** and press **Search**. **Reset** clears the filters.
+- Tick items and press **Export ticked** for a file with the same columns as the old page. The link works for 5 minutes.
 
 ## Not ready yet
 
@@ -720,6 +731,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 37 | Pay To Supplier and Supplier Paid pages: lines we owe suppliers for, manual and DHD costs, invoice numbers, Mark Paid or Mark Unpaid, download of ticked lines; new permission Pay suppliers |
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
+| 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
 | 6 Dec 2026 | 34 | Print Delivery Notes button on the Delivery Booked page (many orders on one page) |
 | 6 Dec 2026 | 33 | Delivery Booking list can now be narrowed by Area |
 | 6 Dec 2026 | 32 | New Area page (add, edit, switch on/off and delete named groups of postcodes) |

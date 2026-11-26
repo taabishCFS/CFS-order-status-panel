@@ -56,7 +56,12 @@ export function readBookingRequest(body) {
   if (action === "reschedule") {
     const reason = text(body.reason, 500);
     if (!reason) return { error: "reason_required" };
-    return { value: { action, lineIds, reason, emailCustomer: body.emailCustomer !== false } };
+    if (typeof body.attempted !== "boolean") return { error: "attempted_required" };
+    // The reschedule charge is only what the customer agreed to: one amount for the whole reschedule, VAT included; blank = no charge.
+    const raw = body.attempted && (typeof body.charge === "string" || typeof body.charge === "number") ? String(body.charge).replace(/[£,\s]/g, "") : "";
+    if (raw !== "" && !/^\d{1,6}(\.\d{1,2})?$/.test(raw)) return { error: "bad_charge" };
+    const chargeMinor = raw === "" ? 0 : Math.round(Number(raw) * 100);
+    return { value: { action, lineIds, reason, emailCustomer: body.emailCustomer !== false, attempted: body.attempted, chargeMinor } };
   }
 
   if (!validDate(body.date)) return { error: "bad_date" };

@@ -581,3 +581,19 @@ model Area {
   @@unique([shop, name])
   @@unique([shop, seq])
 }
+
+// Reschedule charge per line (legacy order_details_new.rescheduleDeliveryCharge / rescheduleDeliveryCount): when a confirmed delivery is
+// rescheduled from the order page and staff answer Yes to "Delivery attempted before?", 10% of price x qty is added and the count goes up by one.
+model LineReschedule {
+  id            String   @id @default(cuid())
+  shop          String
+  orderId       String
+  lineId        String
+  chargeMinor   Int      @default(0)
+  count         Int      @default(0)
+  updatedByName String?
+  updatedAt     DateTime @updatedAt
+
+  @@unique([shop, lineId])
+  @@index([shop, updatedAt])
+}

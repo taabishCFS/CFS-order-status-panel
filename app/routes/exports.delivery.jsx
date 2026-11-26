@@ -11,6 +11,7 @@ import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
 import { payCsv, payRowsFor } from "../orders/pay-supplier.server";
 import { PAY_AGE, listPayAge, parsePayAgeParams, payAgeCsv } from "../orders/pay-age.server";
+import { listReschedules, parseRescheduleParams, rescheduleCsv } from "../orders/reschedule-orders.server";
 import { unauthenticated } from "../shopify.server";
 import { verifyExportLink } from "../orders/export-link.server";
 
@@ -54,6 +55,13 @@ export const loader = async ({ request }) => {
     const { rows } = await listPayAge(db, graphql, link.shop, { ...p, all: true });
     if (rows.length === 0) return refuse(404, "Nothing to export. The items may have changed since the list was loaded.");
     return file(payAgeCsv(rows), PAY_AGE[p.terms].file);
+  }
+  if (link.kind === "delivery-reschedule-orders") {
+    const p = parseRescheduleParams(query);
+    if (p.lines.length === 0) return refuse(404, "Nothing to export.");
+    const { rows } = await listReschedules(db, link.shop, { ...p, all: true });
+    if (rows.length === 0) return refuse(404, "Nothing to export.");
+    return file(rescheduleCsv(rows), "rescheduleDeliveryOrder.csv");
   }
   if (link.kind === "delivery-instock-balance") {
     const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x));

@@ -57,9 +57,9 @@ describe('booking calls', () => {
   });
   it('reschedules with a reason', async () => {
     const { bodies, f } = bodiesOf();
-    expect(await rescheduleLines('1', ['L1'], 'Van broke down', true, f)).toEqual({ ok: true, data: { cleared: 1, email: 'queued' } });
-    expect(bodies[0]).toEqual({ action: 'reschedule', lineIds: ['L1'], reason: 'Van broke down', emailCustomer: true });
-    expect(await rescheduleLines('1', ['L1'], '', true, reply(400, { error: 'reason_required', message: 'Give a reason for rescheduling.' }))).toMatchObject({ ok: false, message: 'Give a reason for rescheduling.' });
+    expect(await rescheduleLines('1', ['L1'], 'Van broke down', true, true, '25', f)).toEqual({ ok: true, data: { cleared: 1, chargedMinor: 0, email: 'queued' } });
+    expect(bodies[0]).toEqual({ action: 'reschedule', lineIds: ['L1'], reason: 'Van broke down', emailCustomer: true, attempted: true, charge: '25' });
+    expect(await rescheduleLines('1', ['L1'], '', true, false, '', reply(400, { error: 'reason_required', message: 'Give a reason for rescheduling.' }))).toMatchObject({ ok: false, message: 'Give a reason for rescheduling.' });
   });
 });
 
@@ -71,6 +71,7 @@ describe('words', () => {
     expect(bookedText({ saved: 1, email: 'email_off' })).toContain('email is switched off');
     expect(rescheduledText({ cleared: 2, email: 'queued' })).toBe('Delivery rescheduled for 2 items. The customer is being emailed.');
     expect(rescheduledText({ cleared: 1, email: 'not_requested' })).toBe('Delivery rescheduled for 1 item.');
+    expect(rescheduledText({ cleared: 2, chargedMinor: 2550, email: 'not_requested' })).toBe('Delivery rescheduled for 2 items. A reschedule charge of £25.50 was added to the order.');
     expect(rescheduledText({ cleared: 1, email: 'email_off' })).toContain('email is switched off');
   });
   it('describes a booking and lists the drops', () => {

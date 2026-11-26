@@ -5,6 +5,7 @@ import { queueOrderEmails } from "../email/queue-order-emails.server";
 import { runEmailTick } from "../email/worker.server";
 import { readBookingRequest } from "../delivery/delivery-rules";
 import { bookDelivery, orderDelivery, rescheduleDelivery } from "../delivery/delivery.server";
+import { addRescheduleCharge } from "../orders/services.server";
 import { authenticate } from "../shopify.server";
 import { can } from "../staff/permissions.server";
 import { staffFromSession } from "../staff/staff.server";
@@ -21,7 +22,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export const action = async ({ request, params }) => {
-  const { session, cors } = await authenticate.admin(request);
+  const { session, admin, cors } = await authenticate.admin(request);
   const json = (body, status = 200) => cors(Response.json(withMessage(body), { status }));
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   const staff = staffFromSession(session);
@@ -45,6 +46,18 @@ export const action = async ({ request, params }) => {
       if (sent.ok) void runEmailTick({ db }).catch((e) => console.error("Email send pass failed", e?.message ?? e));
       return sent;
     };
+    if (read.value.chargeMinor > 0) {
+      // The charge goes on the Shopify order first, so a refused charge leaves the booking as it was.
+      if (!(await can(db, shop, staff, "delivery_charges"))) return json({ error: "no_permission", message: "Adding a reschedule charge needs the Delivery charges permission." }, 403);
+      const booked = await db.deliveryBooking.count({ where: { shop, orderId, lineId: { in: read.value.lineIds } } });
+      if (booked === 0) return json({ error: "not_booked" }, 409);
+      try {
+        await addRescheduleCharge(admin.graphql, { orderId, amountMinor: read.value.chargeMinor, note: `Reschedule charge agreed with the customer, added by ${staff.name}` });
+      } catch (error) {
+        console.error(`Reschedule charge ${orderId} failed at ${error?.stage ?? "?"}`, error?.message ?? error);
+        return json({ error: "charge_failed" }, 422);
+      }
+    }
     const result = await rescheduleDelivery(db, { shop, orderId, request: read.value, actor: staff, queueEmail });
     return result.ok ? json(result) : json({ error: result.code }, STATUS[result.code] ?? 400);
   }

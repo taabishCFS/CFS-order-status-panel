@@ -21,6 +21,9 @@ export const MESSAGES = {
   drop_required: "Select Drop Number.",
   slot_required: "Select Time Slot.",
   reason_required: "Give a reason for rescheduling.",
+  attempted_required: "Choose whether delivery was attempted before (Yes or No).",
+  bad_charge: "Type the agreed reschedule charge as an amount such as 25 or 25.50, or leave it empty for no charge.",
+  charge_failed: "Shopify did not accept the reschedule charge, so nothing was changed. Try again.",
   bad_request: "The request was not accepted. Refresh the page and try again.",
 };
 

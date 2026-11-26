@@ -57,10 +57,11 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
     heading: 'Accounts',
     items: [
       { href: '/supplier-payments', title: 'Supplier Payments', description: 'Your own list of items to pay suppliers for, added with Add To Accounts on an order. Mark them Paid or Not Paid.', icon: 'cash-dollar' },
-      { href: '/pay-to-supplier', title: 'Pay To Supplier', description: 'Lines we still owe a supplier for: check the cost, add the invoice number and mark them paid.', icon: 'cash-dollar' },
-      { href: '/supplier-paid', title: 'Supplier Paid', description: 'Lines already paid to suppliers, grouped by batch invoice. Mark one unpaid if it was a mistake.', icon: 'receipt-refund' },
       { href: '/proforma-payment-report', title: 'Proforma Payment Report', description: 'Items of pro-forma brands waiting for payment, with the invoice amount with and without VAT. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/credit-payment-report', title: 'Credit Payment Report', description: 'Items of credit brands that are In Stock, with the invoice amount with and without VAT. Download the ticked ones.', icon: 'cash-dollar' },
+      { href: '/reschedule-orders', title: 'Reschedule Delivery Orders', description: 'Items rescheduled after a delivery attempt, with any charge the customer agreed to and how many times. Download the ticked ones.', icon: 'delivery' },
+      { href: '/pay-to-supplier', title: 'Pay To Supplier', description: 'Lines we still owe a supplier for: check the cost, add the invoice number and mark them paid.', icon: 'cash-dollar' },
+      { href: '/supplier-paid', title: 'Supplier Paid', description: 'Lines already paid to suppliers, grouped by batch invoice. Mark one unpaid if it was a mistake.', icon: 'receipt-refund' },
     ],
   },
   {

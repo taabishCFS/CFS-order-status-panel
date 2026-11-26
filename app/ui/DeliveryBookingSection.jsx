@@ -21,6 +21,8 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
   const [rescheduling, setRescheduling] = useState(false);
   const [reason, setReason] = useState('');
   const [emailIt, setEmailIt] = useState(true);
+  const [attempted, setAttempted] = useState('');
+  const [charge, setCharge] = useState('');
   const [showHistory, setShowHistory] = useState(false);
 
   const load = useCallback(async () => {
@@ -54,12 +56,14 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
 
   async function reschedule() {
     setBusy('reschedule');
-    const res = await rescheduleLines(id, bookedPicked.map((b) => b.lineId), reason, emailIt);
+    const res = await rescheduleLines(id, bookedPicked.map((b) => b.lineId), reason, emailIt, attempted === 'yes', charge);
     setBusy(false);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
     setNotice({ tone: res.data.email === 'queued' || res.data.email === 'not_requested' ? 'success' : 'warning', text: rescheduledText(res.data) });
     setRescheduling(false);
     setReason('');
+    setAttempted('');
+    setCharge('');
     await load();
   }
 
@@ -127,9 +131,17 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
             <s-stack gap="small">
               <s-text>This clears their booking so they can be booked again.</s-text>
               <s-text-field label="Reason (the customer is told this)" value={reason} onInput={(e) => setReason(e.currentTarget.value)} />
+              <s-select label="Delivery attempted before?" value={attempted} onChange={(e) => setAttempted(e.currentTarget.value)} details="Yes lists the ticked items on Accounts > Reschedule Delivery Orders.">
+                <s-option value="">-- Choose --</s-option>
+                <s-option value="yes">Yes</s-option>
+                <s-option value="no">No</s-option>
+              </s-select>
+              {attempted === 'yes' && (
+                <s-money-field label="Reschedule charge agreed with the customer (£, VAT included)" value={charge} onInput={(e) => setCharge(e.currentTarget.value)} details="Only if the customer agreed to pay. Leave empty for no charge. The amount is added to the Shopify order; the customer is not emailed about it." />
+              )}
               <s-checkbox label="Email the customer" checked={emailIt} onChange={(e) => setEmailIt(e.currentTarget.checked)} />
             </s-stack>
-            <s-button slot="primary-action" disabled={!reason.trim() || busy || undefined} loading={busy === 'reschedule' || undefined} onClick={reschedule}>Reschedule</s-button>
+            <s-button slot="primary-action" disabled={!reason.trim() || !attempted || busy || undefined} loading={busy === 'reschedule' || undefined} onClick={reschedule}>Reschedule</s-button>
             <s-button slot="secondary-actions" onClick={() => setRescheduling(false)}>Cancel</s-button>
           </s-banner>
         )}

@@ -98,11 +98,11 @@ async function bookCall(id: string, body: unknown, fetchFn: typeof fetch): Promi
 export const checkDrop = (id: string, lineIds: string[], form: BookForm, fetchFn: typeof fetch = fetch) => bookCall(id, bookBody('check', lineIds, form), fetchFn);
 export const bookLines = (id: string, lineIds: string[], form: BookForm, allowDuplicate = false, emailCustomer = false, fetchFn: typeof fetch = fetch) => bookCall(id, bookBody('book', lineIds, form, allowDuplicate, emailCustomer), fetchFn);
 
-export async function rescheduleLines(id: string, lineIds: string[], reason: string, emailCustomer: boolean, fetchFn: typeof fetch = fetch): Promise<Result<{ cleared: number; email: string }>> {
+export async function rescheduleLines(id: string, lineIds: string[], reason: string, emailCustomer: boolean, attempted: boolean, charge: string, fetchFn: typeof fetch = fetch): Promise<Result<{ cleared: number; chargedMinor: number; email: string }>> {
   try {
-    const res = await callBackendResult(`/api/orders/${encodeURIComponent(id)}/delivery`, post({ action: 'reschedule', lineIds, reason, emailCustomer }), fetchFn);
-    const b = res.body as ({ cleared?: number; email?: string } & Body) | null;
-    return res.ok && typeof b?.cleared === 'number' ? { ok: true, data: { cleared: b.cleared, email: b.email ?? '' } } : { ok: false, message: explain(res.status, b) };
+    const res = await callBackendResult(`/api/orders/${encodeURIComponent(id)}/delivery`, post({ action: 'reschedule', lineIds, reason, emailCustomer, attempted, charge: attempted ? charge : '' }), fetchFn);
+    const b = res.body as ({ cleared?: number; chargedMinor?: number; email?: string } & Body) | null;
+    return res.ok && typeof b?.cleared === 'number' ? { ok: true, data: { cleared: b.cleared, chargedMinor: b.chargedMinor ?? 0, email: b.email ?? '' } } : { ok: false, message: explain(res.status, b) };
   } catch (e) {
     return failure(e);
   }
@@ -115,8 +115,8 @@ export const bookedText = (r: { saved?: number; pmChanged?: number; email?: stri
   return `${base} The customer email was not sent (${r.email === 'email_off' ? 'email is switched off' : r.email}).`;
 };
 
-export const rescheduledText = (r: { cleared: number; email: string }): string => {
-  const base = `Delivery rescheduled for ${r.cleared} item${r.cleared === 1 ? '' : 's'}.`;
+export const rescheduledText = (r: { cleared: number; chargedMinor?: number; email: string }): string => {
+  const base = `Delivery rescheduled for ${r.cleared} item${r.cleared === 1 ? '' : 's'}.${r.chargedMinor ? ` A reschedule charge of £${(r.chargedMinor / 100).toFixed(2)} was added to the order.` : ''}`;
   if (r.email === 'queued') return `${base} The customer is being emailed.`;
   if (r.email === 'not_requested') return base;
   return `${base} The customer email was not sent (${r.email === 'email_off' ? 'email is switched off' : r.email}).`;

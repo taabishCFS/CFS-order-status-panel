@@ -13,6 +13,8 @@ export const SERVICES = [
 const KEYS = new Set(SERVICES.map((s) => s.key));
 export const serviceMarker = (key) => `[svc:${key}]`;
 export const serviceTitle = (key) => `${SERVICES.find((s) => s.key === key).label} ${serviceMarker(key)}`;
+/** The agreed reschedule charge goes on the order as its own custom line. It is not one of the six services, so that box ignores it. */
+export const RESCHEDULE_TITLE = `Reschedule Charge ${serviceMarker("reschedule")}`;
 
 /** Reads { services: { key: "50.00" | "" | null } }. Returns { value: { key: pence | null } } or { error }. */
 export function readServicesInput(body) {
