@@ -42,8 +42,10 @@ export default function DeliveryBookedPage() {
 
   const runs = data?.runs ?? [];
   const canWrite = !!staff;
-  const tick = (id, on) => setPicked((p) => { const n = new Set(p); if (on) n.add(id); else n.delete(id); return n; });
-  const tickMany = (rows, on) => setPicked((p) => { const n = new Set(p); rows.forEach((r) => (on ? n.add(r.lineId) : n.delete(r.lineId))); return n; });
+  // Ticking or unticking clears a 'Select Record(s)' style warning, so it does not stay up after you have ticked.
+  const clearWarning = () => setNotice((n) => (n?.tone === 'warning' ? null : n));
+  const tick = (id, on) => { clearWarning(); setPicked((p) => { const n = new Set(p); if (on) n.add(id); else n.delete(id); return n; }); };
+  const tickMany = (rows, on) => { clearWarning(); setPicked((p) => { const n = new Set(p); rows.forEach((r) => (on ? n.add(r.lineId) : n.delete(r.lineId))); return n; }); };
 
   function go() {
     setApplied({ ...draft, q: draft.q.trim() });

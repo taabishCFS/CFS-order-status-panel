@@ -41,7 +41,9 @@ export default function DeliveryBookingPage() {
   const lineIds = rows.map((r) => r.lineId);
   const orderIds = rows.map((r) => r.orderId);
   const allTicked = rows.length > 0 && rows.every((r) => ticked.has(r.lineId));
-  const tick = (id, on) => setTicked((t) => { const n = new Set(t); if (on) n.add(id); else n.delete(id); return n; });
+  // Ticking or unticking clears a 'Select Record(s)' style warning, so it does not stay up after you have ticked.
+  const clearWarning = () => setNotice((n) => (n?.tone === 'warning' ? null : n));
+  const tick = (id, on) => { clearWarning(); setTicked((t) => { const n = new Set(t); if (on) n.add(id); else n.delete(id); return n; }); };
   const canWrite = !!staff;
 
   function changeDrop(index, value) {
@@ -161,7 +163,7 @@ export default function DeliveryBookingPage() {
           <s-section padding="none">
             <s-table>
               <s-table-header-row>
-                <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allTicked} onChange={(e) => setTicked(e.currentTarget.checked ? new Set(lineIds) : new Set())} /></s-table-header>
+                <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allTicked} onChange={(e) => { clearWarning(); setTicked(e.currentTarget.checked ? new Set(lineIds) : new Set()); }} /></s-table-header>
                 <s-table-header>Date</s-table-header>
                 <s-table-header listSlot="primary">OrderNo.</s-table-header>
                 <s-table-header>Item</s-table-header>

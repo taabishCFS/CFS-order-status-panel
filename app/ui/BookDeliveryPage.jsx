@@ -37,7 +37,9 @@ export default function BookDeliveryPage() {
 
   const rows = data?.rows ?? [];
   const allPicked = rows.length > 0 && rows.every((r) => picked.has(r.lineId));
-  const tick = (id, on) => setPicked((p) => { const n = new Set(p); if (on) n.add(id); else n.delete(id); return n; });
+  // Ticking or unticking clears a 'Select Record(s)' style warning, so it does not stay up after you have ticked.
+  const clearWarning = () => setNotice((n) => (n?.tone === 'warning' ? null : n));
+  const tick = (id, on) => { clearWarning(); setPicked((p) => { const n = new Set(p); if (on) n.add(id); else n.delete(id); return n; }); };
   const canWrite = !!staff;
   const none = picked.size === 0;
 
@@ -151,7 +153,7 @@ export default function BookDeliveryPage() {
         ) : (
           <s-table>
             <s-table-header-row>
-              <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allPicked} onChange={(e) => setPicked(e.currentTarget.checked ? new Set(rows.map((r) => r.lineId)) : new Set())} /></s-table-header>
+              <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allPicked} onChange={(e) => { clearWarning(); setPicked(e.currentTarget.checked ? new Set(rows.map((r) => r.lineId)) : new Set()); }} /></s-table-header>
               <s-table-header>Order Date</s-table-header>
               <s-table-header listSlot="primary">Order No.</s-table-header>
               <s-table-header>Item</s-table-header>

@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 50 (27 November 2026)
+**Guide version:** 51 (27 November 2026)
 
 ## Before you start
 
@@ -59,8 +59,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
 | 31 | Completed Delivery, Failed Delivery/Collection and On Hold Delivery pages with filters and CSV downloads | Ready, not yet tried |
 | 30 | Delivery Report CSV (Max) page (Maxpro): paid orders still to deliver, brand filter, White Glove list, Send Bulk Email, Order Wise and Product Wise files | Ready, not yet tried |
-| 29 | Delivery Booked page: every booked delivery by day, van and driver in drop order; change drops, reschedule, download the day, a Pick List or a Driver Sheet | Ready, not yet tried |
-| 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready, not yet tried |
+| 29 | Delivery Booked page: every booked delivery by day, van and driver in drop order; change drops, reschedule, download the day, a Pick List or a Driver Sheet | Ready |
+| 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready |
 | 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
 | 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
 
@@ -841,6 +841,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 51 | Book Delivery, Delivery Booking and Delivery Booked tried and marked Ready; the 'Please Select Record(s)' warning now goes away once you tick a line |
 | 27 Nov 2026 | 50 | Van Management and Driver Management filled in with the old system's vans and drivers (add each van's driver, co-driver and the mobile numbers) |
 | 27 Nov 2026 | 49 | Upload Maxpro CSV on Book Delivery explained (the route file Maxpro sends back; tried with the real sample); Not ready yet list brought up to date |
 | 27 Nov 2026 | 48 | Marketing Sales Report tried and marked Ready; the Unmapped brand row (items with no brand) now opens its ranges and orders |
