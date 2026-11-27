@@ -100,11 +100,11 @@ const longDate = (d) => uk(d).replace(/^(\d+) (\w+) (\d+)$/, "$2 $1 $3");
 const dmy = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { timeZone: "Europe/London" }) : "---");
 const ymdToDmy = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s ?? "") ? s.split("-").reverse().join("/") : "---");
 
-/** The rows of the whole list for the ticked orders (numeric order ids). */
+/** The rows for the ticked orders (numeric order ids) that still owe money, whatever status filter the page had on. */
 export async function balancePendingRowsFor(db, shop, numericIds) {
   const wanted = new Set(numericIds.map((n) => `gid://shopify/Order/${n}`));
-  const { rows } = await listBalancePending(db, shop, { all: true });
-  return rows.filter((r) => wanted.has(r.orderId));
+  const { orders, byOrder } = await owingOrders(db, shop);
+  return orders.filter((o) => wanted.has(o.orderId)).map((o) => toRow(o, byOrder.get(o.orderId) ?? []));
 }
 
 /** The old "export ticked" file: one row per order; Status is the order's first line's. */

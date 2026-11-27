@@ -103,7 +103,7 @@ export const loader = async ({ request }) => {
   if (link.kind === "delivery-balance-pending-all") {
     const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
     const out = await balancePendingAllCsv(db, graphql, link.shop);
-    if (out.count === 0) return refuse(404, "Nothing to export: no order owes a balance.");
+    if (out.count === 0) return refuse(404, "Nothing to export: the orders that owe money have no items to list (Completed, Cancelled, Deleted, Order Failed, Payment Not Confirmed, Awaiting V12 Approval and Awaiting Payment items are left out).");
     return file(out.csv, out.fileName);
   }
   if (link.kind === "delivery-maxpro-order" || link.kind === "delivery-maxpro-product") {

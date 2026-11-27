@@ -57,6 +57,9 @@ describe("the list", () => {
     expect(csv.split("\r\n")[0]).toBe("﻿Order No,Order Date,Customer,Grand Total,Balance Amount,Status,ePaymentOption");
     expect(csv.split("\r\n")[1]).toBe("CFS3,November 03 2026,Cust 3,100.00,40.00,In Stock,PayPal");
     expect(balancePendingFileName(0)).toBe("Pending-Balance.csv");
+    // A ticked order shown only under a status filter (every item Completed) is still exported.
+    expect((await balancePendingRowsFor(db, "s", ["4"])).map((r) => r.orderName)).toEqual(["CFS4"]);
+    expect(await balancePendingRowsFor(db, "s", ["2"])).toEqual([]);
     expect(balancePendingFileName(4)).toBe("In Stock - Pending-Balance.csv");
   });
 });

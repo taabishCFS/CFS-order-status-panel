@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { STATUSES, labelFor } from '../../extensions/cfs-order-status/src/statuses';
 import EmptyState from './EmptyState.jsx';
 import Pager from './Pager.jsx';
@@ -21,9 +21,14 @@ export default function BalancePendingPage() {
   const [busy, setBusy] = useState(null); // 'ticked' | 'all'
   const [picked, setPicked] = useState(new Set());
 
+  // Only the newest request may fill the page: stepping through the Status list with the keys sends several,
+  // and an older answer arriving last must not replace the newer one.
+  const latest = useRef(0);
   const load = useCallback(async () => {
+    const mine = ++latest.current;
     setLoading(true);
     const res = await loadPending(query);
+    if (mine !== latest.current) return;
     setLoading(false);
     if (res.ok) { setData(res.data); setError(null); } else setError(res.message);
   }, [query]);
