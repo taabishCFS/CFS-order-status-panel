@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 47 (27 November 2026)
+**Guide version:** 48 (27 November 2026)
 
 ## Before you start
 
@@ -53,7 +53,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice email to the supplier) | Ready |
 | 44 | Order Reports (orders between two dates by status: sales, charts, page totals, line-by-line CSV) | Ready |
 | 45 | Supplier Sales Summary (sales per website and brand, with Order Breakup) | Ready |
-| 46 | Marketing Sales Report (item sales by brand, range, category, product, month, day, source or order; CSV) | Ready, not yet tried |
+| 46 | Marketing Sales Report (item sales by brand, range, category, product, month, day, source or order; CSV) | Ready |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -839,6 +839,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 48 | Marketing Sales Report tried and marked Ready; the Unmapped brand row (items with no brand) now opens its ranges and orders |
 | 27 Nov 2026 | 47 | Marketing Sales Report (Downloads): item sales by brand, range, category, product, month, day, source or order, click-through, CSV; new permission See the Marketing Sales Report |
 | 27 Nov 2026 | 46 | Supplier Sales Summary (Downloads): sales per website and brand with delivery shares, Order Breakup with checks |
 | 27 Nov 2026 | 45 | Order Reports (Downloads): dates and status filters, sales figures, charts, sortable orders with page totals, line-by-line CSV |

@@ -16,6 +16,7 @@ const MAX_ORDERS = 20000;
 const UNSPECIFIED = "__unspecified__";
 export const NO_RANGE = "No collection";
 export const NO_CATEGORY = "No category";
+export const UNMAPPED = "Unmapped";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const validDate = (d) => typeof d === "string" && DATE.test(d) && !Number.isNaN(Date.parse(`${d}T00:00:00Z`));
@@ -103,14 +104,16 @@ export async function soldLines(db, shop, p) {
   if (orders.length === 0) return { items: [], capped: false };
   const byId = new Map(orders.map((o) => [o.orderId, o]));
   const lineWhere = { shop, orderId: { in: [...byId.keys()] }, quantity: { gt: 0 }, OR: [{ lineStatusId: null }, { lineStatusId: { notIn: EXCLUDED_STATUS_IDS } }] };
-  if (p.brand) lineWhere.vendor = p.brand;
   if (p.product) lineWhere.productId = `gid://shopify/Product/${p.product}`;
   const and = [];
+  // Items without a brand show as "Unmapped"; choosing that row finds them.
+  if (p.brand === UNMAPPED) and.push({ OR: [{ vendor: null }, { vendor: "" }] });
+  else if (p.brand) lineWhere.vendor = p.brand;
   if (p.search) and.push({ OR: [{ title: { contains: p.search, mode: "insensitive" } }, { sku: { contains: p.search, mode: "insensitive" } }] });
   const lines = await db.orderLine.findMany({ where: and.length ? { ...lineWhere, AND: and } : lineWhere, select: { orderId: true, vendor: true, productId: true, title: true, sku: true, quantity: true, priceMinor: true, discountMinor: true } });
   const items = lines.map((l) => {
     const o = byId.get(l.orderId);
-    return { orderId: l.orderId, orderName: o.name, placed: o.createdAt, source: o.orderSource ?? "", brand: l.vendor?.trim() || "Unmapped", productId: l.productId, title: l.title, sku: l.sku ?? "", units: l.quantity, sales: l.priceMinor * l.quantity - l.discountMinor };
+    return { orderId: l.orderId, orderName: o.name, placed: o.createdAt, source: o.orderSource ?? "", brand: l.vendor?.trim() || UNMAPPED, productId: l.productId, title: l.title, sku: l.sku ?? "", units: l.quantity, sales: l.priceMinor * l.quantity - l.discountMinor };
   });
   return { items, capped: orders.length === MAX_ORDERS };
 }

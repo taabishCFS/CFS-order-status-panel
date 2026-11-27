@@ -38,6 +38,15 @@ describe("soldLines", () => {
     expect(lw).toMatchObject({ vendor: "Duke", quantity: { gt: 0 } });
     expect(lw.AND[0].OR[0].title).toEqual({ contains: "bed", mode: "insensitive" });
   });
+
+  it("finds items without a brand when Unmapped is chosen", async () => {
+    const lineFind = vi.fn(async () => []);
+    const db = { order: { findMany: async () => [{ orderId: "gid://shopify/Order/1", name: "#1001", createdAt: new Date(), orderSource: null }] }, orderLine: { findMany: lineFind } };
+    await soldLines(db, "s", parseMarketingParams(sp("brand=Unmapped"), "2026-11-27").value);
+    const w = lineFind.mock.calls[0][0].where;
+    expect(w.vendor).toBeUndefined();
+    expect(w.AND).toEqual([{ OR: [{ vendor: null }, { vendor: "" }] }]);
+  });
 });
 
 describe("catalogue", () => {
