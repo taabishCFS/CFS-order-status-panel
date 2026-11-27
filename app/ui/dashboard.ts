@@ -74,6 +74,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/reports?report=xero', title: 'Xero VAT Invoice Report', description: 'One row per order placed in the dates you choose, ready to import into Xero.', icon: 'chart-vertical' },
       { href: '/reports?report=outstanding', title: 'Outstanding Payments Summary', description: 'Products not yet paid to the supplier, for credit or pro-forma brands, in the dates you choose.', icon: 'chart-vertical' },
       { href: '/reports?report=instock', title: 'Outstanding In-Stock Items', description: 'Products in stock whose supplier invoice is not paid yet.', icon: 'chart-vertical' },
+      { href: '/supplier-sales', title: 'Supplier Sales Summary', description: 'Sales per website and brand between two dates, with and without the delivery charges, and each order behind them.', icon: 'chart-vertical' },
       { href: '/reports?report=unpaid', title: 'Unpaid Invoices Report', description: 'Products that have been in stock and whose supplier invoice is not paid yet.', icon: 'chart-vertical' },
       { href: '/reports?report=delivery', title: 'Delivery Report', description: 'Orders that are ready to deliver: every product delivery-ready and nothing owed.', icon: 'chart-vertical' },
       { href: 'https://www.choicefurnituresuperstore.co.uk/PLA/sales_report.php', title: 'Sales Summary', description: 'The sales summary on the website (opens in a new tab), as in the old menu.', icon: 'chart-vertical', external: true },

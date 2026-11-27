@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 45 (27 November 2026)
+**Guide version:** 46 (27 November 2026)
 
 ## Before you start
 
@@ -52,6 +52,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 42 | Power BI Analytics (the four Power BI reports inside the app) | Ready, not yet tried |
 | 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice email to the supplier) | Ready |
 | 44 | Order Reports (orders between two dates by status: sales, charts, page totals, line-by-line CSV) | Ready |
+| 45 | Supplier Sales Summary (sales per website and brand, with Order Breakup) | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -289,7 +290,7 @@ If none of the products on the order were made to order, the box says there is n
 
 ## 13. Reports
 
-Each report has its own card in the **Downloads** group on the **Dashboard**, as in the old Downloads menu: **Order Reports** (below), **Xero VAT Invoice Report**, **Outstanding Payments Summary**, **Outstanding In-Stock Items**, **Unpaid Invoices Report** and **Delivery Report**. A card opens just that report; **All reports** shows them all on one page (as does **Reports** at the top of the order pages). Each report has a download button. A link appears on screen and works for 5 minutes. The **Sales Summary** card opens the sales summary on the website in a new tab, like the old menu.
+Each report has its own card in the **Downloads** group on the **Dashboard**, as in the old Downloads menu: **Order Reports** (below), **Xero VAT Invoice Report**, **Outstanding Payments Summary**, **Outstanding In-Stock Items**, **Supplier Sales Summary** (below), **Unpaid Invoices Report** and **Delivery Report**. A card opens just that report; **All reports** shows them all on one page (as does **Reports** at the top of the order pages). Each report has a download button. A link appears on screen and works for 5 minutes. The **Sales Summary** card opens the sales summary on the website in a new tab, like the old menu.
 
 ![The Reports page](guide-images/13-reports.jpg)
 
@@ -314,6 +315,22 @@ At the top you see:
 **Export data** downloads every order on the filters (all pages) as a spreadsheet with one row per product and the old file's 64 columns. Choose a brand in **Export brand** first to get only that brand's products. Charges for the whole order (delivery, Two Man, White Glove and so on) go on the order's first product row. That row's **Grand Total** also carries everything else on the order that is not a product (delivery, services, configuration price changes, whole-order discounts), so each order's rows add up to its Shopify total. With one brand chosen, its first row carries them. **Cost Price** is the Shopify cost; **Total Cost** is the manual cost from Pay To Supplier if one was typed. A discount on the whole order (such as a coupon) is shown in **Voucher Discount** on the first row. Columns we do not hold yet are empty: Regular, Prepayment and Collection Discount, Supplier OfferCost, New Cost, Offer and Voucher Discount %, Northern Ireland Delivery, Transaction Id, Card Net, Delivery Cost and Brand Group.
 
 **Good to know:** coupon codes and the White Glove, Two Man and Scotland charges are saved with an order from now on. Older orders show them after they next change, or after **Refresh order data** is pressed on the Orders page. The old page's extra chart views (cities, postcodes, hours, coupons and so on) are not copied.
+
+### Supplier Sales Summary
+
+Open **Supplier Sales Summary** from the **Downloads** group on the **Dashboard**. It shows how much each brand sold, one table per website. It opens on today.
+
+1. Choose **From** and **To**, or press **Today**, **Yesterday**, **This Month**, **Last Month**, **This Year** or **Last Year**, then press **Go**.
+2. Each table has one row per brand: **Sale Total** (what the customers paid for that brand's products, without delivery), **Grand Total** (with the brand's share of the delivery charges) and **Units**. The last row is the website's **Total**. Click a column name to sort by it; click again to reverse.
+3. Press **Order Breakup** to add an **Orders** column, then click a brand to see its orders under it: order number (click to open), date, status, the delivery shares (2Man, WG, Scot, Far, IRE, POM), Sale, Grand Total, Qty and a check. **✓ OK** means the brand's Grand Total matches the order total; a red **±£** shows the difference (often the 1 Man postage, which is not a delivery share, as on the old page). Orders with several brands say **split order** and are not checked. **Hide Breakup** goes back.
+
+How the figures are made, as on the old page:
+
+- Cancelled, Deleted, Order Failed, Awaiting Payment, Awaiting V12 Approval and Service Issue orders, and replacement orders (number starting with R), are left out.
+- Orders paid in the store (card or cash) or taken on Shopify POS are one **Store Orders** row, marked **store**.
+- Each delivery service charge (Two Man, White Glove, Scotland, PA/IV/KW postcodes, Republic of Ireland, Peace of Mind) is shared equally between the order's products, so a brand with 2 of the order's 3 products gets two thirds.
+- A coupon on the whole order and configuration price changes are shared between the order's brands by their sales, so Sale Total is what was really charged.
+- An order's website comes from its `site:` tag (eBay orders are found by themselves). Orders without one are under **No site** until the real site rule is set.
 
 ### Xero VAT Invoice Report
 
@@ -787,7 +804,7 @@ These will be added to this guide as soon as they are built:
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
 - Showing the real Site, Taken By and Source on the list
-- The other reports (margins, Supplier Sales Summary, Marketing Sales Report), payment reminders, service issues, returns and credit notes
+- The other reports (margins, Marketing Sales Report), payment reminders, service issues, returns and credit notes
 
 ---
 
@@ -801,6 +818,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 46 | Supplier Sales Summary (Downloads): sales per website and brand with delivery shares, Order Breakup with checks |
 | 27 Nov 2026 | 45 | Order Reports (Downloads): dates and status filters, sales figures, charts, sortable orders with page totals, line-by-line CSV |
 | 27 Nov 2026 | 44 | Downloads on the Dashboard: one card per report in the old menu order, plus a Sales Summary link to the website |
 | 27 Nov 2026 | 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice to the supplier, Batch Invoice No. on the items); new section explaining Pay To Supplier and Supplier Paid |
