@@ -41,7 +41,7 @@ export default function DashboardPage() {
         <s-section key={group.heading} heading={group.heading}>
           <s-grid gridTemplateColumns="repeat(auto-fit, minmax(260px, 1fr))" gap="base">
             {group.items.map((item) => (
-              <s-clickable key={item.href} href={item.href} accessibilityLabel={`${item.title}: ${item.description}`} border="base" borderRadius="large" padding="base">
+              <s-clickable key={item.href} href={item.href} target={item.external ? '_blank' : undefined} accessibilityLabel={`${item.title}: ${item.description}`} border="base" borderRadius="large" padding="base">
                 <s-stack gap="small-200">
                   <s-stack direction="inline" gap="small" alignItems="center">
                     <s-icon type={item.icon} />

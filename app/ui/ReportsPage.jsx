@@ -1,9 +1,14 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { useStaff } from './useStaff';
 import { REPORTS, TERMS_CHOICES, loadReportLink, rangeProblem } from './reports';
 
 // The Reports screen: one card per report, a date range and pay terms where the report needs them, and a download button.
+// ?report=<kind> shows just that report (each has its own Dashboard card, as in the old Downloads menu).
 export default function ReportsPage() {
+  const [params] = useSearchParams();
+  const only = REPORTS.find((r) => r.kind === params.get('report'));
+  const shown = only ? [only] : REPORTS;
   const [ranges, setRanges] = useState({}); // each report keeps its own dates
   const [terms, setTerms] = useState('credit');
   const [busy, setBusy] = useState(null);
@@ -28,8 +33,9 @@ export default function ReportsPage() {
   }
 
   return (
-    <s-page heading="Reports">
+    <s-page heading={only ? only.title : 'Reports'}>
       <s-button slot="secondary-actions" href="/dashboard">Dashboard</s-button>
+      {only && <s-button slot="secondary-actions" href="/reports">All reports</s-button>}
       <s-button slot="secondary-actions" href="/">Orders</s-button>
       <s-button slot="secondary-actions" href="/orders-by-brand">Orders by Brand</s-button>
       <s-button slot="secondary-actions" href="/refunds">Refund Orders List</s-button>
@@ -43,8 +49,8 @@ export default function ReportsPage() {
         </s-banner>
       )}
 
-      {REPORTS.map((report) => (
-        <s-section key={report.kind} heading={report.title}>
+      {shown.map((report) => (
+        <s-section key={report.kind} heading={only ? undefined : report.title}>
           <s-stack gap="base">
             <s-text>{report.description}</s-text>
             {report.needsTerms && (

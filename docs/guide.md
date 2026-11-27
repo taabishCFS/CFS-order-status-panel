@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 43 (27 November 2026)
+**Guide version:** 44 (27 November 2026)
 
 ## Before you start
 
@@ -50,7 +50,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 40 | Reschedule Delivery Orders, and the Delivery attempted before? question when rescheduling on an order | Ready |
 | 41 | Minerva Supplier Orders (discount due from Minerva brands on what we paid them) | Ready |
 | 42 | Power BI Analytics (the four Power BI reports inside the app) | Ready, not yet tried |
-| 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice email to the supplier) | Ready, not yet tried |
+| 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice email to the supplier) | Ready |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -288,7 +288,7 @@ If none of the products on the order were made to order, the box says there is n
 
 ## 13. Reports
 
-Press **Reports** at the top of any page. Each report has its own box and a download button. A link appears on screen and works for 5 minutes.
+Each report has its own card in the **Downloads** group on the **Dashboard**, as in the old Downloads menu: **Xero VAT Invoice Report**, **Outstanding Payments Summary**, **Outstanding In-Stock Items**, **Unpaid Invoices Report** and **Delivery Report**. A card opens just that report; **All reports** shows them all on one page (as does **Reports** at the top of the order pages). Each report has a download button. A link appears on screen and works for 5 minutes. The **Sales Summary** card opens the sales summary on the website in a new tab, like the old menu.
 
 ![The Reports page](guide-images/13-reports.jpg)
 
@@ -778,6 +778,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 44 | Downloads on the Dashboard: one card per report in the old menu order, plus a Sales Summary link to the website |
 | 27 Nov 2026 | 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice to the supplier, Batch Invoice No. on the items); new section explaining Pay To Supplier and Supplier Paid |
 | 27 Nov 2026 | 42 | Power BI Analytics page (choose one of the four Power BI reports) |
 | 26 Nov 2026 | 41 | Minerva Supplier Orders page: set Minerva brands (discount % and dates); items of those brands marked Paid are added up inside and outside the dates, with the discount due; download |
