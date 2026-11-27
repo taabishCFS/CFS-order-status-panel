@@ -147,7 +147,7 @@ function address(json) {
 
 /**
  * One CSV row per product line. Order-level amounts (delivery charges, Grand Total) go on the order's first line, so each column adds up to the
- * orders' totals. VAT is one sixth of the amount (20% included in the price), as the old file.
+ * orders' totals: that row's Grand Total is the order total less the other product rows (a whole-order discount is shown in Voucher Discount). VAT is one sixth of the amount (20% included in the price), as the old file.
  */
 export function csvRows(orders, linesByOrder, extra) {
   const out = [];
@@ -162,8 +162,12 @@ export function csvRows(orders, linesByOrder, extra) {
       const resch = extra.reschedules.get(l.lineId);
       const minerva = extra.minerva.get(l.vendor?.trim() ?? "");
       const finalSale = l.priceMinor * l.quantity - l.discountMinor;
-      const charges = first ? o.shippingMinor + Object.values(o.serviceMinor ?? {}).reduce((s, n) => s + (Number(n) || 0), 0) : 0;
-      const gross = finalSale + charges;
+      const all = extra.orderLines?.get(o.orderId) ?? { saleMinor: finalSale, discountMinor: l.discountMinor };
+      // A discount on the whole order (a coupon not split onto the products) is shown in Voucher Discount on the first row.
+      const voucher = first ? Math.max(0, o.discountMinor - all.discountMinor) : 0;
+      // The first row's Grand Total also carries everything else on the order that is not a product (delivery, services, configuration
+      // price changes, whole-order discounts), so each order's rows add up to its Shopify total.
+      const gross = finalSale + (first ? o.totalMinor - all.saleMinor : 0);
       const vat = Math.round(gross / 6);
       const totalCost = pay?.manualCostMinor ?? (cost?.costMinor == null ? null : cost.costMinor * l.quantity);
       const dhd = pay?.dhdCostMinor ?? null;
@@ -172,7 +176,7 @@ export function csvRows(orders, linesByOrder, extra) {
         out.length + 1, o.orderTakenBy ?? "", dateTime(o.createdAt), o.name.replace(/^#/, ""), numericId(l.productId), o.customerName ?? "", o.email ?? "", o.phone ?? "",
         addr.text, o.postcode ?? "", addr.county, l.vendor ?? "", cost?.range ?? "", l.title, l.variantTitle ?? "", l.sku ?? "", pounds(cost?.costMinor ?? null), "", "", "",
         "", pounds(pay?.manualCostMinor ?? null), pounds(inv?.amountMinor ?? null), dmy(inv?.invoiceDate), inv?.invoiceNumber ?? "", inv ? (inv.paid ? "Yes" : "No") : "", "",
-        l.quantity, pounds(totalCost), pounds(l.priceMinor), "", pounds(l.discountMinor), (o.discountCodes ?? []).join(" "), "", "", pounds(finalSale),
+        l.quantity, pounds(totalCost), pounds(l.priceMinor), "", pounds(l.discountMinor), (o.discountCodes ?? []).join(" "), "", first ? pounds(voucher) : "", pounds(finalSale),
         orderLevel(o.shippingMinor), orderLevel(svc(o, "two_man")), orderLevel(svc(o, "white_glove")), orderLevel(svc(o, "scotland")), orderLevel(svc(o, "postcode_pa_iv_kw")), orderLevel(svc(o, "ireland")), "",
         orderLevel(svc(o, "peace_of_mind")), pounds(gross), pounds(vat), pounds(gross - vat), o.gateway ?? "", o.orderSource ?? "", "", "",
         resch?.count ?? "", pounds(resch?.chargeMinor ?? null), "", pounds(dhd), totalCost == null ? "" : pounds(gross - vat - totalCost - (dhd ?? 0)), statusLabel(l.lineStatusId), o.site ?? "",
@@ -193,20 +197,33 @@ export async function orderReportCsv(db, graphql, shop, p) {
   const ids = orders.map((o) => o.orderId);
   const lines = ids.length ? await db.orderLine.findMany({ where: { shop, orderId: { in: ids }, ...(p.brand ? { vendor: p.brand } : {}) }, orderBy: { id: "asc" } }) : [];
   const lineIds = lines.map((l) => l.lineId);
-  const [invoices, payments, reschedules, minerva, costs] = await Promise.all([
+  const [invoices, payments, reschedules, minerva, costs, allLines] = await Promise.all([
     lineIds.length ? db.lineSupplierInvoice.findMany({ where: { shop, lineId: { in: lineIds } } }) : [],
     lineIds.length ? db.linePayment.findMany({ where: { shop, lineId: { in: lineIds } } }) : [],
     lineIds.length ? db.lineReschedule.findMany({ where: { shop, lineId: { in: lineIds } } }) : [],
     db.minervaBrand.findMany({ where: { shop } }),
     costsFor(graphql, lines),
+    ids.length ? db.orderLine.findMany({ where: { shop, orderId: { in: ids } }, select: { orderId: true, priceMinor: true, quantity: true, discountMinor: true } }) : [],
   ]);
   const byLine = (rows) => new Map(rows.map((r) => [r.lineId, r]));
   const linesByOrder = new Map();
   for (const l of lines) linesByOrder.set(l.orderId, [...(linesByOrder.get(l.orderId) ?? []), l]);
   const rows = csvRows(orders.filter((o) => linesByOrder.has(o.orderId)), linesByOrder, {
-    costs, invoices: byLine(invoices), payments: byLine(payments), reschedules: byLine(reschedules), minerva: new Map(minerva.map((m) => [m.brand.trim(), m])),
+    costs, orderLines: lineSums(allLines), invoices: byLine(invoices), payments: byLine(payments), reschedules: byLine(reschedules), minerva: new Map(minerva.map((m) => [m.brand.trim(), m])),
   });
   return { csv: buildCsv(CSV_HEADERS, rows), count: rows.length, capped };
+}
+
+/** Map orderId -> { saleMinor, discountMinor } over every product line of the order (whatever brand is chosen). */
+export function lineSums(lines) {
+  const out = new Map();
+  for (const l of lines) {
+    const s = out.get(l.orderId) ?? { saleMinor: 0, discountMinor: 0 };
+    s.saleMinor += l.priceMinor * l.quantity - l.discountMinor;
+    s.discountMinor += l.discountMinor;
+    out.set(l.orderId, s);
+  }
+  return out;
 }
 
 async function costsFor(graphql, lines) {

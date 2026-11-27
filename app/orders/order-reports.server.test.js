@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CSV_HEADERS, csvFileName, csvRows, pageTotals, parseOrderReportParams, reportCharts, reportRow, reportWhere, salesWhere } from "./order-reports.server.js";
+import { CSV_HEADERS, csvFileName, csvRows, lineSums, pageTotals, parseOrderReportParams, reportCharts, reportRow, reportWhere, salesWhere } from "./order-reports.server.js";
 
 const sp = (q) => new URLSearchParams(q);
 const order = (over = {}) => ({
@@ -69,7 +69,8 @@ describe("csv", () => {
   const extra = (over = {}) => ({ costs: new Map([["v1", { costMinor: 20000, range: "Beds" }]]), invoices: new Map(), payments: new Map(), reschedules: new Map(), minerva: new Map(), ...over });
   it("has the 64 old columns and puts the order's charges on its first line only", () => {
     const o = order();
-    const rows = csvRows([o], new Map([[o.orderId, [line(), line({ lineId: "gid://shopify/LineItem/2", quantity: 1, discountMinor: 0 })]]]), extra());
+    const ls = [line(), line({ lineId: "gid://shopify/LineItem/2", quantity: 1, discountMinor: 0 })];
+    const rows = csvRows([o], new Map([[o.orderId, ls]]), extra({ orderLines: lineSums(ls) }));
     expect(CSV_HEADERS).toHaveLength(64);
     expect(rows).toHaveLength(2);
     const h = (name) => CSV_HEADERS.indexOf(name);
@@ -81,11 +82,12 @@ describe("csv", () => {
     expect(rows[0][h("Final Sale Price")]).toBe("950.00");
     expect(rows[0][h("2 Man Del")]).toBe("50.00");
     expect(rows[1][h("2 Man Del")]).toBe("");
-    // 950 + 50 + 99 + 25 + 10 = 1134
-    expect(rows[0][h("Grand Total")]).toBe("1134.00");
-    expect(rows[0][h("VAT(16.67%)")]).toBe("189.00");
+    // the order total 1124 less the second row's 500 = 624; the two rows add up to the order total
+    expect(rows[0][h("Grand Total")]).toBe("624.00");
+    expect(rows[1][h("Grand Total")]).toBe("500.00");
+    expect(rows[0][h("VAT(16.67%)")]).toBe("104.00");
     expect(rows[0][h("Total Cost")]).toBe("400.00");
-    expect(rows[0][h("Gross Profit")]).toBe("545.00");
+    expect(rows[0][h("Gross Profit")]).toBe("120.00");
     expect(rows[0][h("Voucher Name")]).toBe("SAVE10");
     expect(rows[0][h("Order Status")]).toBe("In Stock");
   });
@@ -105,6 +107,13 @@ describe("csv", () => {
     expect(rows[0][h("Reschedule Delivery Count")]).toBe(2);
     expect(rows[0][h("Minerva Discount")]).toBe("2.5");
     expect(rows[0][h("Minerva To Date")]).toBe("30/11/2026");
+  });
+  it("takes a whole-order discount off the first row as Voucher Discount", () => {
+    const o = order({ discountMinor: 5000 + 3000, serviceMinor: {}, totalMinor: 92000 });
+    const rows = csvRows([o], new Map([[o.orderId, [line()]]]), extra({ orderLines: lineSums([line()]) }));
+    const h = (name) => CSV_HEADERS.indexOf(name);
+    expect(rows[0][h("Voucher Discount")]).toBe("30.00");
+    expect(rows[0][h("Grand Total")]).toBe("920.00");
   });
   it("names the file after the brand and dates", () => {
     expect(csvFileName({ brand: "", from: "2026-11-01", to: "2026-11-02" })).toBe("order_report_All brands-2026-11-01 to 2026-11-02.csv");

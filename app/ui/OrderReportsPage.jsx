@@ -48,12 +48,14 @@ export default function OrderReportsPage() {
     if (!draft.from || !draft.to) { setNotice({ tone: 'warning', text: 'Choose the From and To dates.' }); return; }
     setBusy('apply');
     setLink(null);
+    setNotice(null);
     setApplied((a) => ({ ...a, from: draft.from, to: draft.to, statuses: draft.statuses, page: 1 }));
   };
   const reset = () => {
     const blank = { from: today, to: today, statuses: [] };
     setDraft(blank);
     setLink(null);
+    setNotice(null);
     setApplied({ ...blank, sort: 'date', dir: 'desc', page: 1 });
   };
   const sortBy = (key) => setApplied((a) => ({ ...a, sort: key, dir: a.sort === key && a.dir === 'desc' ? 'asc' : 'desc', page: 1 }));

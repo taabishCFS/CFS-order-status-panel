@@ -51,7 +51,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 41 | Minerva Supplier Orders (discount due from Minerva brands on what we paid them) | Ready |
 | 42 | Power BI Analytics (the four Power BI reports inside the app) | Ready, not yet tried |
 | 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice email to the supplier) | Ready |
-| 44 | Order Reports (orders between two dates by status: sales, charts, page totals, line-by-line CSV) | Ready, not yet tried |
+| 44 | Order Reports (orders between two dates by status: sales, charts, page totals, line-by-line CSV) | Ready |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -311,9 +311,9 @@ At the top you see:
 
 **Orders** lists 50 orders a page: Order No. (red if money is still owed; click to open the order), Customer, Date, Mode (payment method), Subtotal, Discount, Coupon, White Glove, Two Man, Scotland (Scotland, Republic of Ireland and PA/IV/KW postcode charges), Order Total and Status. Click a column name with an arrow to sort by it; click again to reverse. The last row is the **Page total**.
 
-**Export data** downloads every order on the filters (all pages) as a spreadsheet with one row per product and the old file's 64 columns. Choose a brand in **Export brand** first to get only that brand's products. Charges for the whole order (delivery, Two Man, White Glove and so on) and the Grand Total of those charges go on the order's first product row, so each column adds up. **Cost Price** is the Shopify cost; **Total Cost** is the manual cost from Pay To Supplier if one was typed. Columns we do not hold yet are empty: Regular, Prepayment and Collection Discount, Supplier OfferCost, New Cost, Offer and Voucher Discount %, Voucher Discount, Northern Ireland Delivery, Transaction Id, Card Net, Delivery Cost and Brand Group.
+**Export data** downloads every order on the filters (all pages) as a spreadsheet with one row per product and the old file's 64 columns. Choose a brand in **Export brand** first to get only that brand's products. Charges for the whole order (delivery, Two Man, White Glove and so on) go on the order's first product row. That row's **Grand Total** also carries everything else on the order that is not a product (delivery, services, configuration price changes, whole-order discounts), so each order's rows add up to its Shopify total. With one brand chosen, its first row carries them. **Cost Price** is the Shopify cost; **Total Cost** is the manual cost from Pay To Supplier if one was typed. A discount on the whole order (such as a coupon) is shown in **Voucher Discount** on the first row. Columns we do not hold yet are empty: Regular, Prepayment and Collection Discount, Supplier OfferCost, New Cost, Offer and Voucher Discount %, Northern Ireland Delivery, Transaction Id, Card Net, Delivery Cost and Brand Group.
 
-**Good to know:** coupon codes and the White Glove, Two Man and Scotland charges are saved with an order from now on. Older orders show them after they next change, or after **Sync orders** is run on the Orders page. The old page's extra chart views (cities, postcodes, hours, coupons and so on) are not copied.
+**Good to know:** coupon codes and the White Glove, Two Man and Scotland charges are saved with an order from now on. Older orders show them after they next change, or after **Refresh order data** is pressed on the Orders page. The old page's extra chart views (cities, postcodes, hours, coupons and so on) are not copied.
 
 ### Xero VAT Invoice Report
 
