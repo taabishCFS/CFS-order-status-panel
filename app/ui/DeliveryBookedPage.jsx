@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { labelFor } from '../../extensions/cfs-order-status/src/statuses';
 import EmptyState from './EmptyState.jsx';
 import { useStaff } from './useStaff';
+import { useFollowUp } from './DeliveryFollowUp.jsx';
 import { formatDate, statusTone } from './orderList';
 import { changedDrops, downloadLink, groupByDay, loadBooked, markCompletedLines, poundsText, printDeliveryNotes, rescheduleBooked, runTitle, saveDropsForRun } from './bookedDelivery';
 
@@ -46,6 +47,8 @@ export default function DeliveryBookedPage() {
   const clearWarning = () => setNotice((n) => (n?.tone === 'warning' ? null : n));
   const tick = (id, on) => { clearWarning(); setPicked((p) => { const n = new Set(p); if (on) n.add(id); else n.delete(id); return n; }); };
   const tickMany = (rows, on) => { clearWarning(); setPicked((p) => { const n = new Set(p); rows.forEach((r) => (on ? n.add(r.lineId) : n.delete(r.lineId))); return n; }); };
+
+  const followUp = useFollowUp({ lineIds: [...picked], page: 'booked', onDone: (n, reload) => { setNotice(n); if (reload) { setPicked(new Set()); load(); } } });
 
   function go() {
     setApplied({ ...draft, q: draft.q.trim() });
@@ -148,6 +151,7 @@ export default function DeliveryBookedPage() {
             <s-button onClick={exportAll} disabled={busy || runs.length === 0 || undefined}>Download All</s-button>
             <s-button tone="critical" onClick={() => ask('reschedule')} disabled={!canWrite || busy || undefined}>RESCHEDULE DELIVERY</s-button>
             <s-button onClick={() => ask('complete')} disabled={!canWrite || busy || undefined}>MARK COMPLETED</s-button>
+            {canWrite && followUp.buttons}
           </s-stack>
           {confirm && (
             <s-banner tone="warning" heading={`${confirm === 'complete' ? 'Mark Completed' : 'Reschedule'}: ${picked.size} line${picked.size === 1 ? '' : 's'}?`}>
@@ -162,6 +166,8 @@ export default function DeliveryBookedPage() {
           )}
         </s-stack>
       </s-section>
+
+      {followUp.panel}
 
       {data && runs.length === 0 && (
         <s-section><EmptyState title="No bookings" hint="No deliveries are booked for these dates. Change the dates or the brand, then press GO." /></s-section>
@@ -216,7 +222,12 @@ export default function DeliveryBookedPage() {
                           <s-table-cell>{r.code}</s-table-cell>
                           <s-table-cell>{r.quantity}</s-table-cell>
                           <s-table-cell>{r.box ?? '--'}</s-table-cell>
-                          <s-table-cell>{r.delivery === 'confirmed' ? <s-badge tone="success">Confirmed</s-badge> : ''}</s-table-cell>
+                          <s-table-cell>
+                            <s-stack direction="block" gap="small-500">
+                              {r.delivery === 'confirmed' ? <s-badge tone="success">Confirmed</s-badge> : r.delivery === 'declined' ? <s-badge tone="critical">Declined</s-badge> : <s-badge tone="warning">Not Confirmed</s-badge>}
+                              {r.confirmNote && <s-text color="subdued">{r.confirmNote}</s-text>}
+                            </s-stack>
+                          </s-table-cell>
                           <s-table-cell>{r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : ''}</s-table-cell>
                           <s-table-cell>{r.amPm}</s-table-cell>
                           <s-table-cell>{r.drop ?? ''}</s-table-cell>

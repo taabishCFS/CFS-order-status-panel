@@ -541,12 +541,18 @@ model DeliveryBooking {
   amPm          String? // AM | PM | ALL (All Day)
   slotId        String?
   bookedByName  String
+  // The customer's "confirm your delivery" link (legacy crandomno): a random token put in the booking email. A newer email replaces it,
+  // and answering clears it, so each link works once. confirmNote is what the customer typed with the answer.
+  confirmToken  String?
+  confirmNote   String?
+  confirmedAt   DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@unique([shop, lineId])
   @@index([shop, orderId])
   @@index([shop, date, vanId, drop])
+  @@index([confirmToken])
 }
 
 // Every booking, reschedule and completion (the legacy delivery_booking_history).
@@ -555,7 +561,7 @@ model DeliveryHistory {
   shop      String
   orderId   String
   lineId    String
-  action    String // booked | prebooked | rescheduled | marked
+  action    String // booked | prebooked | rescheduled | marked | customer_confirmed | customer_declined | not_confirmed_emailed
   partner   String   @default("CFS")
   date      String?
   vanName   String?

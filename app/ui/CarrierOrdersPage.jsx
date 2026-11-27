@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { labelFor } from '../../extensions/cfs-order-status/src/statuses';
 import EmptyState from './EmptyState.jsx';
 import Pager from './Pager.jsx';
+import { useFollowUp } from './DeliveryFollowUp.jsx';
 import { callBulkEmail } from './bulkEmail';
 import { DELIVERY_UPDATE_MESSAGE, DELIVERY_UPDATE_SUBJECT } from './maxpro';
 import { formatDate, formatMoney, rangeText, statusTone } from './orderList';
@@ -27,7 +28,7 @@ function cellFor(column, r, page) {
     case 'drop': return r.drop ? `Drop ${r.drop}` : '';
     case 'slot': return r.slot;
     case 'delType': return r.deliveryType;
-    case 'confirm': return r.confirmed === 'confirmed' ? <s-badge tone="success">Confirmed</s-badge> : r.confirmed === 'declined' ? <s-badge tone="critical">Declined</s-badge> : '';
+    case 'confirm': return <ConfirmCell r={r} />;
     case 'status': return r.lineStatusId != null ? <s-badge tone={statusTone(r.lineStatusId)}>{labelFor(r.lineStatusId)}</s-badge> : '';
     case 'emailed': return r.emailed ? 'Yes' : 'No';
     case 'balance': return r.balanceMinor > 0 ? <s-text tone="critical">{formatMoney(r.balanceMinor, 'GBP')}</s-text> : '';
@@ -37,6 +38,13 @@ function cellFor(column, r, page) {
     case 'total': return formatMoney(r.amountMinor, 'GBP');
     default: return '';
   }
+}
+
+// Del.Confirm: the customer's (or staff's) answer, Not Confirmed while a dated delivery has none, and the customer's note.
+function ConfirmCell({ r }) {
+  const badge = r.confirmed === 'confirmed' ? <s-badge tone="success">Confirmed</s-badge> : r.confirmed === 'declined' ? <s-badge tone="critical">Declined</s-badge> : r.date ? <s-badge tone="warning">Not Confirmed</s-badge> : null;
+  if (!r.confirmNote) return badge ?? '';
+  return <s-stack direction="block" gap="small-500">{badge}<s-text color="subdued">{r.confirmNote}</s-text></s-stack>;
 }
 
 // The Carrier Deliveries pages, laid out like the old ones: filters, a list of lines, a delivery-update email to the ticked
@@ -73,6 +81,8 @@ export default function CarrierOrdersPage({ carrier }) {
   const go = (extra = {}) => { setApplied({ ...draft, page: 1, all: false, ...extra }); setPicked(new Set()); setLink(null); };
   const reset = () => { setDraft(start); setApplied(start); setPicked(new Set()); setLink(null); };
   const lineIds = [...picked];
+  const followUp = useFollowUp({ lineIds, page: carrier, onDone: (n, reload) => { setLink(null); setNotice(n); if (reload) { setPicked(new Set()); load(); } } });
+  const hasFollowUp = carrier !== 'instock';
 
   async function download(print = false) {
     if (data && data.total === 0) { setLink(null); setNotice({ tone: 'warning', text: 'Nothing to download: no records match.' }); return; }
@@ -159,9 +169,11 @@ export default function CarrierOrdersPage({ carrier }) {
             {page.emailLabel && <s-button disabled={picked.size === 0 || undefined} onClick={() => { setNotice(null); setMailOpen(true); }}>{page.emailLabel}</s-button>}
             {page.pdf && <s-button disabled={busy || undefined} loading={busy === 'pdf' || undefined} onClick={() => download(true)}>Download PDF</s-button>}
             <s-button disabled={busy || undefined} loading={busy === 'csv' || undefined} onClick={() => download(false)}>Download CSV</s-button>
+            {hasFollowUp && followUp.buttons}
           </s-stack>
         </s-stack>
       </s-section>
+      {hasFollowUp && followUp.panel}
 
       {mailOpen && page.emailLabel && (
         <s-section heading={page.emailLabel}>

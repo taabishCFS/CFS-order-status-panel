@@ -45,7 +45,7 @@ describe("seeded layout and status templates", () => {
   });
 
   it("has every other legacy template", () => {
-    expect(OTHER_TEMPLATES.map((t) => t.key).sort()).toEqual(["bulk.customer", "delivery.booking_confirmation", "delivery.confirmed", "delivery.prebooked", "delivery.rescheduled", "delivery.update", "enquiry.reply", "expected_date", "invoice", "supplier.chaseup", "supplier.order_form", "supplier.payment_advice", "tracking"]);
+    expect(OTHER_TEMPLATES.map((t) => t.key).sort()).toEqual(["bulk.customer", "delivery.booking_confirmation", "delivery.confirmed", "delivery.new_date", "delivery.not_confirmed", "delivery.prebooked", "delivery.rescheduled", "delivery.update", "enquiry.reply", "expected_date", "invoice", "supplier.chaseup", "supplier.order_form", "supplier.payment_advice", "tracking"]);
   });
 
   it("the layout carries the legacy header, address, phone, email and copyright", () => {

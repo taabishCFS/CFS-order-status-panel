@@ -1,6 +1,6 @@
 // Fills the template tables from the legacy wording the first time a shop needs them. Never overwrites anything.
 import { LAYOUT } from "./layout";
-import { OTHER_TEMPLATES } from "./other-templates";
+import { BOOKING_CONFIRMATION_BODY, BOOKING_CONFIRMATION_V1, OTHER_TEMPLATES } from "./other-templates";
 import { SITES } from "./sites";
 import { STATUS_TEMPLATES } from "./status-templates";
 
@@ -14,6 +14,20 @@ async function createIgnoringDuplicate(create) {
     await create();
   } catch (error) {
     if (!isDuplicate(error)) throw error; // another request seeded it first
+  }
+}
+
+// Wording we changed after a template was first imported. A shop whose template is still exactly the old text gets the new one
+// (as a new version); a template staff have edited is left alone.
+export const UPGRADES = [{ key: "delivery.booking_confirmation", from: BOOKING_CONFIRMATION_V1, to: BOOKING_CONFIRMATION_BODY, reason: "Confirm button added" }];
+
+async function applyUpgrades(db, shop) {
+  for (const u of UPGRADES) {
+    const row = await db.emailTemplate.findUnique({ where: { shop_key: { shop, key: u.key } } });
+    if (!row || row.body !== u.from) continue;
+    const version = row.version + 1;
+    const done = await db.emailTemplate.updateMany({ where: { shop, key: u.key, version: row.version }, data: { body: u.to, version } });
+    if (done.count === 1) await db.emailTemplateVersion.create({ data: { shop, key: u.key, version, subject: row.subject, body: u.to, reason: u.reason } });
   }
 }
 
@@ -35,4 +49,5 @@ export async function ensureSeeded(db, shop) {
       }),
     );
   }
+  if (haveTemplates.size > 0) await applyUpgrades(db, shop);
 }

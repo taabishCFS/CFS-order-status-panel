@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 51 (27 November 2026)
+**Guide version:** 52 (27 November 2026)
 
 ## Before you start
 
@@ -63,6 +63,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready |
 | 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
 | 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
+| 47 | Customer delivery confirmation: CLICK HERE TO CONFIRM in the booking email opens a page on the store website; the answer shows on the delivery pages. Bulk Reschedule and Not Confirmed Email on the delivery pages | Ready, not yet tried |
 
 ---
 
@@ -699,6 +700,33 @@ Open them from the **Dashboard**, in the **Delivery** group. Each is a list of o
 
 **Downloads.** Every page has **Download CSV** for everything the filters match (all pages), except **FurDeco Orders**: its download is the **FurDeco booking file** for the carrier. Tick the lines to send, press **Download CSV** (it says "Please Select Record(s) to Export" if nothing is ticked) and you get `Furdeco-Orders.csv` with the same 32 columns as the old file: trading name, order number, recipient name and address, phone numbers, email, DELIVER or COLLECT, qty, code, description and so on. **Parts, Cube, Weight and the instructions columns are empty** because we do not hold that data yet. **Allocated From Stock + Delivery Booked** also has **Download PDF**: it opens a landscape page with every column and the print box opens by itself. Choose **Save as PDF** there (or print it). Unlike the old PDF, nothing is cut off at the right.
 
+**Delivery confirmation (Del.Confirm column).** TNT, FurDeco, Pallet, DHD and White Glove now also show **Del.Confirm** (and TNT the **Delivery Date**), as Allocated and Delivery Booked do:
+- **Confirmed** (green): the customer pressed *Yes, I can accept* on the confirm page (or staff set it on the order).
+- **Declined** (red): the customer pressed *No, I can't accept*.
+- **Not Confirmed** (yellow): the line has a delivery date but no answer yet.
+- Anything the customer typed in **Delivery notes** shows under the badge.
+
+### Customer delivery confirmation
+The booking email (**Book & Email** on an order, or **BOOK & EMAIL** on Delivery Booking) now has the old **CLICK HERE TO CONFIRM** button. The rescheduled-date email has it too.
+
+1. The customer clicks the button. It opens a page **on the store website, in the store's own look** (not the app): their order number, the booked items with the delivery date and AM/PM, a box for delivery notes, and two buttons: **Yes, I can accept** and **No, I can't accept**. They can untick items to answer only some of them.
+2. **Yes** saves **Confirmed** on those items, "By Customer". **No** saves **Declined** and sends them the **Delivery update (customer cannot accept)** email (the old "taken off the schedule, we will be in touch by Wednesday 6pm" email), as the old system did.
+3. The answer shows straight away on the delivery pages (Del.Confirm) and in the order's history. Each item can be answered once per email; a newer email for the same items makes the older link stop working ("This link is no longer valid").
+
+### Bulk Reschedule and Not Confirmed Email
+On **TNT, Pallet, FurDeco, DHD, White Glove, Allocated From Stock + Delivery Booked** and **Delivery Booked**.
+
+**Bulk Reschedule.** Tick the lines (for example everyone who has not confirmed, or who declined), press **Bulk Reschedule**, choose the **New delivery date** and press **Reschedule**.
+- The ticked lines move to that date. Van, driver, drop and AM/PM stay as they were (use **EDIT** on Delivery Booked to change drops).
+- Any earlier answer is cleared, because the customer has to confirm the new date. The lines show **Not Confirmed** again.
+- With **Email the customers the new date with a confirm link** ticked (it is, to start with), each customer gets one **Delivery rescheduled to a new date** email with a new **CLICK HERE TO CONFIRM** button.
+- On TNT, Pallet, FurDeco and DHD this also gives a date to lines that were only marked for the carrier, so it is how you **book a TNT date** and send the confirm email. On the other pages, a line with no booking is left out (book it on Book Delivery first) and the message says so.
+- Each move is written to the order's Delivery Update History.
+
+**Not Confirmed Email.** Tick the lines whose customers have not confirmed (for example a delivery due tomorrow with no answer by the end of today), press **Not Confirmed Email**, then **Send emails**. Each customer gets one **Delivery not confirmed** email: we did not get their confirmation and will arrange another delivery within the next 24-72 hours. **Only the email is sent**; nothing else changes. It is written to the Delivery Update History.
+
+The wording of all these emails can be changed on **Email Templates**: *Delivery booking confirmation*, *Delivery rescheduled to a new date*, *Delivery not confirmed* and *Delivery update (customer cannot accept)*. While email is in test mode, only addresses on the allowed list receive them.
+
 **Not on these pages:** the TNT tracking number, volume, weight and number of boxes (we do not hold them). **20Kg TNT** is not built because it depends on item weights we do not hold. The **Panther**, **Prebook** and **Kinetic** pages are not being built because they are not used.
 
 ### Delivery Report CSV (Max) page (Maxpro)
@@ -723,7 +751,9 @@ Open it from the **Dashboard**: **Delivery Booked** in the **Delivery** group. I
 
 **Changing a drop.** Press **EDIT** on a block, type the new drop in **New Drop**, then **SAVE**. An order that already has that drop moves down one place, and so does anything after it that is in the way. The same happens when you book an order into a taken drop, from the order page or from the Book Delivery page and you press **Book anyway**. Every move is written to the order's **Delivery Update History**. A van has at most 16 drops.
 
-**Reschedule.** Tick lines and press **RESCHEDULE DELIVERY**. Their booking is cleared and they go back on the Book Delivery list. The customer is not emailed.
+**Reschedule.** Tick lines and press **RESCHEDULE DELIVERY**. Their booking is cleared and they go back on the Book Delivery list. The customer is not emailed. To move lines to a new date instead (and email the customers a new confirm link), use **Bulk Reschedule** (see Carrier pages above). **Not Confirmed Email** is here too.
+
+**Del.Confirm** shows Confirmed, Declined or Not Confirmed for each line, with the customer's note under it.
 
 **Mark Completed.** Tick the lines that have been delivered and press **MARK COMPLETED**. Their status becomes Completed. A box asks whether to email the customers as well; leave it empty and nobody is emailed. If an email cannot be sent, the status is still saved and the message tells you why.
 
@@ -841,6 +871,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 52 | Customer delivery confirmation page on the store website (CLICK HERE TO CONFIRM in the booking email); Del.Confirm on the carrier pages; Bulk Reschedule and Not Confirmed Email on the delivery pages; two new email templates |
 | 27 Nov 2026 | 51 | Book Delivery, Delivery Booking and Delivery Booked tried and marked Ready; the 'Please Select Record(s)' warning now goes away once you tick a line |
 | 27 Nov 2026 | 50 | Van Management and Driver Management filled in with the old system's vans and drivers (add each van's driver, co-driver and the mobile numbers) |
 | 27 Nov 2026 | 49 | Upload Maxpro CSV on Book Delivery explained (the route file Maxpro sends back; tried with the real sample); Not ready yet list brought up to date |

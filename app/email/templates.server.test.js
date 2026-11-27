@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { fakeTemplatesDb } from "./fixtures";
-import { ensureSeeded } from "./seed/index.server";
+import { ensureSeeded, UPGRADES } from "./seed/index.server";
 import { getTemplate, listTemplates, restoreTemplate, saveTemplate } from "./templates.server";
 
 const SHOP = "s.myshopify.com";
@@ -26,7 +26,7 @@ describe("ensureSeeded", () => {
     expect([db.templates.length, db.versions.length, db.sites.length]).toEqual([t, v, s]);
   });
 
-  it("checks an already-seeded shop with two reads, not one read per template", async () => {
+  it("checks an already-seeded shop with two reads (plus one per wording upgrade), not one read per template", async () => {
     const reads = { one: 0, many: 0 };
     for (const model of [db.emailTemplate, db.emailSite]) {
       const { findUnique, findMany } = model;
@@ -34,7 +34,7 @@ describe("ensureSeeded", () => {
       model.findMany = async (...a) => { reads.many += 1; return findMany(...a); };
     }
     await ensureSeeded(db, SHOP);
-    expect(reads).toEqual({ one: 0, many: 2 });
+    expect(reads).toEqual({ one: UPGRADES.length, many: 2 });
   });
 
   it("fills in only what is missing", async () => {

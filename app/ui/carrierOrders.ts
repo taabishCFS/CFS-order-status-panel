@@ -4,7 +4,7 @@ import { callBackendResult } from './backend';
 export type CarrierKey = 'tnt' | 'pallet' | 'furdeco' | 'dhd' | 'white-glove' | 'allocated' | 'instock';
 export interface CarrierRow {
   lineId: string; orderId: string; orderName: string; orderDate: string; email: string; brand: string; postcode: string; product: string; code: string; quantity: number;
-  balanceMinor: number; stockedDate: string | null; bookingStatus: string; allStatuses: (number | null)[]; custDate: string | null; driver: string; drop: number | null; slot: string; size: string; deliveryType: string; expectedDate: string | null; lastChaseDate: string | null; date: string | null; van: string; confirmed: string | null; emailed: boolean; lineStatusId: number | null; amountMinor: number;
+  balanceMinor: number; stockedDate: string | null; bookingStatus: string; allStatuses: (number | null)[]; custDate: string | null; driver: string; drop: number | null; slot: string; size: string; deliveryType: string; expectedDate: string | null; lastChaseDate: string | null; date: string | null; van: string; confirmed: string | null; confirmNote?: string | null; emailed: boolean; lineStatusId: number | null; amountMinor: number;
 }
 export interface CarrierList { rows: CarrierRow[]; total: number; page: number; pageCount: number; size: number; vans: { id: string; name: string }[]; brands: string[] }
 export interface CarrierFilter { key: CarrierKey; q: string; brand: string; van: string; from: string; to: string; page: number; all: boolean; pay?: string; lines?: string[] }
@@ -16,11 +16,11 @@ export const COLUMN_NAMES: Record<ColumnKey, string> = {
 };
 // Each page shows the columns of its old screen. emailLabel: the page can email the ticked customers. filters: which boxes sit above the list.
 export const PAGES: Record<CarrierKey, { title: string; emailLabel?: string; brand: boolean; dates: boolean; van: boolean; search: boolean; pdf?: boolean; pay?: boolean; exportTicked?: boolean; columns: ColumnKey[] }> = {
-  tnt: { title: 'TNT Orders', emailLabel: 'Send TNT Email', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'status', 'emailed', 'total'] },
-  furdeco: { title: 'FurDeco Orders', emailLabel: 'Send Bulk Email', exportTicked: true, brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'status', 'total'] },
-  pallet: { title: 'Pallet Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'delDate', 'status'] },
-  dhd: { title: 'DHD Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'expDate', 'delDate', 'status'] },
-  'white-glove': { title: 'White Glove Delivery Orders', brand: false, dates: false, van: false, search: false, columns: ['orderDate', 'orderNo', 'brand', 'item', 'code', 'qty', 'delDate', 'status'] },
+  tnt: { title: 'TNT Orders', emailLabel: 'Send TNT Email', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'delDate', 'confirm', 'status', 'emailed', 'total'] },
+  furdeco: { title: 'FurDeco Orders', emailLabel: 'Send Bulk Email', exportTicked: true, brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'postcode', 'item', 'qty', 'custDate', 'delDate', 'confirm', 'status', 'total'] },
+  pallet: { title: 'Pallet Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'delDate', 'confirm', 'status'] },
+  dhd: { title: 'DHD Orders', brand: true, dates: true, van: false, search: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'expDate', 'delDate', 'confirm', 'status'] },
+  'white-glove': { title: 'White Glove Delivery Orders', brand: false, dates: false, van: false, search: false, columns: ['orderDate', 'orderNo', 'brand', 'item', 'code', 'qty', 'delDate', 'confirm', 'status'] },
   instock: { title: 'Instock Delivery Not Booked', brand: false, dates: false, van: false, search: false, pay: true, exportTicked: true, columns: ['orderNo', 'orderDate', 'brand', 'item', 'instockDate', 'balance', 'status', 'bookingStatus', 'allStatus', 'postcode'] },
   allocated: { title: 'Allocated From Stock + Delivery Booked', brand: false, dates: true, van: true, search: true, pdf: true, columns: ['orderDate', 'orderNo', 'brand', 'item', 'code', 'qty', 'delDate', 'van', 'driver', 'drop', 'slot', 'delType', 'confirm', 'status'] },
 };

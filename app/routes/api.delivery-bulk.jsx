@@ -4,6 +4,7 @@ import { readMailConfig } from "../email/config.server";
 import { queueOrderEmails } from "../email/queue-order-emails.server";
 import { runEmailTick } from "../email/worker.server";
 import { MARKS, parseBulkParams, readBulkRequest } from "../delivery/bulk-delivery-rules";
+import { issueConfirmLink } from "../delivery/delivery-confirm.server";
 import { bulkBook, bulkReschedule, listBookable, loadForBooking, markLines } from "../delivery/bulk-delivery.server";
 import { activeAreas } from "../delivery/area.server";
 import { listBrands } from "../orders/list-query.server";
@@ -56,7 +57,8 @@ export const action = async ({ request }) => {
     const date = dmy(lines[0].date);
     const lineExtras = Object.fromEntries(lines.map((l) => [l.lineId, { deliveryDate: dmy(l.date), slot: l.amPm ?? "", drop: l.drop === null ? "" : String(l.drop) }]));
     const templateKey = prebook ? "delivery.prebooked" : "delivery.booking_confirmation";
-    const sent = await queueOrderEmails(db, { shop, orderId, request: { templateKey, lineIds, extras: { deliveryDate: date }, lineExtras }, actor: staff, config });
+    const confirmLink = prebook ? "" : await issueConfirmLink(db, { shop, lineIds });
+    const sent = await queueOrderEmails(db, { shop, orderId, request: { templateKey, lineIds, extras: { deliveryDate: date, confirmLink }, lineExtras }, actor: staff, config });
     if (sent.ok) void runEmailTick({ db }).catch((e) => console.error("Email send pass failed", e?.message ?? e));
     return sent;
   };

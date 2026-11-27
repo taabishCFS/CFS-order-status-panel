@@ -65,6 +65,7 @@ export async function listBooked(db, shop, params) {
       postcode: o.postcode ?? "",
       amountMinor,
       emailed: Boolean(b.emailed),
+      confirmNote: b.confirmNote ?? null,
     });
   }
   const list = [...runs.values()].sort((a, b) => a.date.localeCompare(b.date) || a.vanName.localeCompare(b.vanName));

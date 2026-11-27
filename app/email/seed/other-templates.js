@@ -23,6 +23,42 @@ const box = (inner) => `<table width="100%" cellpadding="10" cellspacing="0" bor
   </tr>
 </table>`;
 
+// The confirm button of the old booking email (legacy ordersconfrm.php link): it opens the confirm page on the shop's website.
+const CONFIRM_BLOCK = `<p>We request you click the link below to confirm that you are OK / Not OK to accept your delivery on the specified date.</p>
+<p style="text-align:center;margin:20px 0;">
+  <a href="{{confirm_link}}" target="_blank"
+     style="display:inline-block;background:#c00;color:#fff;padding:12px 30px;border-radius:5px;text-decoration:none;font-weight:bold;letter-spacing:0.5px;">
+    CLICK HERE TO CONFIRM
+  </a>
+</p>`;
+const ADDRESS_CHECK = `<p><strong>Please check your shipping address and contact us on
+<a href="mailto:{{deliveries_email}}" style="color:#c00;">{{deliveries_email}}</a>
+if any correction is required.</strong></p>`;
+const TIMINGS = `<p style="font-size:13px;color:#555;">
+  <em>Timings for delivery are subject to traffic &amp; weather conditions. Deliveries will be cancelled if any untoward incidence happens or in case our vans break down.</em>
+</p>`;
+
+// The booking confirmation as first imported (no confirm button). A shop still holding exactly this gets the button added (see seed/index.server.js).
+export const BOOKING_CONFIRMATION_V1 = `<p>Dear <strong>{{customer_first_name}}</strong>,</p>
+<p>Good News! We have a delivery date for your order.</p>
+${itemsTable("Delivery Info", "{{line_delivery_date}}<br>{{line_slot}}")}
+${ADDRESS_CHECK}
+${TIMINGS}
+<p style="font-size:13px;color:#555;">
+  Upon receipt of your items please check the items for any damages or other issues you may find, kindly email us at
+  <a href="mailto:{{customer_service_email}}" style="color:#4D403A;">{{customer_service_email}}</a>.
+</p>
+<p style="font-size:13px;color:#555;">
+  <strong>Other Options:</strong><br />
+  If the item(s) you have ordered are small in size and you are unavailable to accept delivery on the above stated date, but do not wish to wait another 2 weeks, you may arrange for our delivery drivers to leave the item in your doorway, porch, garage, with a neighbour etc. Please leave a signed written note on your door stating your authorisation. Without a signed note, drivers will not leave the item and will bring your order back to our warehouse.
+</p>
+<p style="font-size:13px;color:#555;">
+  In the meantime, if you need any further information feel free to contact us.<br /><br />
+  We thank you for your co-operation and await your confirmation.
+</p>`;
+export const BOOKING_CONFIRMATION_BODY = BOOKING_CONFIRMATION_V1.replace(ADDRESS_CHECK, `${ADDRESS_CHECK}
+${CONFIRM_BLOCK}`);
+
 export const OTHER_TEMPLATES = [
   {
     key: "delivery.prebooked",
@@ -40,28 +76,8 @@ ${box("{{delivery_date}}")}
     key: "delivery.booking_confirmation",
     label: "Delivery booking confirmation (customer to confirm)",
     subject: "Order No. {{order_number}} : Delivery Booking Confirmation : {{site_name}}",
-    body: `<p>Dear <strong>{{customer_first_name}}</strong>,</p>
-<p>Good News! We have a delivery date for your order.</p>
-${itemsTable("Delivery Info", "{{line_delivery_date}}<br>{{line_slot}}")}
-<p><strong>Please check your shipping address and contact us on
-<a href="mailto:{{deliveries_email}}" style="color:#c00;">{{deliveries_email}}</a>
-if any correction is required.</strong></p>
-<p style="font-size:13px;color:#555;">
-  <em>Timings for delivery are subject to traffic &amp; weather conditions. Deliveries will be cancelled if any untoward incidence happens or in case our vans break down.</em>
-</p>
-<p style="font-size:13px;color:#555;">
-  Upon receipt of your items please check the items for any damages or other issues you may find, kindly email us at
-  <a href="mailto:{{customer_service_email}}" style="color:#4D403A;">{{customer_service_email}}</a>.
-</p>
-<p style="font-size:13px;color:#555;">
-  <strong>Other Options:</strong><br />
-  If the item(s) you have ordered are small in size and you are unavailable to accept delivery on the above stated date, but do not wish to wait another 2 weeks, you may arrange for our delivery drivers to leave the item in your doorway, porch, garage, with a neighbour etc. Please leave a signed written note on your door stating your authorisation. Without a signed note, drivers will not leave the item and will bring your order back to our warehouse.
-</p>
-<p style="font-size:13px;color:#555;">
-  In the meantime, if you need any further information feel free to contact us.<br /><br />
-  We thank you for your co-operation and await your confirmation.
-</p>`,
-    mustContain: ["We have a delivery date for your order", "Without a signed note, drivers will not leave the item"],
+    body: BOOKING_CONFIRMATION_BODY,
+    mustContain: ["We have a delivery date for your order", "Without a signed note, drivers will not leave the item", "CLICK HERE TO CONFIRM", "{{confirm_link}}"],
   },
   {
     key: "tracking",
@@ -123,6 +139,37 @@ ${itemsTable("Delivery", "To be rearranged")}
    <a href="mailto:{{deliveries_email}}" style="color:#4D403A;">{{deliveries_email}}</a>.</p>
 <p>Thank you for your patience.<br>Warm regards,<br>Customer Service<br>{{site_name}}</p>`,
     mustContain: ["taken your delivery off the current schedule", "Wednesday 6:00pm"],
+  },
+  {
+    key: "delivery.new_date",
+    label: "Delivery rescheduled to a new date (customer to confirm)",
+    subject: "Order No. {{order_number}} : Delivery Rescheduled : {{site_name}}",
+    body: `<p>Dear <strong>{{customer_first_name}}</strong>,</p>
+<p>Your delivery has been rescheduled. The new delivery date for your order <strong>{{order_number}}</strong> is:</p>
+${box("{{delivery_date}}")}
+${itemsTable("Delivery Info", "{{line_delivery_date}}<br>{{line_slot}}")}
+${CONFIRM_BLOCK}
+${ADDRESS_CHECK}
+${TIMINGS}
+<p style="font-size:13px;color:#555;">
+  In the meantime, if you need any further information feel free to contact us.<br /><br />
+  We thank you for your co-operation and await your confirmation.
+</p>
+<p>Warm regards,<br>Delivery Team<br>{{site_name}}</p>`,
+    mustContain: ["Your delivery has been rescheduled", "CLICK HERE TO CONFIRM", "{{confirm_link}}"],
+  },
+  {
+    key: "delivery.not_confirmed",
+    label: "Delivery not confirmed (new delivery in 24-72 hours)",
+    subject: "Order No. {{order_number}} : Delivery Not Confirmed : {{site_name}}",
+    body: `<p>Dear <strong>{{customer_first_name}}</strong>,</p>
+<p>We did not get any confirmation from you for the delivery of the items below on your order <strong>{{order_number}}</strong>.</p>
+${itemsTable("Delivery Date", "{{line_delivery_date}}")}
+<p>We will be arranging another delivery within the next <strong>24&ndash;72 hours</strong> and will be in touch with the new date.</p>
+<p>If you have any questions in the meantime, please email us at
+   <a href="mailto:{{deliveries_email}}" style="color:#4D403A;">{{deliveries_email}}</a>.</p>
+<p>Thank you for your patience.<br>Warm regards,<br>Delivery Team<br>{{site_name}}</p>`,
+    mustContain: ["We did not get any confirmation from you", "24&ndash;72 hours"],
   },
   {
     key: "enquiry.reply",

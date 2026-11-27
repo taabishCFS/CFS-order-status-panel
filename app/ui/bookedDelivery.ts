@@ -4,7 +4,7 @@ import { callBackendResult } from './backend';
 
 export interface BookedRow {
   lineId: string; orderId: string; orderName: string; orderDate: string; brand: string; product: string; code: string; size: string;
-  quantity: number; box: number | null; delivery: 'confirmed' | 'declined' | null; lineStatusId: number | null; amPm: '' | 'AM' | 'PM';
+  quantity: number; box: number | null; delivery: 'confirmed' | 'declined' | null; confirmNote?: string | null; lineStatusId: number | null; amPm: '' | 'AM' | 'PM';
   drop: number | null; deliveryType: string; postcode: string; amountMinor: number; emailed: boolean;
 }
 export interface BookedRun { key: string; date: string; vanId: string; vanName: string; driverName: string; rows: BookedRow[]; totalMinor: number; currency: string }

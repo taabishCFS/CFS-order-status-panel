@@ -26,6 +26,7 @@ export const PLACEHOLDERS = {
     "order_numbers",
     "invoice_number",
     "total_amount",
+    "confirm_link",
   ],
   // Only between {{#lines}} and {{/lines}} (once per selected line).
   line: ["line_name", "line_options", "line_qty", "line_expected_date", "line_delivery_date", "line_slot", "line_drop", "line_note", "line_order_number", "line_cost"],

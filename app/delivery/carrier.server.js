@@ -76,7 +76,7 @@ export async function carrierRows(db, shop, params) {
       custDate: b?.date ?? l.expectedDate ?? null, expectedDate: l.expectedDate ?? null, lastChaseDate: chaseOf.get(l.lineId)?.toISOString?.() ?? null,
       date: b?.date ?? null, van: b?.partner === OWN ? vanOf.get(b.vanId)?.name ?? "" : "",
       driver: b?.partner === OWN ? driverOf.get(b.driverId ?? vanOf.get(b.vanId)?.driverId) ?? "" : "", drop: b?.partner === OWN ? b.drop ?? null : null,
-      slot: b?.amPm === "AM" || b?.amPm === "PM" ? b.amPm : "", size: l.variantTitle ?? "", deliveryType: cfg.booked ? deliveryTypeOf(titles.get(l.orderId) ?? []) : "", confirmed: l.deliveryOutcome ?? null, emailed: Boolean(b?.emailed),
+      slot: b?.amPm === "AM" || b?.amPm === "PM" ? b.amPm : "", size: l.variantTitle ?? "", deliveryType: cfg.booked ? deliveryTypeOf(titles.get(l.orderId) ?? []) : "", confirmed: l.deliveryOutcome ?? null, confirmNote: b?.confirmNote ?? null, emailed: Boolean(b?.emailed),
       balanceMinor: balance, stockedDate: l.stockedDate ?? null, bookingStatus: cfg.unbooked ? latest.get(l.lineId) ?? "" : "", allStatuses: cfg.unbooked ? statusesOf.get(l.orderId) ?? [] : [],
       ship: params.key === "furdeco" ? { name: o.customerName ?? "", phone: o.phone ?? "", email: o.email ?? "", address1: shippingOf(o).address1 ?? "", address2: shippingOf(o).address2 ?? "", city: shippingOf(o).city ?? "", zip: shippingOf(o).zip ?? o.postcode ?? "", shipPhone: shippingOf(o).phone ?? "" } : undefined,
       lineStatusId: l.lineStatusId, amountMinor: Math.max(0, (l.priceMinor ?? 0) * (l.quantity ?? 1) - (l.discountMinor ?? 0)),
