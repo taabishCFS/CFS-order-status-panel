@@ -76,7 +76,12 @@ export default function DeliveryBookingSection({ id, lines, picked, setNotice })
         {data && data.bookings.length > 0 && (
           <s-stack gap="small-200">
             <s-text type="strong">Booked</s-text>
-            {data.bookings.map((b) => <s-text key={b.lineId}>{nameOf(b.lineId)}: {bookingLine(b)}</s-text>)}
+            {data.bookings.map((b) => (
+              <s-stack key={b.lineId} gap="none">
+                <s-text>{nameOf(b.lineId)}: {bookingLine(b)}</s-text>
+                {b.confirmNote && <s-text color="subdued">Customer note: {b.confirmNote}</s-text>}
+              </s-stack>
+            ))}
           </s-stack>
         )}
 

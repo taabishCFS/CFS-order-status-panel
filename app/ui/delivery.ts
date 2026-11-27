@@ -5,7 +5,7 @@ import { callBackendResult } from './backend';
 export interface FleetItem { id: string; name: string; extra: string; active: boolean; driverId?: string | null; coDriverId?: string | null }
 export interface Fleet { drivers: FleetItem[]; vans: FleetItem[]; slots: FleetItem[] }
 export type FleetKind = 'driver' | 'van' | 'slot';
-export interface Booking { lineId: string; partner: string; date: string | null; vanId: string | null; vanName: string; driverId: string | null; driverName: string; drop: number | null; amPm: string | null; bookedByName: string }
+export interface Booking { lineId: string; partner: string; date: string | null; vanId: string | null; vanName: string; driverId: string | null; driverName: string; drop: number | null; amPm: string | null; bookedByName: string; confirmNote?: string | null }
 export interface HistoryEntry { id: string; action: string; partner: string; lineId: string; date: string | null; vanName: string; driverName: string; drop: number | null; amPm: string | null; reason: string; actorName: string; createdAt: string }
 export interface OrderDelivery { fleet: Fleet; bookings: Booking[]; history: HistoryEntry[] }
 export interface BookForm { partner: string; date: string; vanId: string; driverId: string; drop: string; amPm: string }

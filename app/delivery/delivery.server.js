@@ -80,6 +80,8 @@ const bookingView = (b, names) => ({
   drop: b.drop,
   amPm: b.amPm,
   bookedByName: b.bookedByName,
+  // What the customer typed on the confirm page when answering (shown with the booking).
+  confirmNote: b.confirmNote ?? null,
 });
 
 async function nameMaps(db, shop) {

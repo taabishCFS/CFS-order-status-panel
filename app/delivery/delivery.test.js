@@ -142,7 +142,7 @@ describe("booking", () => {
     expect(r).toMatchObject({ ok: true, saved: 2 });
     const view = await orderDelivery(db, SHOP, O(1));
     expect(view.bookings).toHaveLength(2);
-    expect(view.bookings[0]).toMatchObject({ partner: "CFS", vanName: "Van 1", driverName: "Dan", drop: 2, amPm: "AM", bookedByName: "Sam" });
+    expect(view.bookings[0]).toMatchObject({ partner: "CFS", vanName: "Van 1", driverName: "Dan", drop: 2, amPm: "AM", bookedByName: "Sam", confirmNote: null });
     expect(view.history.map((h) => h.action)).toEqual(["booked", "booked"]);
   });
   it("Book & Email queues the customer email, Book & Save does not", async () => {
