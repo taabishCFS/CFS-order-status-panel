@@ -34,6 +34,8 @@ function orderColumns(o) {
     orderSource: o.orderSource,
     brands: o.brands,
     lineStatusIds: o.lineStatusIds,
+    discountCodes: o.discountCodes ?? [],
+    serviceMinor: o.serviceMinor ?? {},
   };
 }
 

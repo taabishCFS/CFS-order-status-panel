@@ -61,6 +61,8 @@ model Order {
   archivedAt       DateTime?
   brands           String[]
   lineStatusIds    Int[]
+  discountCodes    String[]  @default([]) // coupon codes used on the order (Order Reports)
+  serviceMinor     Json      @default("{}") // delivery service charges on the order, { two_man: 5000, ... } in pence (Order Reports)
   syncedAt         DateTime  @default(now()) @updatedAt
 
   @@unique([shop, orderId])

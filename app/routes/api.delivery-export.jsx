@@ -1,6 +1,7 @@
 import { parsePayAgeParams } from "../orders/pay-age.server";
 import { parseRescheduleParams } from "../orders/reschedule-orders.server";
 import { parseMinervaParams } from "../orders/minerva.server";
+import { parseOrderReportParams } from "../orders/order-reports.server";
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
 import { parseCarrierParams } from "../delivery/carrier-rules";
 import { parseOutcomeParams } from "../delivery/outcome-rules";
@@ -59,6 +60,12 @@ export const loader = async ({ request }) => {
     const lines = parseRescheduleParams(search).lines;
     if (lines.length === 0) return json({ error: "bad_request" }, 400);
     query = new URLSearchParams({ lines: lines.join(",") }).toString();
+  } else if (kind === "order-report") {
+    const p = parseOrderReportParams(search, today());
+    const q = new URLSearchParams({ from: p.from, to: p.to });
+    if (p.statuses.length) q.set("statuses", p.statuses.join(","));
+    if (p.brand) q.set("brand", p.brand);
+    query = q.toString();
   } else if (kind === "minerva") {
     const p = parseMinervaParams(search);
     const q = new URLSearchParams();

@@ -14,6 +14,26 @@ describe("mapOrder service and configuration lines", () => {
   });
 });
 
+describe("mapOrder coupon codes and service charges", () => {
+  it("keeps the coupon codes and adds up each service charge in pence, skipping removed ones", () => {
+    const o = gqlOrder();
+    o.discountCodes = ["SAVE10"];
+    o.lineItems.nodes.push(
+      gqlLine(92, { title: "Two Man Delivery [svc:two_man]", originalUnitPriceSet: money("50.00") }),
+      gqlLine(93, { title: "White Glove Premium Delivery [svc:white_glove]", originalUnitPriceSet: money("99.00"), currentQuantity: 0 }),
+      gqlLine(94, { title: "Scotland Delivery [svc:scotland]", originalUnitPriceSet: money("25.50") }),
+    );
+    const { order } = mapOrder("s.myshopify.com", o);
+    expect(order.discountCodes).toEqual(["SAVE10"]);
+    expect(order.serviceMinor).toEqual({ two_man: 5000, scotland: 2550 });
+  });
+  it("has no codes and no charges on a plain order", () => {
+    const { order } = mapOrder("s.myshopify.com", gqlOrder());
+    expect(order.discountCodes).toEqual([]);
+    expect(order.serviceMinor).toEqual({});
+  });
+});
+
 describe("mapOrder removed lines", () => {
   it("leaves out lines removed in an order edit (current quantity 0)", () => {
     const o = gqlOrder();

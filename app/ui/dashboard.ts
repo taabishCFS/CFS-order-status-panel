@@ -70,6 +70,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
   {
     heading: 'Downloads',
     items: [
+      { href: '/order-reports', title: 'Order Reports', description: 'Orders placed between two dates by status: sales, charts, page totals and a line-by-line CSV.', icon: 'chart-vertical' },
       { href: '/reports?report=xero', title: 'Xero VAT Invoice Report', description: 'One row per order placed in the dates you choose, ready to import into Xero.', icon: 'chart-vertical' },
       { href: '/reports?report=outstanding', title: 'Outstanding Payments Summary', description: 'Products not yet paid to the supplier, for credit or pro-forma brands, in the dates you choose.', icon: 'chart-vertical' },
       { href: '/reports?report=instock', title: 'Outstanding In-Stock Items', description: 'Products in stock whose supplier invoice is not paid yet.', icon: 'chart-vertical' },

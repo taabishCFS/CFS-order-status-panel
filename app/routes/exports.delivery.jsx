@@ -13,6 +13,7 @@ import { payCsv, payRowsFor } from "../orders/pay-supplier.server";
 import { PAY_AGE, listPayAge, parsePayAgeParams, payAgeCsv } from "../orders/pay-age.server";
 import { listReschedules, parseRescheduleParams, rescheduleCsv } from "../orders/reschedule-orders.server";
 import { minervaCsv, minervaReport, parseMinervaParams } from "../orders/minerva.server";
+import { csvFileName, orderReportCsv, parseOrderReportParams } from "../orders/order-reports.server";
 import { unauthenticated } from "../shopify.server";
 import { verifyExportLink } from "../orders/export-link.server";
 
@@ -63,6 +64,13 @@ export const loader = async ({ request }) => {
     const { rows } = await listReschedules(db, link.shop, { ...p, all: true });
     if (rows.length === 0) return refuse(404, "Nothing to export.");
     return file(rescheduleCsv(rows), "rescheduleDeliveryOrder.csv");
+  }
+  if (link.kind === "delivery-order-report") {
+    const p = parseOrderReportParams(query);
+    const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
+    const { csv, count } = await orderReportCsv(db, graphql, link.shop, p);
+    if (count === 0) return refuse(404, "Nothing to export.");
+    return file(csv, csvFileName(p));
   }
   if (link.kind === "delivery-minerva") {
     const { rows } = await minervaReport(db, link.shop, parseMinervaParams(query));

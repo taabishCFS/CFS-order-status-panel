@@ -35,6 +35,14 @@ export function mapOrder(shop, o) {
   // Lines removed in an order edit stay on the Shopify order with a current quantity of 0; they are not on the order any more.
   const lineNodes = (o.lineItems?.nodes ?? []).filter((l) => l.currentQuantity !== 0 && !/\[(svc:[a-z_]+|cfg:\d+:v\d+)\]/.test(l.title ?? ""));
   const brandOf = (l) => l.vendor?.trim() || "Unmapped";
+  // Each delivery service charge (and the reschedule charge) in pence, from its [svc:...] line, for Order Reports.
+  const serviceMinor = {};
+  for (const l of o.lineItems?.nodes ?? []) {
+    const key = /\[svc:([a-z_]+)\]/.exec(l.title ?? "")?.[1];
+    const qty = l.currentQuantity ?? l.quantity ?? 0;
+    if (!key || qty <= 0) continue;
+    serviceMinor[key] = (serviceMinor[key] ?? 0) + toMinor(l.originalUnitPriceSet?.shopMoney?.amount ?? 0) * qty;
+  }
   const order = {
     shop,
     orderId: o.id,
@@ -65,6 +73,8 @@ export function mapOrder(shop, o) {
     orderSource: tagValue(tags, "source"),
     brands: [...new Set(lineNodes.map(brandOf))],
     lineStatusIds: [...new Set(lineNodes.map((l) => status.lines[l.id]?.statusId).filter((id) => id != null))],
+    discountCodes: o.discountCodes ?? [],
+    serviceMinor,
   };
   const lines = lineNodes.map((l) => ({
     shop,
