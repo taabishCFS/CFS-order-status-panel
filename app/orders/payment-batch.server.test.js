@@ -84,6 +84,11 @@ describe("building and sending a batch", () => {
     expect((await sendBatch(db, { shop: SHOP, graphql: undefined, request, actor, config })).duplicate).toBe(true);
     expect(db.outbox).toHaveLength(3);
   });
+  it("names the addresses test mode will not email", async () => {
+    const db = makeDb({ lines: [line(1)], contacts, payments: [{ shop: SHOP, lineId: L(1), manualCostMinor: 100 }] });
+    const r = await sendBatch(db, { shop: SHOP, request: { lineIds: [L(1)], invoiceNo: "X", idempotencyKey: KEY }, actor, config: { ...config, mode: "test", allowlist: ["acc@duke.example"] } });
+    expect(r).toMatchObject({ ok: true, blocked: ["sales@duke.example"], mode: "test" });
+  });
   it("changes nothing when email is off", async () => {
     const db = makeDb({ lines: [line(1)], contacts, payments: [{ shop: SHOP, lineId: L(1), manualCostMinor: 100 }] });
     expect(await sendBatch(db, { shop: SHOP, request: { lineIds: [L(1)], invoiceNo: "X", idempotencyKey: KEY }, actor, config: { enabled: false } })).toMatchObject({ ok: false, code: "email_off" });

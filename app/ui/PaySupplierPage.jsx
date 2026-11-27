@@ -92,7 +92,12 @@ export default function PaySupplierPage({ paid = false, list = false }) {
     setBusy(null);
     if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
     const d = res.data;
-    setNotice({ tone: 'success', text: `Batch created and email ${d.duplicate ? 'already sent' : 'sent'} to ${d.recipients.join(', ')} for invoice #${d.invoiceNo} (${d.lines} line${d.lines === 1 ? '' : 's'}, ${money(d.totalMinor)}). Mark the lines Paid when the payment is made.` });
+    const sentTo = d.recipients.filter((r) => !d.blocked?.includes(r));
+    const batchText = `Batch created for invoice #${d.invoiceNo} (${d.lines} line${d.lines === 1 ? '' : 's'}, ${money(d.totalMinor)}).`;
+    const emailText = d.mode === 'log'
+      ? 'Email is in log mode, so the payment advice was recorded but not sent.'
+      : `${sentTo.length ? `Payment advice ${d.duplicate ? 'was already sent' : 'sent'} to ${sentTo.join(', ')}.` : ''}${d.blocked?.length ? ` Test mode: ${d.blocked.join(', ')} ${d.blocked.length === 1 ? 'is' : 'are'} not an allowed test address, so ${d.blocked.length === 1 ? 'it was' : 'they were'} not emailed.` : ''}`;
+    setNotice({ tone: d.blocked?.length || d.mode === 'log' ? 'warning' : 'success', text: `${batchText} ${emailText.trim()} Mark the lines Paid when the payment is made.` });
     setBatchDraft(null);
     setPicked(new Set());
     setInvoiceNo(suggestInvoiceNo());
@@ -199,7 +204,10 @@ export default function PaySupplierPage({ paid = false, list = false }) {
       {batchDraft && (
         <s-section heading={`Payment Batch Draft — Invoice #${batchDraft.invoiceNo}`}>
           <s-stack gap="base">
-            <s-text><s-text type="strong">Supplier:</s-text> {batchDraft.brand}   <s-text type="strong">To:</s-text> {batchDraft.recipients.join(', ')}</s-text>
+            <s-stack gap="small-300">
+              <s-text><s-text type="strong">Supplier:</s-text> {batchDraft.brand}</s-text>
+              <s-text><s-text type="strong">To:</s-text> {batchDraft.recipients.join(', ')}</s-text>
+            </s-stack>
             <s-table>
               <s-table-header-row>
                 <s-table-header listSlot="primary">Order No</s-table-header>

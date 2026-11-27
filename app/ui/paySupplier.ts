@@ -92,7 +92,7 @@ export const removeFromPayList = (lineIds: string[], fetchFn: typeof fetch = fet
 // Create Payment Batch & Draft Email (Pay To Supplier): one brand's ticked lines, the supplier's invoice number, a draft to review, then send.
 export interface BatchLine { lineId: string; orderName: string; title: string; variantTitle: string; quantity: number; costMinor: number }
 export interface BatchDraft { brand: string; recipients: string[]; lines: BatchLine[]; totalMinor: number; invoiceNo: string }
-export interface BatchSent { brand: string; recipients: string[]; lines: number; totalMinor: number; invoiceNo: string; queued: number; duplicate: boolean }
+export interface BatchSent { brand: string; recipients: string[]; blocked: string[]; mode: string | null; lines: number; totalMinor: number; invoiceNo: string; queued: number; duplicate: boolean }
 
 async function postBatch<T>(body: object, fetchFn: typeof fetch): Promise<Result<T>> {
   try {

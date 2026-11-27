@@ -105,5 +105,7 @@ export async function sendBatch(db, { shop, graphql, request, actor, config, now
   const drafts = batch.recipients.map((to) => ({ ...base, kind: "supplier", recipient: to, dedupeKey: `${request.idempotencyKey}:batch:${to}` }));
   if (config.internalCopyTo) drafts.push({ ...base, kind: "internal_copy", recipient: config.internalCopyTo, subject: `${subject} : ${actor.name}`, dedupeKey: `${request.idempotencyKey}:batch:internal_copy` });
   const { rows, duplicate } = await enqueueEmails(db, drafts);
-  return { ok: true, brand: batch.brand, recipients: batch.recipients, lines: batch.lines.length, totalMinor: batch.totalMinor, invoiceNo: batch.invoiceNo, queued: rows.length, duplicate };
+  // In test mode the sender skips addresses that are not on the allowed test list; say so instead of claiming the email went.
+  const blocked = config.mode === "test" ? batch.recipients.filter((to) => !(config.allowlist ?? []).includes(to.toLowerCase())) : [];
+  return { ok: true, brand: batch.brand, recipients: batch.recipients, blocked, mode: config.mode ?? null, lines: batch.lines.length, totalMinor: batch.totalMinor, invoiceNo: batch.invoiceNo, queued: rows.length, duplicate };
 }
