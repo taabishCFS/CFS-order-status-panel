@@ -52,7 +52,7 @@ Still open:
 
 Now unblocked by the answers (build, no more input needed):
 - DONE: the Maxpro return file (`Taabish.csv` format) loads on Book Delivery (Upload Maxpro CSV, built 2026-12-04; checked with the real sample 2026-11-27).
-- Load the drivers and vans list into Van Management / Driver Management (which driver drives which van is still to be read from the cut-off column).
+- DONE 2026-11-27: drivers and vans loaded (scripts/load-old-fleet.mjs <shop>, adds only missing names). Staff still to set each van's driver/co-driver, registrations and mobiles on the pages.
 - Maxpro Country = GB.
 - Main admin setup (Junaid Khan, Sohail Khan, Taabish for testing) and the permission list: add the permission keys for Pay Suppliers, Credit Note, Clearance Ordered Items, Damage Items, SBTS / Display, Free Stock and Containers, Resend Invoice, Replacement orders, Brand terms and email templates.
 
@@ -80,7 +80,7 @@ Now unblocked by the answers (build, no more input needed):
 
 ## Suggested order
 
-0. **Quick wins from the answers:** (Maxpro return file: done) load the drivers and vans, set the main admins and add the new permission keys.
+0. **Quick wins from the answers:** (Maxpro return file and drivers/vans: done) set the main admins and add the new permission keys.
 1. **Read the old code and build the Accounts menu**, starting with Pay To Supplier and Supplier Paid (already decided), then Supplier Payments and the two payment reports, then Reschedule Delivery Orders. Power BI Analytics last (probably only a link).
 2. **Payments & Balances pages**: Balance Pending, Payment History, V12 Approval Status, then Returned Items.
 3. **Stock pages**: Credit Note, Damage Items, Clearance Ordered Items, De-Allocated Stock List.

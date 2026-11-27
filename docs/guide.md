@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 49 (27 November 2026)
+**Guide version:** 50 (27 November 2026)
 
 ## Before you start
 
@@ -615,6 +615,8 @@ Open it from the **Dashboard**: click **Van Management** in the **Delivery** gro
 - Tick one or more vans, then press **INACTIVE** (hides them from the booking box), **ACTIVE** (brings them back) or **DELETE**.
 - **DELETE** asks you to confirm first. A van that is on a delivery booking is not deleted; make it inactive instead and the page tells you which one.
 
+**Already filled in:** the old system's vans (Van 1, Van2 to Van7, Van9, Van12, Fitting Van, Graham Van, Leicester, Humz Van, Devon CFS, SGK, Graham Scotland, Graham Devon, CFS Van, and Kinetic Logistics and Panther as inactive because they are not used now) and drivers (barry, farook, navdeep, nazir, praveen, Rajwant, viman, yusuf, zeeshan). The old screenshots did not show which driver drives which van, the registrations or the mobile numbers: click each van and driver to add them.
+
 ### Driver Management
 Also on the **Dashboard**, in the **Delivery** group. Same layout: ID, Driver Name, Mobile and Status, with the same four buttons. Add your drivers here first, then put them on the vans. A driver who is on a booking or a van cannot be deleted; make them inactive instead.
 
@@ -839,6 +841,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 50 | Van Management and Driver Management filled in with the old system's vans and drivers (add each van's driver, co-driver and the mobile numbers) |
 | 27 Nov 2026 | 49 | Upload Maxpro CSV on Book Delivery explained (the route file Maxpro sends back; tried with the real sample); Not ready yet list brought up to date |
 | 27 Nov 2026 | 48 | Marketing Sales Report tried and marked Ready; the Unmapped brand row (items with no brand) now opens its ranges and orders |
 | 27 Nov 2026 | 47 | Marketing Sales Report (Downloads): item sales by brand, range, category, product, month, day, source or order, click-through, CSV; new permission See the Marketing Sales Report |
