@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 52 (27 November 2026)
+**Guide version:** 53 (27 November 2026)
 
 ## Before you start
 
@@ -63,7 +63,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 28 | Book Delivery page: tick the ready lines, mark TNT/Pallet/FurDeco or book them onto a van with drops and times, email the customers | Ready |
 | 26 | Van Management and Driver Management: tables like the old system, with ADD NEW, INACTIVE, ACTIVE and DELETE; a van has a driver and co-driver | Ready, not yet tried |
 | 27 | Book Delivery box on an order, laid out like the old system: partner, date, driver, van, drop, slot, Book & Email, Book & Save, Reschedule | Ready |
-| 47 | Customer delivery confirmation: CLICK HERE TO CONFIRM in the booking email opens a page on the store website; the answer shows on the delivery pages. Bulk Reschedule and Not Confirmed Email on the delivery pages | Ready, not yet tried |
+| 47 | Customer delivery confirmation: CLICK HERE TO CONFIRM in the booking email opens a page on the store website; the answer shows on the delivery pages. Bulk Reschedule and Not Confirmed Email on the delivery pages | Ready |
 
 ---
 
@@ -711,7 +711,8 @@ The booking email (**Book & Email** on an order, or **BOOK & EMAIL** on Delivery
 
 1. The customer clicks the button. It opens a page **on the store website, in the store's own look** (not the app): their order number, the booked items with the delivery date and AM/PM, a box for delivery notes, and two buttons: **Yes, I can accept** and **No, I can't accept**. They can untick items to answer only some of them.
 2. **Yes** saves **Confirmed** on those items, "By Customer". **No** saves **Declined** and sends them the **Delivery update (customer cannot accept)** email (the old "taken off the schedule, we will be in touch by Wednesday 6pm" email), as the old system did.
-3. The answer shows straight away on the delivery pages (Del.Confirm) and in the order's history. Each item can be answered once per email; a newer email for the same items makes the older link stop working ("This link is no longer valid").
+3. The answer shows straight away on the delivery pages (Del.Confirm) and in the order's history. Each item can be answered once per email: opening the link again shows "Thank you, we have your answer" with their answer and note, not the Yes/No buttons. A newer email for the same items makes the older link stop working ("This link is no longer valid").
+4. The page is at **/apps/cfs-delivery/delivery-confirm** on the store website. Nothing needs adding to the theme: Shopify shows the page inside the theme automatically. (Not /apps/cfs: the configurator app uses that.)
 
 ### Bulk Reschedule and Not Confirmed Email
 On **TNT, Pallet, FurDeco, DHD, White Glove, Allocated From Stock + Delivery Booked** and **Delivery Booked**.
@@ -871,6 +872,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 53 | Customer delivery confirmation tried live and marked Ready (Yes, No, Bulk Reschedule, Not Confirmed Email); CLICK HERE TO CONFIRM button brown like the old site; page moved to /apps/cfs-delivery; an answered link shows the customer's note |
 | 27 Nov 2026 | 52 | Customer delivery confirmation page on the store website (CLICK HERE TO CONFIRM in the booking email); Del.Confirm on the carrier pages; Bulk Reschedule and Not Confirmed Email on the delivery pages; two new email templates |
 | 27 Nov 2026 | 51 | Book Delivery, Delivery Booking and Delivery Booked tried and marked Ready; the 'Please Select Record(s)' warning now goes away once you tick a line |
 | 27 Nov 2026 | 50 | Van Management and Driver Management filled in with the old system's vans and drivers (add each van's driver, co-driver and the mobile numbers) |

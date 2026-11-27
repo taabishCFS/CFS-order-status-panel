@@ -55,7 +55,7 @@ const answerPill = (answer) =>
 
 const itemRow = (i, { checkbox }) => `<li class="cfs-dc__item">
   ${checkbox ? `<input type="checkbox" name="line" value="${esc(i.lineId)}" checked aria-label="${esc(i.title)}">` : ""}
-  <div><p class="cfs-dc__name">${esc(i.title)}</p><p class="cfs-dc__meta">${i.options ? `${esc(i.options)} &middot; ` : ""}Qty ${esc(i.quantity)}</p></div>
+  <div><p class="cfs-dc__name">${esc(i.title)}</p><p class="cfs-dc__meta">${i.options ? `${esc(i.options)} &middot; ` : ""}Qty ${esc(i.quantity)}</p>${!checkbox && i.note ? `<p class="cfs-dc__meta">Your note: ${esc(i.note)}</p>` : ""}</div>
   <div class="cfs-dc__date"><strong>${esc(i.dateLong || i.date)}</strong>${i.slot ? esc(i.slot) : ""}${checkbox ? "" : `<br>${answerPill(i.answer)}`}</div>
 </li>`;
 

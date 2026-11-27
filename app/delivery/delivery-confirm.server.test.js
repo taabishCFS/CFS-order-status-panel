@@ -60,7 +60,7 @@ describe("confirm link", () => {
 describe("loadConfirmPage", () => {
   it("lists the items still to answer and the ones already answered", async () => {
     const db = fakeDb({
-      bookings: [booking("l1"), booking("l2", { confirmedAt: new Date() })],
+      bookings: [booking("l1"), booking("l2", { confirmedAt: new Date(), confirmNote: "Ring first" })],
       lines: [line("l1"), line("l2", { deliveryOutcome: "confirmed" })],
       orders: [ORDER],
     });
@@ -70,6 +70,9 @@ describe("loadConfirmPage", () => {
     expect(page.open.map((i) => i.lineId)).toEqual(["l1"]);
     expect(page.open[0]).toMatchObject({ date: "30/11/2026", dateLong: "Monday 30 November 2026", slot: "AM", options: "Grey" });
     expect(page.answered[0].answer).toBe("confirmed");
+    expect(page.answered[0].note).toBe("Ring first");
+    expect(page.open[0].note).toBeNull();
+    expect(confirmPage({ data: page, token: T, site: { deliveriesEmail: "d@x.co", phone: "" }, formAction: "/" })).toContain("Your note: Ring first");
   });
 
   it("refuses a bad or replaced token", async () => {

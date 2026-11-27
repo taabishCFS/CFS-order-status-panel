@@ -105,7 +105,7 @@ export async function loadConfirmPage(db, { shop, token }) {
     .map((b) => {
       const l = lineOf.get(b.lineId);
       const options = l.variantTitle && l.variantTitle !== "Default Title" ? l.variantTitle : "";
-      return { lineId: b.lineId, title: l.title, options, quantity: l.quantity, date: dmy(b.date), dateLong: longDate(b.date), slot: slotText(b.amPm), answer: b.confirmedAt ? l.deliveryOutcome ?? null : null, answeredAt: b.confirmedAt };
+      return { lineId: b.lineId, title: l.title, options, quantity: l.quantity, date: dmy(b.date), dateLong: longDate(b.date), slot: slotText(b.amPm), answer: b.confirmedAt ? l.deliveryOutcome ?? null : null, answeredAt: b.confirmedAt, note: b.confirmedAt ? b.confirmNote ?? null : null };
     })
     .sort((a, b) => a.title.localeCompare(b.title));
   if (items.length === 0) return { state: "invalid" };
@@ -191,7 +191,7 @@ export async function rescheduleToDate(db, { shop, request, actor, graphql, queu
       data: {
         shop, orderId: l.orderId, lineId: l.lineId, action: "rescheduled", partner: row.partner, date: request.date,
         vanName: row.vanId ? vanName.get(row.vanId) ?? null : null, driverName: row.driverId ? driverName.get(row.driverId) ?? null : null,
-        drop: row.drop, amPm: row.amPm, reason: oldDate ? `Moved from ${dmy(oldDate)} to ${dmy(request.date)}` : `Delivery date set to ${dmy(request.date)}`, actorName: actor.name,
+        drop: row.drop, amPm: row.amPm, reason: oldDate === request.date ? `Date kept at ${dmy(request.date)}, customer asked to confirm again` : oldDate ? `Moved from ${dmy(oldDate)} to ${dmy(request.date)}` : `Delivery date set to ${dmy(request.date)}`, actorName: actor.name,
       },
     });
     moved.push(row);
