@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 41 (26 November 2026)
+**Guide version:** 42 (27 November 2026)
 
 ## Before you start
 
@@ -49,6 +49,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
 | 40 | Reschedule Delivery Orders, and the Delivery attempted before? question when rescheduling on an order | Ready |
 | 41 | Minerva Supplier Orders (discount due from Minerva brands on what we paid them) | Ready |
+| 42 | Power BI Analytics (the four Power BI reports inside the app) | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -728,6 +729,10 @@ Some brands (Minerva suppliers) give us a discount on what we pay them between t
 
 Type a **From** and **To** date and press **Go** to count only items paid in those days; **Reset** clears them. Press **Download** for the same report as a file (minerva_report.csv). The link works for 5 minutes.
 
+### Power BI Analytics
+
+Open it from the **Accounts** group on the **Dashboard**. Choose a **Report** (Brand Report, UD Report, UD Spend Report or Hour Report) and it shows below. **Open in Power BI** opens the same report in a new tab, full screen. These are the same reports as in the old admin; their figures come from Power BI, not from this app.
+
 ## Not ready yet
 
 These will be added to this guide as soon as they are built:
@@ -753,6 +758,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 42 | Power BI Analytics page (choose one of the four Power BI reports) |
 | 26 Nov 2026 | 41 | Minerva Supplier Orders page: set Minerva brands (discount % and dates); items of those brands marked Paid are added up inside and outside the dates, with the discount due; download |
 | 6 Dec 2026 | 34 | Print Delivery Notes button on the Delivery Booked page (many orders on one page) |
 | 6 Dec 2026 | 33 | Delivery Booking list can now be narrowed by Area |

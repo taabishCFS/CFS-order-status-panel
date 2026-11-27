@@ -61,6 +61,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/credit-payment-report', title: 'Credit Payment Report', description: 'Items of credit brands that are In Stock, with the invoice amount with and without VAT. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/minerva-orders', title: 'Minerva Supplier Orders', description: 'For brands that give a Minerva discount: what we paid them inside and outside the discount dates, and the discount due. Set the Minerva brands here.', icon: 'cash-dollar' },
       { href: '/reschedule-orders', title: 'Reschedule Delivery Orders', description: 'Items rescheduled after a delivery attempt, with any charge the customer agreed to and how many times. Download the ticked ones.', icon: 'delivery' },
+      { href: '/power-bi', title: 'Power BI Analytics', description: 'The Power BI reports: Brand Report, UD Report, UD Spend Report and Hour Report.', icon: 'chart-vertical' },
       { href: '/pay-to-supplier', title: 'Pay To Supplier', description: 'Lines we still owe a supplier for: check the cost, add the invoice number and mark them paid.', icon: 'cash-dollar' },
       { href: '/supplier-paid', title: 'Supplier Paid', description: 'Lines already paid to suppliers, grouped by batch invoice. Mark one unpaid if it was a mistake.', icon: 'receipt-refund' },
     ],
