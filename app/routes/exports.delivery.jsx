@@ -14,6 +14,7 @@ import { PAY_AGE, listPayAge, parsePayAgeParams, payAgeCsv } from "../orders/pay
 import { listReschedules, parseRescheduleParams, rescheduleCsv } from "../orders/reschedule-orders.server";
 import { minervaCsv, minervaReport, parseMinervaParams } from "../orders/minerva.server";
 import { csvFileName, orderReportCsv, parseOrderReportParams } from "../orders/order-reports.server";
+import { marketingCsv, marketingFileName, parseMarketingParams } from "../orders/marketing-sales.server";
 import { unauthenticated } from "../shopify.server";
 import { verifyExportLink } from "../orders/export-link.server";
 
@@ -64,6 +65,15 @@ export const loader = async ({ request }) => {
     const { rows } = await listReschedules(db, link.shop, { ...p, all: true });
     if (rows.length === 0) return refuse(404, "Nothing to export.");
     return file(rescheduleCsv(rows), "rescheduleDeliveryOrder.csv");
+  }
+  if (link.kind === "delivery-marketing-sales") {
+    const read = parseMarketingParams(query);
+    if (read.error) return refuse(400, read.error);
+    const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
+    const out = await marketingCsv(db, graphql, link.shop, read.value);
+    if (out.error) return refuse(400, out.error);
+    if (out.count === 0) return refuse(404, "Nothing to export.");
+    return file(out.csv, marketingFileName(read.value));
   }
   if (link.kind === "delivery-order-report") {
     const p = parseOrderReportParams(query);

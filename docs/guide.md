@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 46 (27 November 2026)
+**Guide version:** 47 (27 November 2026)
 
 ## Before you start
 
@@ -52,7 +52,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 42 | Power BI Analytics (the four Power BI reports inside the app) | Ready, not yet tried |
 | 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice email to the supplier) | Ready |
 | 44 | Order Reports (orders between two dates by status: sales, charts, page totals, line-by-line CSV) | Ready |
-| 45 | Supplier Sales Summary (sales per website and brand, with Order Breakup) | Ready, not yet tried |
+| 45 | Supplier Sales Summary (sales per website and brand, with Order Breakup) | Ready |
+| 46 | Marketing Sales Report (item sales by brand, range, category, product, month, day, source or order; CSV) | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -290,7 +291,7 @@ If none of the products on the order were made to order, the box says there is n
 
 ## 13. Reports
 
-Each report has its own card in the **Downloads** group on the **Dashboard**, as in the old Downloads menu: **Order Reports** (below), **Xero VAT Invoice Report**, **Outstanding Payments Summary**, **Outstanding In-Stock Items**, **Supplier Sales Summary** (below), **Unpaid Invoices Report** and **Delivery Report**. A card opens just that report; **All reports** shows them all on one page (as does **Reports** at the top of the order pages). Each report has a download button. A link appears on screen and works for 5 minutes. The **Sales Summary** card opens the sales summary on the website in a new tab, like the old menu.
+Each report has its own card in the **Downloads** group on the **Dashboard**, as in the old Downloads menu: **Order Reports** (below), **Marketing Sales Report** (below), **Xero VAT Invoice Report**, **Outstanding Payments Summary**, **Outstanding In-Stock Items**, **Supplier Sales Summary** (below), **Unpaid Invoices Report** and **Delivery Report**. A card opens just that report; **All reports** shows them all on one page (as does **Reports** at the top of the order pages). Each report has a download button. A link appears on screen and works for 5 minutes. The **Sales Summary** card opens the sales summary on the website in a new tab, like the old menu.
 
 ![The Reports page](guide-images/13-reports.jpg)
 
@@ -331,6 +332,25 @@ How the figures are made, as on the old page:
 - Each delivery service charge (Two Man, White Glove, Scotland, PA/IV/KW postcodes, Republic of Ireland, Peace of Mind) is shared equally between the order's products, so a brand with 2 of the order's 3 products gets two thirds.
 - A coupon on the whole order and configuration price changes are shared between the order's brands by their sales, so Sale Total is what was really charged.
 - An order's website comes from its `site:` tag (eBay orders are found by themselves). Orders without one are under **No site** until the real site rule is set.
+
+### Marketing Sales Report
+
+Open **Marketing Sales Report** from the **Downloads** group on the **Dashboard**. Only staff with the **See the Marketing Sales Report** tick can open it (see Permissions), as the old menu showed it to two staff groups only. It opens on this month up to today, by brand, highest sales first.
+
+1. Press a **Quick dates** button (Today, Yesterday, Current week, Previous week, Current month, Previous month, Current year, Previous year) or type **From date** and **To date**.
+2. Choose any of **Brand**, **Range (collection)**, **Category**, **Product name or SKU**, **Break down by** (Brand, Range, Category, Product, Month, Day, Order source or Orders) and **Sort by**. **More filters** has **Product ID**, **Site**, **Order source** and **Eligible order status**.
+3. Press **Apply filters**. Until you do, the page says *Filters changed*; **Discard changes** puts the form back. **Start over** clears everything.
+4. The four boxes show **Matching orders** (click to list them), **Units sold**, **Item sales** and **Products sold**.
+5. The table has one row per group with **Orders**, **Units** and **Item sales**. Click an order count or **View orders** to see the orders behind a row. **View ranges**, **View products** and **View monthly sales** go one step deeper (brand → ranges → products → months). On the Orders view, **View matching items** shows that order's items and **Open order** opens it.
+6. The filters in use show as chips under the heading; click the **×** on a chip to remove it, or **Clear all filters**. The path at the top (**All sales › brand › range**) takes you back up.
+7. **Export CSV** gives a link to the whole breakdown (all pages, up to 10,000 rows) with the old file's heading lines.
+
+How the figures are made, as on the old page:
+
+- **Item sales** is each item's price × quantity less its own discount. Delivery, service charges and a coupon on the whole order are not included, and refunds are not subtracted.
+- Orders with a total of £0, replacement orders (number starting with R) and items with no quantity are left out. Orders and items in Cancelled, Deleted, Order Failed, Awaiting Payment, Payment Not Confirmed, Awaiting V12 Approval, Cancel-Removed or Payment Not Come are left out.
+- **Range** is the product's Shopify collection, and a product in two collections counts in both. **Category** is its Shopify category (or product type). Both are read from Shopify as they are now.
+- **Site** and **Order source** come from the order's tags; most orders have none yet, so the report starts on **All sites** (the old one started on CFS).
 
 ### Xero VAT Invoice Report
 
@@ -535,6 +555,7 @@ The restricted actions are:
 - **Change delivery and service charges** (the Delivery & services box on an order).
 - **Work the refund list** (Refunded, Save, Add Order and Remove on the Refund Orders List).
 - **Print delivery notes**.
+- **See the Marketing Sales Report** (the page and its CSV).
 - **Manage permissions** (open this page and change what others can do).
 
 ### Setting it up
@@ -818,6 +839,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 47 | Marketing Sales Report (Downloads): item sales by brand, range, category, product, month, day, source or order, click-through, CSV; new permission See the Marketing Sales Report |
 | 27 Nov 2026 | 46 | Supplier Sales Summary (Downloads): sales per website and brand with delivery shares, Order Breakup with checks |
 | 27 Nov 2026 | 45 | Order Reports (Downloads): dates and status filters, sales figures, charts, sortable orders with page totals, line-by-line CSV |
 | 27 Nov 2026 | 44 | Downloads on the Dashboard: one card per report in the old menu order, plus a Sales Summary link to the website |

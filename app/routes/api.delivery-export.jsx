@@ -2,6 +2,9 @@ import { parsePayAgeParams } from "../orders/pay-age.server";
 import { parseRescheduleParams } from "../orders/reschedule-orders.server";
 import { parseMinervaParams } from "../orders/minerva.server";
 import { parseOrderReportParams } from "../orders/order-reports.server";
+import { marketingQuery, parseMarketingParams } from "../orders/marketing-sales.server";
+import db from "../db.server";
+import { can } from "../staff/permissions.server";
 import { parseBookedParams } from "../delivery/booked-delivery-rules";
 import { parseCarrierParams } from "../delivery/carrier-rules";
 import { parseOutcomeParams } from "../delivery/outcome-rules";
@@ -60,6 +63,11 @@ export const loader = async ({ request }) => {
     const lines = parseRescheduleParams(search).lines;
     if (lines.length === 0) return json({ error: "bad_request" }, 400);
     query = new URLSearchParams({ lines: lines.join(",") }).toString();
+  } else if (kind === "marketing-sales") {
+    if (!(await can(db, session.shop, staffFromSession(session), "marketing_sales"))) return json({ error: "no_permission", message: "You do not have permission to see the Marketing Sales Report." }, 403);
+    const read = parseMarketingParams(new URLSearchParams([...search.entries()].filter(([k]) => k !== "kind")), today());
+    if (read.error) return json({ error: "bad_filters", message: read.error }, 400);
+    query = marketingQuery(read.value);
   } else if (kind === "order-report") {
     const p = parseOrderReportParams(search, today());
     const q = new URLSearchParams({ from: p.from, to: p.to });

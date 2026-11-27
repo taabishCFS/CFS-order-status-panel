@@ -9,6 +9,7 @@ export const PERMISSIONS = [
   { key: "book_delivery", label: "Book and reschedule deliveries", detail: "The Delivery Booking box on an order: set the date, van and drop, or reschedule." },
   { key: "pay_suppliers", label: "Pay suppliers", detail: "Pay To Supplier and Supplier Paid: edit costs and invoice numbers, mark lines paid or unpaid." },
   { key: "van_management", label: "Edit drivers, vans and slots", detail: "The Van Management page." },
+  { key: "marketing_sales", label: "See the Marketing Sales Report", detail: "The Marketing Sales Report page and its CSV (Downloads)." },
   { key: "manage_permissions", label: "Manage permissions", detail: "Open this page and change what other staff can do." },
 ];
 export const PERMISSION_KEYS = PERMISSIONS.map((p) => p.key);
