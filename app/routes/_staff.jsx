@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLoaderData, useRouteError } from "react-router";
+import { Outlet, isRouteErrorResponse, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { authenticate } from "../shopify.server";
@@ -31,8 +31,13 @@ export default function StaffLayout() {
 }
 
 // Shopify needs these to carry the sign-in through redirects and to keep the page embeddable.
+// On a first visit Shopify's sign-in answers with a short "bounce" page (status 200) that fetches a session token and reloads.
+// boundary.error spots that answer by its class name, which the minified browser bundle renames, so in the browser it threw the
+// answer on and React Router showed a bare "200". isRouteErrorResponse does not depend on the name, so the bounce page shows and reloads.
 export function ErrorBoundary() {
-  return boundary.error(useRouteError());
+  const error = useRouteError();
+  if (isRouteErrorResponse(error)) return <div dangerouslySetInnerHTML={{ __html: error.data || "Handling response" }} />;
+  return boundary.error(error);
 }
 
 export const headers = (headersArgs) => boundary.headers(headersArgs);
