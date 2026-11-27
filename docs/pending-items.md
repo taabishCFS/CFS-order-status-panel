@@ -51,14 +51,14 @@ Still open:
 28. (Closed) Brand ID 215 is Urban Deco; the menu-pages question is closed too: build the old pages as they are.
 
 Now unblocked by the answers (build, no more input needed):
-- Load the Maxpro return file (`Taabish.csv` format) into Delivery Booking.
+- DONE: the Maxpro return file (`Taabish.csv` format) loads on Book Delivery (Upload Maxpro CSV, built 2026-12-04; checked with the real sample 2026-11-27).
 - Load the drivers and vans list into Van Management / Driver Management (which driver drives which van is still to be read from the cut-off column).
 - Maxpro Country = GB.
 - Main admin setup (Junaid Khan, Sohail Khan, Taabish for testing) and the permission list: add the permission keys for Pay Suppliers, Credit Note, Clearance Ordered Items, Damage Items, SBTS / Display, Free Stock and Containers, Resend Invoice, Replacement orders, Brand terms and email templates.
 
 ## C. Small gaps in what is built
 
-29. Delivery Report CSV (Max) cannot yet load the Maxpro return file back into Delivery Booking (sample now received: Taabish.csv).
+29. DONE: the Maxpro return file loads on Book Delivery (Upload Maxpro CSV); checked with Taabish.csv 2026-11-27.
 30. Box column on the delivery pages (no data).
 31. Scotland-charge rule on the Delivery Booking list (not copied).
 32. Staff must type in the 12 areas and the supplier collection addresses by hand.
@@ -80,13 +80,13 @@ Now unblocked by the answers (build, no more input needed):
 
 ## Suggested order
 
-0. **Quick wins from the answers:** load the Maxpro return file into Delivery Booking, load the drivers and vans, set the main admins and add the new permission keys.
+0. **Quick wins from the answers:** (Maxpro return file: done) load the drivers and vans, set the main admins and add the new permission keys.
 1. **Read the old code and build the Accounts menu**, starting with Pay To Supplier and Supplier Paid (already decided), then Supplier Payments and the two payment reports, then Reschedule Delivery Orders. Power BI Analytics last (probably only a link).
 2. **Payments & Balances pages**: Balance Pending, Payment History, V12 Approval Status, then Returned Items.
 3. **Stock pages**: Credit Note, Damage Items, Clearance Ordered Items, De-Allocated Stock List.
 4. **Customer service pages**: Service Issue Reports, Feedback Calling; then Paypal Orders and Add Marketplace Orders.
 5. **Downloads menu reports** not yet built.
 6. **Non-admin permissions check**, then the security audit, then going-live work (E).
-7. As soon as staff answer the 15 open questions, do the weights, volume, tracking and boxes fields, then 20Kg TNT, the FurDeco empty columns, the Maxpro return file and the Scotland rule.
+7. As soon as staff answer the 15 open questions, do the weights, volume, tracking and boxes fields, then 20Kg TNT, the FurDeco empty columns and the Scotland rule.
 
 Why this order: the Accounts pages were already decided and need no staff input; the permissions check is best done after the new pages exist, so it covers them too. Pages marked "still used?" in the staff questions should be confirmed before building them, so we do not build pages nobody uses.

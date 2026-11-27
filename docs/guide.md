@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 48 (27 November 2026)
+**Guide version:** 49 (27 November 2026)
 
 ## Before you start
 
@@ -625,7 +625,7 @@ Open it from the **Dashboard**: **Book Delivery** in the **Delivery** group. It 
 
 **Finding orders.** Type order numbers or postcodes in the search box (separate several with commas) and press Search. The list follows the order you typed them in. The **Brand / vendor** box shows one brand only.
 
-**Upload Maxpro CSV.** Choose the Maxpro file and press **Load**. The order numbers in the first column are put into the search for you.
+**Upload Maxpro CSV.** Choose the file Maxpro sends back (the route file with 10 columns: Order, Task, Arrival, Departure, Vehicle, Performer and so on) and press **Load**. The order numbers in the first column are put into the search for you, without Maxpro's stop number (151-CFS333977 becomes CFS333977), and the list shows those orders in the file's order, so you can tick them and book the van and drops in route order. A file without 10 columns is refused: *Please upload a proper Maxpro CSV file (expected 10 columns).*
 
 **Mark.** Tick lines and press **TNT**, **PALLET** or **FURDECO**, then confirm. Those lines leave the list and are recorded as going by that carrier.
 
@@ -819,13 +819,13 @@ Open it from the **Accounts** group on the **Dashboard**. Choose a **Report** (B
 These will be added to this guide as soon as they are built:
 
 - Paying refunds straight from the system
-- Replacement orders, Add To Accounts and De-allocate
-- the 20Kg TNT page, Area Management, and loading the Maxpro return file into Delivery Booking
+- Replacement orders and De-allocate
+- the 20Kg TNT page (waiting for staff to say where weight, volume, tracking and boxes are entered)
 - Review emails
 - Export 1 and the Store Orders filter
 - Automatic emails when a status changes
 - Showing the real Site, Taken By and Source on the list
-- The other reports (margins, Marketing Sales Report), payment reminders, service issues, returns and credit notes
+- The other reports (margins), payment reminders, service issues, returns and credit notes
 
 ---
 
@@ -839,6 +839,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 49 | Upload Maxpro CSV on Book Delivery explained (the route file Maxpro sends back; tried with the real sample); Not ready yet list brought up to date |
 | 27 Nov 2026 | 48 | Marketing Sales Report tried and marked Ready; the Unmapped brand row (items with no brand) now opens its ranges and orders |
 | 27 Nov 2026 | 47 | Marketing Sales Report (Downloads): item sales by brand, range, category, product, month, day, source or order, click-through, CSV; new permission See the Marketing Sales Report |
 | 27 Nov 2026 | 46 | Supplier Sales Summary (Downloads): sales per website and brand with delivery shares, Order Breakup with checks |
