@@ -140,7 +140,7 @@ export function sampleEmailData() {
     orderNumbers: "CFS100123, CFS100124",
     invoiceNumber: "CFSINV-20261127120000",
     totalAmount: "£1,250.00",
-    confirmLink: "https://example.myshopify.com/apps/cfs/delivery-confirm?t=preview",
+    confirmLink: "https://example.myshopify.com/apps/cfs-delivery/delivery-confirm?t=preview",
     lines: [
       { name: "Natural Gold 3500 Platform Top Divan Bed", options: "Drawer: with 2 Drawer, Fabric: Carlton Black", qty: 1, expectedDate: "30-Nov-2026", deliveryDate: "02-Dec-2026", slot: "AM (Between 8am – 1pm)", drop: "2", note: "Part delivery", orderNumber: "CFS100123", cost: "£1,000.00" },
       { name: "Comfort Mattress", options: "", qty: 2, expectedDate: "30-Nov-2026", deliveryDate: "02-Dec-2026", drop: "2", note: "", orderNumber: "CFS100124", cost: "£250.00" },

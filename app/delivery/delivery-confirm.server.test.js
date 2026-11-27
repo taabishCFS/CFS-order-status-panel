@@ -51,7 +51,7 @@ describe("confirm link", () => {
   it("is on the shop's own website, with a 48-character token", async () => {
     const db = fakeDb({ bookings: [booking("l1", { confirmToken: null }), booking("l2", { confirmToken: null })] });
     const link = await issueConfirmLink(db, { shop: SHOP, lineIds: ["l1"], newToken: () => T });
-    expect(link).toBe(`https://${SHOP}/apps/cfs/delivery-confirm?t=${T}`);
+    expect(link).toBe(`https://${SHOP}/apps/cfs-delivery/delivery-confirm?t=${T}`);
     expect(db.bookings.map((b) => b.confirmToken)).toEqual([T, null]);
     expect(TOKEN.test(confirmLink(SHOP, T).split("t=")[1])).toBe(true);
   });
@@ -223,11 +223,11 @@ describe("confirm page", () => {
   const site = { deliveriesEmail: "deliveries@cfsonline.co.uk", phone: "0116-296-3800" };
   it("escapes everything, including Liquid braces", () => {
     expect(esc("{{ shop.name }} {% x %} <b>")).toBe("&#123;&#123; shop.name &#125;&#125; &#123;&#37; x &#37;&#125; &lt;b&gt;");
-    const html = confirmPage({ data: { state: "open", order: { name: "#1", firstName: "{{x}}" }, open: [{ lineId: "l1", title: "Sofa", options: "", quantity: 1, date: "30/11/2026", dateLong: "Monday 30 November 2026", slot: "AM" }], answered: [] }, token: T, site, formAction: "/apps/cfs/delivery-confirm" });
+    const html = confirmPage({ data: { state: "open", order: { name: "#1", firstName: "{{x}}" }, open: [{ lineId: "l1", title: "Sofa", options: "", quantity: 1, date: "30/11/2026", dateLong: "Monday 30 November 2026", slot: "AM" }], answered: [] }, token: T, site, formAction: "/apps/cfs-delivery/delivery-confirm" });
     expect(html).not.toContain("{{");
     expect(html).toContain('value="agree"');
     expect(html).toContain('value="disagree"');
-    expect(html).toContain('<form method="post" action="/apps/cfs/delivery-confirm">');
+    expect(html).toContain('<form method="post" action="/apps/cfs-delivery/delivery-confirm">');
     expect(html).toContain("Monday 30 November 2026");
   });
   it("shows the right message for an old link and after each answer", () => {
@@ -245,6 +245,9 @@ describe("email wording", () => {
   it("the booking email has the confirm button, and shops with the old text get it", () => {
     expect(OTHER_TEMPLATES.find((t) => t.key === "delivery.booking_confirmation").body).toBe(BOOKING_CONFIRMATION_BODY);
     expect(UPGRADES[0]).toMatchObject({ key: "delivery.booking_confirmation", to: BOOKING_CONFIRMATION_BODY });
-    expect(UPGRADES[0].from).not.toContain("CLICK HERE TO CONFIRM");
+    expect(UPGRADES[0].from[0]).not.toContain("CLICK HERE TO CONFIRM");
+    expect(UPGRADES[0].from[1]).toContain("background:#c00");
+    expect(BOOKING_CONFIRMATION_BODY).toContain("background:#4D403A;color:#fff");
+    expect(UPGRADES[1].to).toContain("background:#4D403A;color:#fff");
   });
 });

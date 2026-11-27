@@ -20,8 +20,10 @@ const ANSWERS = { agree: "confirmed", disagree: "declined" };
 export const PAGE_PARTNER = { tnt: "TNT", pallet: "Pallet", furdeco: "Fur Deco", dhd: "DHD" };
 
 export const newConfirmToken = () => randomBytes(24).toString("hex");
-/** The link in the email: the shop's own website (app proxy /apps/cfs), so the customer stays on the store and its theme. */
-export const confirmLink = (shop, token) => `https://${shop}/apps/cfs/delivery-confirm?t=${token}`;
+// The store-website path of the confirm page (app proxy prefix + subpath). Set DELIVERY_CONFIRM_PATH if a store's proxy path was changed in its admin.
+export const CONFIRM_PATH = "/apps/cfs-delivery/delivery-confirm";
+/** The link in the email: the shop's own website (app proxy), so the customer stays on the store and its theme. */
+export const confirmLink = (shop, token, path = process.env.DELIVERY_CONFIRM_PATH || CONFIRM_PATH) => `https://${shop}${path}?t=${token}`;
 export const dmy = (iso) => (iso ? String(iso).slice(0, 10).split("-").reverse().join("/") : "");
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

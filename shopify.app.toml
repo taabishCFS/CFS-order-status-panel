@@ -25,7 +25,7 @@ embedded_app_direct_api_access = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_orders,write_orders,write_order_edits,read_products"
+scopes = "read_orders,write_orders,write_order_edits,read_products,write_app_proxy"
 
 [metaobjects.app.cfs_status_history]
 name = "CFS status entry"
@@ -57,10 +57,11 @@ type = "single_line_text_field"
 name = "Entry JSON"
 type = "json"
 
-# The customer's delivery confirmation page on the store's website: https://<store>/apps/cfs/delivery-confirm?t=...
+# The customer's delivery confirmation page on the store's website: https://<store>/apps/cfs-delivery/delivery-confirm?t=...
+# (not apps/cfs: the cfs-configurator app already uses that path)
 [app_proxy]
 url = "https://cfs-order-status-panel.onrender.com/proxy"
-subpath = "cfs"
+subpath = "cfs-delivery"
 prefix = "apps"
 
 [auth]

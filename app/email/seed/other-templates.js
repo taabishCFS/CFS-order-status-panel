@@ -24,13 +24,16 @@ const box = (inner) => `<table width="100%" cellpadding="10" cellspacing="0" bor
 </table>`;
 
 // The confirm button of the old booking email (legacy ordersconfrm.php link): it opens the confirm page on the shop's website.
-const CONFIRM_BLOCK = `<p>We request you click the link below to confirm that you are OK / Not OK to accept your delivery on the specified date.</p>
+// Brown, the colour of the old site's buttons (first built red; shops still holding the red text are upgraded).
+const confirmBlock = (colour) => `<p>We request you click the link below to confirm that you are OK / Not OK to accept your delivery on the specified date.</p>
 <p style="text-align:center;margin:20px 0;">
   <a href="{{confirm_link}}" target="_blank"
-     style="display:inline-block;background:#c00;color:#fff;padding:12px 30px;border-radius:5px;text-decoration:none;font-weight:bold;letter-spacing:0.5px;">
+     style="display:inline-block;background:${colour};color:#fff;padding:12px 30px;border-radius:5px;text-decoration:none;font-weight:bold;letter-spacing:0.5px;">
     CLICK HERE TO CONFIRM
   </a>
 </p>`;
+const CONFIRM_BLOCK = confirmBlock("#4D403A");
+const RED_CONFIRM_BLOCK = confirmBlock("#c00");
 const ADDRESS_CHECK = `<p><strong>Please check your shipping address and contact us on
 <a href="mailto:{{deliveries_email}}" style="color:#c00;">{{deliveries_email}}</a>
 if any correction is required.</strong></p>`;
@@ -58,6 +61,22 @@ ${TIMINGS}
 </p>`;
 export const BOOKING_CONFIRMATION_BODY = BOOKING_CONFIRMATION_V1.replace(ADDRESS_CHECK, `${ADDRESS_CHECK}
 ${CONFIRM_BLOCK}`);
+export const BOOKING_CONFIRMATION_RED = BOOKING_CONFIRMATION_V1.replace(ADDRESS_CHECK, `${ADDRESS_CHECK}
+${RED_CONFIRM_BLOCK}`);
+const newDateBody = (block) => `<p>Dear <strong>{{customer_first_name}}</strong>,</p>
+<p>Your delivery has been rescheduled. The new delivery date for your order <strong>{{order_number}}</strong> is:</p>
+${box("{{delivery_date}}")}
+${itemsTable("Delivery Info", "{{line_delivery_date}}<br>{{line_slot}}")}
+${block}
+${ADDRESS_CHECK}
+${TIMINGS}
+<p style="font-size:13px;color:#555;">
+  In the meantime, if you need any further information feel free to contact us.<br /><br />
+  We thank you for your co-operation and await your confirmation.
+</p>
+<p>Warm regards,<br>Delivery Team<br>{{site_name}}</p>`;
+export const NEW_DATE_BODY = newDateBody(CONFIRM_BLOCK);
+export const NEW_DATE_RED = newDateBody(RED_CONFIRM_BLOCK);
 
 export const OTHER_TEMPLATES = [
   {
@@ -144,18 +163,7 @@ ${itemsTable("Delivery", "To be rearranged")}
     key: "delivery.new_date",
     label: "Delivery rescheduled to a new date (customer to confirm)",
     subject: "Order No. {{order_number}} : Delivery Rescheduled : {{site_name}}",
-    body: `<p>Dear <strong>{{customer_first_name}}</strong>,</p>
-<p>Your delivery has been rescheduled. The new delivery date for your order <strong>{{order_number}}</strong> is:</p>
-${box("{{delivery_date}}")}
-${itemsTable("Delivery Info", "{{line_delivery_date}}<br>{{line_slot}}")}
-${CONFIRM_BLOCK}
-${ADDRESS_CHECK}
-${TIMINGS}
-<p style="font-size:13px;color:#555;">
-  In the meantime, if you need any further information feel free to contact us.<br /><br />
-  We thank you for your co-operation and await your confirmation.
-</p>
-<p>Warm regards,<br>Delivery Team<br>{{site_name}}</p>`,
+    body: NEW_DATE_BODY,
     mustContain: ["Your delivery has been rescheduled", "CLICK HERE TO CONFIRM", "{{confirm_link}}"],
   },
   {

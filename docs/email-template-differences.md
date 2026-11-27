@@ -32,7 +32,7 @@ All line numbers are in `master_adm_book_27/`. Wording is ported as written; the
 | Key | Legacy source | Notes |
 |---|---|---|
 | `delivery.prebooked` | `orderdetailadd_a.php` ~507 | Greets "Dear Customer" as legacy does |
-| `delivery.booking_confirmation` | `orderdetailadd_a.php` ~877 | The **CLICK HERE TO CONFIRM** button is ported (`{{confirm_link}}`): it opens our confirm page on the store website (app proxy `/apps/cfs/delivery-confirm`), which replaces `ordersconfrm.php` / `confrom_order.php`. A shop still holding the first imported text gets the button added automatically (`UPGRADES` in `seed/index.server.js`); an edited template is left alone. The legacy shipping-address block is still not ported |
+| `delivery.booking_confirmation` | `orderdetailadd_a.php` ~877 | The **CLICK HERE TO CONFIRM** button is ported (`{{confirm_link}}`): it opens our confirm page on the store website (app proxy `/apps/cfs-delivery/delivery-confirm`), which replaces `ordersconfrm.php` / `confrom_order.php`. A shop still holding the first imported text gets the button added automatically (`UPGRADES` in `seed/index.server.js`); an edited template is left alone. The legacy shipping-address block is still not ported |
 | `delivery.new_date` | none (new, 2026-11-27) | Bulk Reschedule email: the new date with the confirm button. No legacy wording existed; drafted from the booking confirmation |
 | `delivery.not_confirmed` | none (new, 2026-11-27) | Not Confirmed Email: "we did not get any confirmation ... another delivery within the next 24-72 hours", from the staff request. No legacy wording existed |
 | `tracking` | `orderdetailadd_a.php` ~915 | Greets with the full name, as legacy |
