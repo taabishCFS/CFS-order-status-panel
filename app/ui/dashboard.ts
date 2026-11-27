@@ -20,6 +20,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/orders-by-brand', title: 'Orders by Brand', description: 'One row per product, by supplier brand. Chase suppliers and download the ordering sheets.', icon: 'product' },
       { href: '/supplier-chaseup', title: 'Supplier Chaseup', description: 'Lines due soon: email the supplier a chase-up and update expected dates.', icon: 'clock' },
       { href: '/date-lapsed', title: 'Date Lapsed', description: 'Lines whose expected date has passed and are still waiting on the supplier.', icon: 'alert-circle' },
+      { href: '/balance-pending', title: 'Balance Pending', description: 'Every order that still owes money: what was paid and what is owed. Download the ticked orders or every item.', icon: 'cash-dollar' },
       { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },
     ],

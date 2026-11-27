@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 53 (27 November 2026)
+**Guide version:** 54 (27 November 2026)
 
 ## Before you start
 
@@ -44,6 +44,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 25 | Keep each brand's supplier email, and mark brands you order from by hand | Ready, not yet tried |
 | 35 | Area page (named groups of postcodes) | Ready, not yet tried |
 | 36 | Instock Balance Due (orders that still owe money while every item is in stock or on its way) | Ready, not yet tried |
+| 48 | Balance Pending (every order that still owes money, paid and owed amounts, two downloads) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
@@ -110,6 +111,18 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 - A **blue row** means a replacement order.
 - A **star** next to a name means the customer has ordered before.
 - **Pay Type** tells you if the order is Fully paid, Partially paid, Awaiting payment or Payment failed. A cancelled order shows Payment failed.
+
+### Balance Pending
+Open **Balance Pending** on the Dashboard (Orders group). It lists **every order that still owes money**, newest first, like the old Balance Pending page.
+
+- An order is left off when every item is Completed, Cancelled, Deleted, Order Failed, Awaiting V12 Approval or Awaiting Payment. Cancelled orders are left off too.
+- Each row shows the date, order number (click it to open the order), customer, postcode, payment type, **Total**, **Paid Amt.** and **Balance Amt.**, a **Full refund** or **Part refund** mark, and the status of every item.
+- **Balance** and **Paid** at the top add up the orders shown on the page (press **All** to show every order at once).
+- **Status** shows only orders with an item in that status. **Search** finds an order number, email, customer name or payment type; press **GO**. **Reset** clears both.
+- **Export ticked**: tick orders and press it for the old file (Order No, Order Date, Customer, Grand Total, Balance Amount, Status, ePaymentOption).
+- **Download All**: one row per item of every order that owes money (whatever the page is showing). It has the brand, product, quantity, unit and total cost (from Shopify), sale prices, the **Deposit Amount** and **Balance Amount** for that item (the order's paid and owed money shared out over its items by price), payment type, expected date and status. Items that are Completed, Cancelled, Deleted, Order Failed, Payment Not Confirmed, Awaiting V12 Approval or Awaiting Payment are left out.
+
+**Not copied:** the old **Send** balance reminder button and its History column. In the old system that button was already switched off (it pointed to a file that no longer exists).
 
 ---
 
@@ -872,6 +885,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 54 | Balance Pending page: every order that still owes money, paid and owed amounts, status filter, search, Export ticked and Download All |
 | 27 Nov 2026 | 53 | Customer delivery confirmation tried live and marked Ready (Yes, No, Bulk Reschedule, Not Confirmed Email); CLICK HERE TO CONFIRM button brown like the old site; page moved to /apps/cfs-delivery; an answered link shows the customer's note; the order page's Book Delivery box shows the customer's note too |
 | 27 Nov 2026 | 52 | Customer delivery confirmation page on the store website (CLICK HERE TO CONFIRM in the booking email); Del.Confirm on the carrier pages; Bulk Reschedule and Not Confirmed Email on the delivery pages; two new email templates |
 | 27 Nov 2026 | 51 | Book Delivery, Delivery Booking and Delivery Booked tried and marked Ready; the 'Please Select Record(s)' warning now goes away once you tick a line |

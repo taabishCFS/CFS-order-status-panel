@@ -6,6 +6,7 @@ import { CARRIERS, carrierCsv, carrierPrintHtml, parseCarrierParams } from "../d
 import { outcomeRows } from "../delivery/outcome.server";
 import { KINDS, outcomeCsv, parseOutcomeParams } from "../delivery/outcome-rules";
 import { balanceRowsFor, instockBalanceCsv } from "../delivery/instock-balance.server";
+import { balancePendingAllCsv, balancePendingCsv, balancePendingFileName, balancePendingRowsFor, parseBalancePendingParams } from "../orders/balance-pending.server";
 import { maxproRowsFor } from "../delivery/maxpro.server";
 import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
@@ -92,6 +93,18 @@ export const loader = async ({ request }) => {
     const rows = await balanceRowsFor(db, link.shop, ids);
     if (rows.length === 0) return refuse(404, "Nothing to export. The orders may have been paid or changed since the list was loaded.");
     return file(instockBalanceCsv(rows), "Instock-Pending-Balance.csv");
+  }
+  if (link.kind === "delivery-balance-pending") {
+    const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x));
+    const rows = await balancePendingRowsFor(db, link.shop, ids);
+    if (rows.length === 0) return refuse(404, "Nothing to export. The orders may have been paid or changed since the list was loaded.");
+    return file(balancePendingCsv(rows), balancePendingFileName(parseBalancePendingParams(query).status));
+  }
+  if (link.kind === "delivery-balance-pending-all") {
+    const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
+    const out = await balancePendingAllCsv(db, graphql, link.shop);
+    if (out.count === 0) return refuse(404, "Nothing to export: no order owes a balance.");
+    return file(out.csv, out.fileName);
   }
   if (link.kind === "delivery-maxpro-order" || link.kind === "delivery-maxpro-product") {
     const ids = (query.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)).map((x) => `gid://shopify/Order/${x}`);

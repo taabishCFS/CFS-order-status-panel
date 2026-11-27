@@ -2,6 +2,7 @@ import { parsePayAgeParams } from "../orders/pay-age.server";
 import { parseRescheduleParams } from "../orders/reschedule-orders.server";
 import { parseMinervaParams } from "../orders/minerva.server";
 import { parseOrderReportParams } from "../orders/order-reports.server";
+import { parseBalancePendingParams } from "../orders/balance-pending.server";
 import { marketingQuery, parseMarketingParams } from "../orders/marketing-sales.server";
 import db from "../db.server";
 import { can } from "../staff/permissions.server";
@@ -84,6 +85,13 @@ export const loader = async ({ request }) => {
     const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
     if (ids.length === 0 || ids.length > 2000) return json({ error: "bad_request" }, 400);
     query = new URLSearchParams({ ids: ids.join(",") }).toString();
+  } else if (kind === "balance-pending") {
+    const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
+    if (ids.length === 0 || ids.length > 2000) return json({ error: "bad_request" }, 400);
+    const status = parseBalancePendingParams(search).status;
+    query = new URLSearchParams({ ids: ids.join(","), ...(status ? { status: String(status) } : {}) }).toString();
+  } else if (kind === "balance-pending-all") {
+    query = "";
   } else if (kind === "maxpro-order" || kind === "maxpro-product") {
     const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
     if (ids.length === 0 || ids.length > MAX_EXPORT_ORDERS) return json({ error: "bad_request" }, 400);
