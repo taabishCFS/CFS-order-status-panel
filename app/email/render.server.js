@@ -77,6 +77,8 @@ function orderValues({ site, data, now }, encode) {
     reason: data.reason,
     message: data.message,
     order_numbers: data.orderNumbers,
+    invoice_number: data.invoiceNumber,
+    total_amount: data.totalAmount,
   };
   const values = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, encode(v ?? "")]));
   // A message typed by staff keeps its line breaks (after escaping, so the <br> is ours).
@@ -94,6 +96,8 @@ function lineValues(line) {
     line_slot: escapeHtml(line.slot),
     line_drop: escapeHtml(line.drop),
     line_note: escapeHtml(line.note),
+    line_order_number: escapeHtml(line.orderNumber),
+    line_cost: escapeHtml(line.cost),
   };
 }
 
@@ -133,9 +137,11 @@ export function sampleEmailData() {
     reason: "Customer request",
     message: "This is a sample message.",
     orderNumbers: "CFS100123, CFS100124",
+    invoiceNumber: "CFSINV-20261127120000",
+    totalAmount: "£1,250.00",
     lines: [
-      { name: "Natural Gold 3500 Platform Top Divan Bed", options: "Drawer: with 2 Drawer, Fabric: Carlton Black", qty: 1, expectedDate: "30-Nov-2026", deliveryDate: "02-Dec-2026", slot: "AM (Between 8am – 1pm)", drop: "2", note: "Part delivery" },
-      { name: "Comfort Mattress", options: "", qty: 2, expectedDate: "30-Nov-2026", deliveryDate: "02-Dec-2026", drop: "2", note: "" },
+      { name: "Natural Gold 3500 Platform Top Divan Bed", options: "Drawer: with 2 Drawer, Fabric: Carlton Black", qty: 1, expectedDate: "30-Nov-2026", deliveryDate: "02-Dec-2026", slot: "AM (Between 8am – 1pm)", drop: "2", note: "Part delivery", orderNumber: "CFS100123", cost: "£1,000.00" },
+      { name: "Comfort Mattress", options: "", qty: 2, expectedDate: "30-Nov-2026", deliveryDate: "02-Dec-2026", drop: "2", note: "", orderNumber: "CFS100124", cost: "£250.00" },
     ],
   };
 }

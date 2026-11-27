@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 42 (27 November 2026)
+**Guide version:** 43 (27 November 2026)
 
 ## Before you start
 
@@ -50,6 +50,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 40 | Reschedule Delivery Orders, and the Delivery attempted before? question when rescheduling on an order | Ready |
 | 41 | Minerva Supplier Orders (discount due from Minerva brands on what we paid them) | Ready |
 | 42 | Power BI Analytics (the four Power BI reports inside the app) | Ready, not yet tried |
+| 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice email to the supplier) | Ready, not yet tried |
 | 34 | Supplier Collection page (book by brand, van and date; address on Suppliers page) | Ready, not yet tried |
 | 33 | Instock Delivery Not Booked page (payment filter, CSV of ticked items) | Ready, not yet tried |
 | 32 | Carrier pages (TNT, Pallet, FurDeco, DHD, White Glove, Allocated + Booked) with filters, email and CSV | Ready, not yet tried |
@@ -709,6 +710,25 @@ Open it from the **Accounts** group on the **Dashboard**. It lists every item th
 - Type part of a product name, brand or order number in **Search** and press **Search**. **Reset** clears the filters.
 - Tick items and press **Export ticked** for a file with the same columns as the old page. The link works for 5 minutes.
 
+### Pay To Supplier and Supplier Paid
+
+Open them from the **Accounts** group on the **Dashboard**. **Pay To Supplier** lists the items we still have to pay suppliers for; **Supplier Paid** lists the ones already paid. Changing anything needs the **Pay suppliers** permission.
+
+- Type a cost in **Update Cost** (the manual cost) or **DHD Cost** and press **Save**. **Final Cost** is the manual cost (or the Shopify cost) plus DHD.
+- Type the supplier's **Invoice No.** for an item and press **Save**.
+- Tick items and press **Mark Paid**. On **Supplier Paid**, tick items and press **Mark Unpaid** to undo a mistake.
+- **Export ticked** downloads the ticked items.
+
+**Create Payment Batch & Draft Email** (one email goes to one supplier):
+
+1. Choose the **Brand** at the top. The batch boxes appear under the buttons.
+2. Tick the items you are paying for. Check the **Supplier invoice number for this batch**: a number like CFSINV-20261127114500 is filled in for you; type the supplier's own invoice number instead if you have it. **New number** makes a fresh one.
+3. Press **Create Payment Batch & Draft Email**. A draft shows: the supplier, the email addresses it goes to, each item with its cost, and the total. Nothing is changed yet.
+4. Press **Confirm & Send Email**. The invoice number is put on the items (the **Batch Invoice No.** column) and the supplier is emailed a **Payment Advice**. Press **Cancel** instead to change something.
+5. The items are **not** marked paid. Press **Mark Paid** when the payment is made.
+
+The cost in the email is the manual cost if one was typed, otherwise the Shopify cost (DHD is not included). Every ticked item needs a cost, and the brand needs an email address on the **Suppliers** page. The email wording can be changed on **Email Templates** (Supplier payment advice).
+
 ### Minerva Supplier Orders
 
 Some brands (Minerva suppliers) give us a discount on what we pay them between two dates. Open this page from the **Accounts** group on the **Dashboard**.
@@ -758,6 +778,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 27 Nov 2026 | 43 | Create Payment Batch & Draft Email on Pay To Supplier (payment advice to the supplier, Batch Invoice No. on the items); new section explaining Pay To Supplier and Supplier Paid |
 | 27 Nov 2026 | 42 | Power BI Analytics page (choose one of the four Power BI reports) |
 | 26 Nov 2026 | 41 | Minerva Supplier Orders page: set Minerva brands (discount % and dates); items of those brands marked Paid are added up inside and outside the dates, with the discount due; download |
 | 6 Dec 2026 | 34 | Print Delivery Notes button on the Delivery Booked page (many orders on one page) |

@@ -88,3 +88,26 @@ async function postList(body: object, fetchFn: typeof fetch): Promise<Result<{ a
 }
 export const addToPayList = (lineIds: string[], fetchFn: typeof fetch = fetch) => postList({ op: 'add', lineIds }, fetchFn);
 export const removeFromPayList = (lineIds: string[], fetchFn: typeof fetch = fetch) => postList({ op: 'remove', lineIds }, fetchFn);
+
+// Create Payment Batch & Draft Email (Pay To Supplier): one brand's ticked lines, the supplier's invoice number, a draft to review, then send.
+export interface BatchLine { lineId: string; orderName: string; title: string; variantTitle: string; quantity: number; costMinor: number }
+export interface BatchDraft { brand: string; recipients: string[]; lines: BatchLine[]; totalMinor: number; invoiceNo: string }
+export interface BatchSent { brand: string; recipients: string[]; lines: number; totalMinor: number; invoiceNo: string; queued: number; duplicate: boolean }
+
+async function postBatch<T>(body: object, fetchFn: typeof fetch): Promise<Result<T>> {
+  try {
+    const res = await callBackendResult('/api/payment-batch', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }, fetchFn);
+    const b = res.body as (T & Body) | null;
+    return res.ok && b ? { ok: true, data: b as T } : { ok: false, message: explain(res.status, b) };
+  } catch (e) {
+    return failure(e);
+  }
+}
+export const draftBatch = (lineIds: string[], invoiceNo: string, fetchFn: typeof fetch = fetch) => postBatch<BatchDraft>({ op: 'draft', lineIds, invoiceNo }, fetchFn);
+export const sendBatch = (lineIds: string[], invoiceNo: string, idempotencyKey: string, fetchFn: typeof fetch = fetch) => postBatch<BatchSent>({ op: 'send', lineIds, invoiceNo, idempotencyKey }, fetchFn);
+
+/** A new suggested batch invoice number, CFSINV-<date and time>, like the old page's (which also had the brand number). */
+export function suggestInvoiceNo(now = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `CFSINV-${now.getFullYear()}${p(now.getMonth() + 1)}${p(now.getDate())}${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}`;
+}

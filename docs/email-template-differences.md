@@ -41,6 +41,7 @@ All line numbers are in `master_adm_book_27/`. Wording is ported as written; the
 | `bulk.customer` | `bulk_order_by_brand_email.php` | Legacy lets staff type subject and body with `{{customer_name}}` and `{{order_numbers}}`; here `{{message}}` is what staff type |
 | `supplier.order_form` | `orderProcess_a.php` ~380 | **Needs staff wording/data.** Legacy fills supplier address, product codes, courier and coupon blocks from tables the app does not have yet. Seeded: heading, item table, and the legacy Notes text |
 | `supplier.chaseup` | `orderProcessChaseup_a.php` ~284 | **Needs staff wording/data.** Same limitation; heading and item table only |
+| `supplier.payment_advice` | `accountsPayToSupplier_batchAction.php` | Same wording and table (Order No, Item, Qty, Cost, Total). Subject adds ` : {{site_name}}` like the other emails; the old hard-coded footer is replaced by the shared layout |
 | `expected_date` | `orderdetailadd_a.php` ~1760 (`sendExpectedDateNew`) | **Needs staff wording.** Legacy has no fixed text (staff write it in a pop-up); this is a minimal template listing the lines and the date |
 
 ## Sending rules to confirm with staff

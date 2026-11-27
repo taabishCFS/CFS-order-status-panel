@@ -197,6 +197,36 @@ ${OPEN}
     mustContain: ["Please confirm by written email receipt of this order form", "All Order Confirmations and queries must be sent to"],
   },
   {
+    // Legacy accountsPayToSupplier_batchAction.php (Create Payment Batch & Draft Email on Pay To Supplier).
+    key: "supplier.payment_advice",
+    label: "Supplier payment advice",
+    subject: "Payment Advice - Invoice {{invoice_number}} : {{site_name}}",
+    body: `<div style="font-size:22px;font-weight:bold;color:#111827;">Payment Advice</div>
+<p style="margin:4px 0 16px 0;color:#6b7280;">Invoice #{{invoice_number}}</p>
+<p>Dear {{manufacturer}},</p>
+<p>Please find below the order-lines included in this payment batch. Payment is being processed against invoice <b>#{{invoice_number}}</b>.</p>
+${OPEN}
+  ${HEAD}
+    <th style="text-align:left;${TH}">Order No</th>
+    <th style="text-align:left;${TH}">Item</th>
+    <th style="text-align:center;${TH}width:60px;">Qty</th>
+    <th style="text-align:right;${TH}width:110px;">Cost</th>
+  </tr>
+  {{#lines}}<tr>
+    <td style="padding:8px;">{{line_order_number}}</td>
+    <td style="padding:8px;">{{line_name}}<br><span style="font-size:12px;color:#666;">{{line_options}}</span></td>
+    <td style="text-align:center;padding:8px;">{{line_qty}}</td>
+    <td style="text-align:right;padding:8px;">{{line_cost}}</td>
+  </tr>{{/lines}}
+  <tr>
+    <td colspan="3" style="text-align:right;padding:8px;font-weight:bold;">Total</td>
+    <td style="text-align:right;padding:8px;font-weight:bold;">{{total_amount}}</td>
+  </tr>
+</table>
+<p style="font-size:13px;color:#6b7280;">If you have any questions about this payment advice, please reply to this email.</p>`,
+    mustContain: ["Payment Advice", "Please find below the order-lines included in this payment batch", "If you have any questions about this payment advice, please reply to this email."],
+  },
+  {
     key: "supplier.chaseup",
     label: "Supplier chase-up",
     subject: "Order Chase Up Form : {{site_name}}",

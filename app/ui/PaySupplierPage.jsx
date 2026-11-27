@@ -4,7 +4,7 @@ import EmptyState from './EmptyState.jsx';
 import Pager from './Pager.jsx';
 import { useStaff } from './useStaff';
 import { formatDate, formatMoney, statusTone } from './orderList';
-import { loadPayList, loadPayable, markPaid, payLink, removeFromPayList, saveDhdCost, saveInvoiceNo, saveManualCost } from './paySupplier';
+import { draftBatch, loadPayList, loadPayable, markPaid, payLink, removeFromPayList, saveDhdCost, saveInvoiceNo, saveManualCost, sendBatch, suggestInvoiceNo } from './paySupplier';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
 const pounds = (minor) => (minor == null ? '' : (minor / 100).toFixed(2));
@@ -26,6 +26,11 @@ export default function PaySupplierPage({ paid = false, list = false }) {
   const [busy, setBusy] = useState(null); // 'export' | 'paid' | 'unpaid' | 'search' | `${field}:${lineId}`
   const [picked, setPicked] = useState(new Set());
   const [edits, setEdits] = useState({}); // `${field}:${lineId}` -> text typed but not saved
+  // Create Payment Batch & Draft Email (Pay To Supplier only): the invoice number typed, and the draft shown for review.
+  const batching = !paid && !list;
+  const [invoiceNo, setInvoiceNo] = useState(() => suggestInvoiceNo());
+  const [batchDraft, setBatchDraft] = useState(null);
+  const [batchKey, setBatchKey] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -34,6 +39,7 @@ export default function PaySupplierPage({ paid = false, list = false }) {
     if (res.ok) { setData(res.data); setError(null); } else setError(res.message);
   }, [applied, list]);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { setBatchDraft(null); }, [applied]);
 
   const rows = data?.rows ?? [];
   const canEdit = !!staff;
@@ -65,6 +71,31 @@ export default function PaySupplierPage({ paid = false, list = false }) {
     const n = res.data.changed ?? ticked.length;
     setNotice({ tone: 'success', text: `${n} line${n === 1 ? '' : 's'} marked ${isPaid ? 'paid' : 'unpaid'}.` });
     setPicked(new Set());
+    await load();
+  }
+
+  async function makeDraft() {
+    if (!invoiceNo.trim()) { setNotice({ tone: 'warning', text: 'Please enter the supplier invoice number for this batch.' }); return; }
+    if (ticked.length === 0) { setNotice({ tone: 'warning', text: 'Please select at least one order line to include in this batch.' }); return; }
+    setBusy('draft');
+    const res = await draftBatch(ticked, invoiceNo);
+    setBusy(null);
+    if (!res.ok) { setBatchDraft(null); setNotice({ tone: 'critical', text: res.message }); return; }
+    setNotice(null);
+    setBatchDraft(res.data);
+    setBatchKey(crypto.randomUUID());
+  }
+
+  async function confirmSend() {
+    setBusy('send');
+    const res = await sendBatch(batchDraft.lines.map((l) => l.lineId), batchDraft.invoiceNo, batchKey);
+    setBusy(null);
+    if (!res.ok) { setNotice({ tone: 'critical', text: res.message }); return; }
+    const d = res.data;
+    setNotice({ tone: 'success', text: `Batch created and email ${d.duplicate ? 'already sent' : 'sent'} to ${d.recipients.join(', ')} for invoice #${d.invoiceNo} (${d.lines} line${d.lines === 1 ? '' : 's'}, ${money(d.totalMinor)}). Mark the lines Paid when the payment is made.` });
+    setBatchDraft(null);
+    setPicked(new Set());
+    setInvoiceNo(suggestInvoiceNo());
     await load();
   }
 
@@ -153,8 +184,54 @@ export default function PaySupplierPage({ paid = false, list = false }) {
             )}
             {ticked.length > 0 && <s-text>Selected: {ticked.length} line{ticked.length === 1 ? '' : 's'}, total {money(selectedTotal)}</s-text>}
           </s-stack>
+          {batching && (applied.brand ? (
+            <s-stack direction="inline" gap="base" alignItems="end">
+              <s-text-field label="Supplier invoice number for this batch" value={invoiceNo} disabled={!canEdit || undefined} onInput={(e) => setInvoiceNo(e.currentTarget.value)} />
+              <s-button disabled={!canEdit || undefined} onClick={() => setInvoiceNo(suggestInvoiceNo())}>New number</s-button>
+              <s-button variant="primary" disabled={!canEdit || (busy && busy !== 'draft') || undefined} loading={busy === 'draft' || undefined} onClick={makeDraft}>Create Payment Batch &amp; Draft Email</s-button>
+            </s-stack>
+          ) : (
+            <s-text color="subdued">Select a specific brand above to create a payment batch (one email goes to one supplier).</s-text>
+          ))}
         </s-stack>
       </s-section>
+
+      {batchDraft && (
+        <s-section heading={`Payment Batch Draft — Invoice #${batchDraft.invoiceNo}`}>
+          <s-stack gap="base">
+            <s-text><s-text type="strong">Supplier:</s-text> {batchDraft.brand}   <s-text type="strong">To:</s-text> {batchDraft.recipients.join(', ')}</s-text>
+            <s-table>
+              <s-table-header-row>
+                <s-table-header listSlot="primary">Order No</s-table-header>
+                <s-table-header>Item</s-table-header>
+                <s-table-header format="numeric">Qty</s-table-header>
+                <s-table-header format="numeric">Cost</s-table-header>
+              </s-table-header-row>
+              <s-table-body>
+                {batchDraft.lines.map((l) => (
+                  <s-table-row key={l.lineId}>
+                    <s-table-cell>{l.orderName}</s-table-cell>
+                    <s-table-cell>{l.variantTitle ? `${l.title} - ${l.variantTitle}` : l.title}</s-table-cell>
+                    <s-table-cell>{l.quantity}</s-table-cell>
+                    <s-table-cell>{money(l.costMinor)}</s-table-cell>
+                  </s-table-row>
+                ))}
+                <s-table-row>
+                  <s-table-cell></s-table-cell>
+                  <s-table-cell></s-table-cell>
+                  <s-table-cell><s-text type="strong">Total</s-text></s-table-cell>
+                  <s-table-cell><s-text type="strong">{money(batchDraft.totalMinor)}</s-text></s-table-cell>
+                </s-table-row>
+              </s-table-body>
+            </s-table>
+            <s-text color="subdued">Sending puts invoice #{batchDraft.invoiceNo} on these lines and emails the supplier this payment advice. It does not mark them paid.</s-text>
+            <s-stack direction="inline" gap="base">
+              <s-button variant="primary" disabled={(busy && busy !== 'send') || undefined} loading={busy === 'send' || undefined} onClick={confirmSend}>Confirm &amp; Send Email</s-button>
+              <s-button disabled={busy === 'send' || undefined} onClick={() => setBatchDraft(null)}>Cancel</s-button>
+            </s-stack>
+          </s-stack>
+        </s-section>
+      )}
 
       {confirming && (
         <s-banner tone="critical" heading={`Take ${ticked.length} line${ticked.length === 1 ? '' : 's'} off your list?`}>
@@ -173,7 +250,7 @@ export default function PaySupplierPage({ paid = false, list = false }) {
           <s-table>
             <s-table-header-row>
               <s-table-header><s-checkbox label="Select all" labelAccessibilityVisibility="exclusive" checked={allPicked} onChange={(e) => setPicked(e.currentTarget.checked ? new Set(rows.map((r) => r.lineId)) : new Set())} /></s-table-header>
-              {paid && <s-table-header>Batch Invoice No.</s-table-header>}
+              {!list && <s-table-header>Batch Invoice No.</s-table-header>}
               {!list && <s-table-header listSlot="primary">Date</s-table-header>}
               <s-table-header listSlot={list ? 'primary' : undefined}>OrderNo</s-table-header>
               {!paid && !list && <s-table-header>Status</s-table-header>}
@@ -195,7 +272,7 @@ export default function PaySupplierPage({ paid = false, list = false }) {
               {rows.map((r) => (
                 <s-table-row key={r.lineId}>
                   <s-table-cell><s-checkbox label={`Select ${r.orderName}`} labelAccessibilityVisibility="exclusive" checked={picked.has(r.lineId)} onChange={(e) => tick(r.lineId, e.currentTarget.checked)} /></s-table-cell>
-                  {paid && <s-table-cell>{r.batchInvoiceNo || '—'}</s-table-cell>}
+                  {!list && <s-table-cell>{r.batchInvoiceNo || '—'}</s-table-cell>}
                   {!list && <s-table-cell>{formatDate(r.orderDate)}</s-table-cell>}
                   <s-table-cell><s-link href={orderUrl(r.orderId)}>{r.orderName}</s-link></s-table-cell>
                   {!paid && !list && <s-table-cell>{r.statusId != null ? <s-badge tone={statusTone(r.statusId)}>{labelFor(r.statusId)}</s-badge> : ''}</s-table-cell>}
