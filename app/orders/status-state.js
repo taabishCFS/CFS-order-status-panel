@@ -37,6 +37,11 @@ export function readStatusState(value) {
       cancelReason: stamp?.statusId === 7 ? text(stamp?.extras?.cancelReason) : null,
       // The day the line was set to Completed (Feedback Calling lists orders by it).
       completedDate: stamp?.statusId === 6 ? ukDay(stamp?.at) : null,
+      // When the line was last given its status, and by whom (Service Issue Orders shows them for finished lines).
+      statusAt: typeof stamp?.at === "string" && !Number.isNaN(Date.parse(stamp.at)) ? stamp.at : null,
+      statusBy: text(stamp?.by?.name),
+      // The remarks typed with Service Issue (status 15).
+      serviceRemarks: stamp?.statusId === 15 ? text(stamp?.extras?.serviceRemarks) : null,
     };
   }
   return { orderStatusId: int(state.order?.statusId), lines, unreadable: false };

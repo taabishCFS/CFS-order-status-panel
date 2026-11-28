@@ -60,6 +60,9 @@ const lineColumns = (l, archived) => ({
   stockedDate: l.stockedDate,
   cancelReason: l.cancelReason ?? null,
   completedDate: l.completedDate ?? null,
+  statusAt: l.statusAt ? new Date(l.statusAt) : null,
+  statusBy: l.statusBy ?? null,
+  serviceRemarks: l.serviceRemarks ?? null,
   orderCreatedAt: l.orderCreatedAt,
   orderArchived: archived,
 });

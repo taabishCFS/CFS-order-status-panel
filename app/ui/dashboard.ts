@@ -24,6 +24,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/payment-history', title: 'Payment History', description: 'Every payment and refund taken, newest first, read live from Shopify. Filter by date.', icon: 'receipt' },
       { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/returned-items', title: 'Returned Items', description: 'Every cancelled item with its reason. Mark what was done with the goods: back to supplier, damaged, clearance, dispose or free stock.', icon: 'return' },
+      { href: '/service-issue-orders', title: 'Service Issue Orders', description: 'Every item of replacement and Service Issue orders: status, supplier expected date, when it finished and how many days it took.', icon: 'clock' },
       { href: '/service-issues', title: 'Service Issue Report', description: 'The log of service issues: add and edit them, filter by brand, vendor or status, attach photos, download as CSV.', icon: 'alert-circle' },
       { href: '/feedback-calling', title: 'Feedback Calling', description: 'Orders with every item Completed: phone the customer for a review and note the call, remarks and rating.', icon: 'phone' },
       { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },

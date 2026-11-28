@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 60 (28 November 2026)
+**Guide version:** 61 (28 November 2026)
 
 ## Before you start
 
@@ -48,7 +48,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 49 | Payment History (every payment and refund taken, newest first, date filter) | Ready |
 | 50 | Returned Items (every cancelled item with its reason; mark what was done with the goods) | Ready |
 | 51 | Feedback Calling (completed orders to phone for a review: caller, call status, remarks, rating) | Ready |
-| 52 | Service Issue Report (staff log of service issues with photos; replaces the old Report, Images and By Vendor pages) | Ready, not yet tried |
+| 52 | Service Issue Report (staff log of service issues with photos; replaces the old Report, Images and By Vendor pages) | Ready |
+| 53 | Service Issue Orders (items of replacement and Service Issue orders with how long they took; the old Service Issue (Sameer)) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
@@ -175,6 +176,18 @@ Open **Service Issue Report** on the Dashboard (Orders group). It is the log of 
 - **Download CSV** gives the list as filtered, with every column, the vendor and the photo links.
 
 **Not copied:** the sort-by-column links and the tick boxes (the old page did nothing with them). Issues cannot be deleted (the old page could not either).
+
+### Service Issue Orders
+Open **Service Issue Orders** on the Dashboard (Orders group). It is the old **Service Issue (Sameer)** page: every item of a **replacement order** (number starting with R) or of an order with **Service Issue**, so you can see how long each one is taking.
+
+- Columns: **Order No** (opens the order), **Date** (of the order), **Item** (with brand, code and qty), **Order Taken By**, the item's **Status**, **Sup. Expected Date**, **Completed Date** (with who did it), **Process Duration** and the **Service Remarks** typed when the item was set to Service Issue.
+- **Process Duration** is the days from the order to the day the item was set to Completed, Cancelled, Credit Note Received or Collection. For an item still going it counts up to today.
+- Filters: **Order No.**, **Sup. expected from / To** dates with **GO**, and **Order Taken By**. **Reset** clears them.
+- **Download CSV** gives the list as filtered.
+
+**Good to know:** the app keeps when and by whom an item's status was set from now on. A finished item whose day is not known yet shows **Not known** under Process Duration until its order next changes or **Refresh order data** is pressed on the Orders page.
+
+**Not copied:** the sort-by-column links. The old CSV only took ticked items; the new one takes the whole filtered list.
 
 ---
 
@@ -941,7 +954,8 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
-| 28 Nov 2026 | 60 | Service Issue Report page: the service issue log with editing in the table, Add New, brand/vendor/user/status filters, photos and CSV |
+| 28 Nov 2026 | 61 | Service Issue Orders page (the old Service Issue (Sameer)): items of replacement and Service Issue orders, completed date and by whom, process duration, service remarks, CSV |
+| 28 Nov 2026 | 60 | Service Issue Report page: the service issue log with editing in the table, Add New, brand/vendor/user/status filters, photos and CSV. Tried live: adding, editing (Final Price worked out again), search, CSV, uploading a photo and removing it (deleted from Files too) all work |
 | 28 Nov 2026 | 59 | Feedback Calling page: completed orders to phone for a review, callers list, share out, CSV. Tried live: share out, saving each field, callers, CSV and the completed-date filter all work; table boxes widened |
 | 28 Nov 2026 | 58 | Returned Items page: cancelled items with their cancel reason, and the action taken with the returned goods; tried live and marked Ready |
 | 28 Nov 2026 | 57 | Date Lapsed matches the old Instock Date Lapsed: clearance and In Stock items left off, delivery date, booked and customer confirm columns (page and CSV). V12 Approval Status not copied (V12 finance no longer used); tried live |

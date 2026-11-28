@@ -92,6 +92,9 @@ model OrderLine {
   stockedDate     String? // YYYY-MM-DD the line last came into stock (status 4); kept when it moves on
   cancelReason    String? // the reason typed when the line was set to Cancelled (status 7)
   completedDate   String? // YYYY-MM-DD (UK) the line was set to Completed (status 6)
+  statusAt        DateTime? // when the line was given its current status
+  statusBy        String? // who gave it
+  serviceRemarks  String? // the remarks typed with Service Issue (status 15)
   orderCreatedAt  DateTime @default(now())
   orderArchived   Boolean  @default(false)
 

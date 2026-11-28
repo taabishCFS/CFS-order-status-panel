@@ -10,6 +10,7 @@ import { balancePendingAllCsv, balancePendingCsv, balancePendingFileName, balanc
 import { maxproRowsFor } from "../delivery/maxpro.server";
 import { feedbackCsv, parseFeedbackParams } from "../orders/feedback-calling.server";
 import { issuesCsv, parseIssueParams } from "../orders/service-issues.server";
+import { parseServiceOrderParams, serviceOrdersCsv } from "../orders/service-issue-orders.server";
 import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
 import { payCsv, payRowsFor } from "../orders/pay-supplier.server";
@@ -106,6 +107,11 @@ export const loader = async ({ request }) => {
     const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
     const out = await balancePendingAllCsv(db, graphql, link.shop);
     if (out.count === 0) return refuse(404, "Nothing to export: the orders that owe money have no items to list (Completed, Cancelled, Deleted, Order Failed, Payment Not Confirmed, Awaiting V12 Approval and Awaiting Payment items are left out).");
+    return file(out.csv, out.fileName);
+  }
+  if (link.kind === "delivery-service-issue-orders") {
+    const out = await serviceOrdersCsv(db, link.shop, parseServiceOrderParams(query));
+    if (out.count === 0) return refuse(404, "Nothing to export: no service issue or replacement order items match these filters.");
     return file(out.csv, out.fileName);
   }
   if (link.kind === "delivery-service-issues") {

@@ -5,6 +5,7 @@ import { parseOrderReportParams } from "../orders/order-reports.server";
 import { parseBalancePendingParams } from "../orders/balance-pending.server";
 import { parseFeedbackParams } from "../orders/feedback-calling.server";
 import { parseIssueParams } from "../orders/service-issues.server";
+import { parseServiceOrderParams } from "../orders/service-issue-orders.server";
 import { marketingQuery, parseMarketingParams } from "../orders/marketing-sales.server";
 import db from "../db.server";
 import { can } from "../staff/permissions.server";
@@ -94,6 +95,11 @@ export const loader = async ({ request }) => {
     query = new URLSearchParams({ ids: ids.join(","), ...(status ? { status: String(status) } : {}) }).toString();
   } else if (kind === "balance-pending-all") {
     query = "";
+  } else if (kind === "service-issue-orders") {
+    const p = parseServiceOrderParams(search);
+    const q = new URLSearchParams();
+    for (const k of ["from", "to", "takenBy", "q"]) if (p[k]) q.set(k, p[k]);
+    query = q.toString();
   } else if (kind === "service-issues") {
     const p = parseIssueParams(search);
     const q = new URLSearchParams();
