@@ -69,7 +69,7 @@ export default function PaypalOrdersPage() {
             <s-date-field label="From" value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.currentTarget.value })} />
             <s-date-field label="To" value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.currentTarget.value })} />
             <s-button variant="primary" onClick={() => setQuery((q) => ({ ...q, ...draft, range: 'custom' }))}>Apply</s-button>
-            <s-select label="Payment method" value={query.gateway} onChange={(e) => setQuery((q) => ({ ...q, gateway: e.currentTarget.value }))}>
+            <s-select label="Payment method" value={query.gateway} onChange={(e) => { const gateway = e.currentTarget.value; setQuery((q) => ({ ...q, gateway })); }}>
               {gateways.map((g) => <s-option key={g} value={g}>{gatewayName(g)}</s-option>)}
             </s-select>
           </s-stack>
@@ -85,7 +85,7 @@ export default function PaypalOrdersPage() {
               <s-button variant="tertiary" onClick={() => setOpen(new Set())}>Collapse All</s-button>
             </s-stack>
           </s-stack>
-          {data && <s-text color="subdued">{`${t.orders} orders · ${dmy(data.from)} – ${dmy(data.to)}. Deleted, Order Failed, Awaiting Payment and Awaiting V12 Approval items are left out.`}</s-text>}
+          {data && <s-text color="subdued">{`${t.orders} order${t.orders === 1 ? '' : 's'} ·${dmy(data.from)} – ${dmy(data.to)}. Deleted, Order Failed, Awaiting Payment and Awaiting V12 Approval items are left out.`}</s-text>}
         </s-stack>
       </s-section>
 
