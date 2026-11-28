@@ -21,6 +21,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/supplier-chaseup', title: 'Supplier Chaseup', description: 'Lines due soon: email the supplier a chase-up and update expected dates.', icon: 'clock' },
       { href: '/date-lapsed', title: 'Date Lapsed', description: 'Lines whose expected date has passed and are still waiting on the supplier.', icon: 'alert-circle' },
       { href: '/balance-pending', title: 'Balance Pending', description: 'Every order that still owes money: what was paid and what is owed. Download the ticked orders or every item.', icon: 'cash-dollar' },
+      { href: '/paypal-orders', title: 'Paypal Orders', description: 'PayPal orders in a date range, grouped by status: orders, items and value for each group, then each order and its items.', icon: 'cash-dollar' },
       { href: '/payment-history', title: 'Payment History', description: 'Every payment and refund taken, newest first, read live from Shopify. Filter by date.', icon: 'receipt' },
       { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
       { href: '/returned-items', title: 'Returned Items', description: 'Every cancelled item with its reason. Mark what was done with the goods: back to supplier, damaged, clearance, dispose or free stock.', icon: 'return' },

@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 61 (28 November 2026)
+**Guide version:** 62 (28 November 2026)
 
 ## Before you start
 
@@ -49,7 +49,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 50 | Returned Items (every cancelled item with its reason; mark what was done with the goods) | Ready |
 | 51 | Feedback Calling (completed orders to phone for a review: caller, call status, remarks, rating) | Ready |
 | 52 | Service Issue Report (staff log of service issues with photos; replaces the old Report, Images and By Vendor pages) | Ready |
-| 53 | Service Issue Orders (items of replacement and Service Issue orders with how long they took; the old Service Issue (Sameer)) | Ready, not yet tried |
+| 53 | Service Issue Orders (items of replacement and Service Issue orders with how long they took; the old Service Issue (Sameer)) | Ready |
+| 54 | Paypal Orders (PayPal orders in a date range grouped by status, with totals; any payment method) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
@@ -188,6 +189,18 @@ Open **Service Issue Orders** on the Dashboard (Orders group). It is the old **S
 **Good to know:** the app keeps when and by whom an item's status was set from now on. A finished item whose day is not known yet shows **Not known** under Process Duration until its order next changes or **Refresh order data** is pressed on the Orders page.
 
 **Not copied:** the sort-by-column links. The old CSV only took ticked items; the new one takes the whole filtered list.
+
+### Paypal Orders
+Open **Paypal Orders** on the Dashboard (Orders group). It is the old PayPal Express reporting panel: the items of PayPal orders in a date range, grouped so you can see where the money is.
+
+- It opens on the **last 90 days**. Pick **From** and **To** and press **Apply**, or press **7 Days**, **30 Days**, **90 Days**, **6 Months**, **1 Year** or **All Time**.
+- The four boxes show **Total Orders**, **Total Line Items**, **Total Value** (items after discount) and **Avg Order Value**.
+- Items are grouped like the old page: **In Stock / Delivered / Collected**, **Booked / In Transit / Invoice**, **Pending / Waiting / Delayed**, **Replacement / Service / Exchange**, **Cancelled / Failed / Discontinued**, **Completed (Closed)**, and **Other / Not set**. Click a group to see its statuses, and a status to see its orders with their items. **Expand All** and **Collapse All** open or close them all.
+- **Search** (order no or product) narrows everything down and opens the matches.
+- **Payment method** shows the same report for another way of paying (for example card), so the old separate Revolut report is not needed.
+- Deleted, Order Failed, Awaiting Payment and Awaiting V12 Approval items are left out, as on the old page.
+
+**Not copied:** the old page also left out orders with a "SumUp" note; in Shopify the payment method already tells them apart.
 
 ---
 
@@ -954,7 +967,8 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
-| 28 Nov 2026 | 61 | Service Issue Orders page (the old Service Issue (Sameer)): items of replacement and Service Issue orders, completed date and by whom, process duration, service remarks, CSV |
+| 28 Nov 2026 | 62 | Paypal Orders page: PayPal orders grouped by colour group and status with totals, quick ranges, search, payment method picker |
+| 28 Nov 2026 | 61 | Service Issue Orders page (the old Service Issue (Sameer)): items of replacement and Service Issue orders, completed date and by whom, process duration, service remarks, CSV. Tried live: list, completed date and by whom, duration and CSV all correct |
 | 28 Nov 2026 | 60 | Service Issue Report page: the service issue log with editing in the table, Add New, brand/vendor/user/status filters, photos and CSV. Tried live: adding, editing (Final Price worked out again), search, CSV, uploading a photo and removing it (deleted from Files too) all work |
 | 28 Nov 2026 | 59 | Feedback Calling page: completed orders to phone for a review, callers list, share out, CSV. Tried live: share out, saving each field, callers, CSV and the completed-date filter all work; table boxes widened |
 | 28 Nov 2026 | 58 | Returned Items page: cancelled items with their cancel reason, and the action taken with the returned goods; tried live and marked Ready |
