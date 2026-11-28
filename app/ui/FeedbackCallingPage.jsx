@@ -15,6 +15,9 @@ function Field({ row, field, kind, options, busy, onSave }) {
   const saving = busy === `${row.orderId}:${field}`;
   const label = { callDate: 'Calling date', staff: 'Staff', callStatus: 'Call status', remark: 'Remark', remark2: 'Remark 2', rating: 'Rating received', ratingDate: 'Rating date' }[field];
   const save = (v) => { if (v !== (row[field] ?? '')) onSave(row, field, v); };
+  // Without a minimum width the table squeezes the boxes to a letter wide.
+  return <s-box minInlineSize={{ date: '150px', select: '130px', area: '220px', text: '90px' }[kind]}>{control()}</s-box>;
+  function control() {
   if (kind === 'date') return <s-date-field label={label} labelAccessibilityVisibility="exclusive" value={value} disabled={saving || undefined} onChange={(e) => { setValue(e.currentTarget.value); save(e.currentTarget.value); }} />;
   if (kind === 'select') {
     return (
@@ -26,6 +29,7 @@ function Field({ row, field, kind, options, busy, onSave }) {
   }
   const Tag = kind === 'area' ? 's-text-area' : 's-text-field';
   return <Tag label={label} labelAccessibilityVisibility="exclusive" value={value} disabled={saving || undefined} onInput={(e) => setValue(e.currentTarget.value)} onChange={(e) => save(e.currentTarget.value.trim())} />;
+  }
 }
 
 // Feedback Calling (old Order menu): orders whose every item is Completed, to phone the customer for a review and note the answer.
