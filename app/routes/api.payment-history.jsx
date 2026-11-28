@@ -8,7 +8,9 @@ export const loader = async ({ request }) => {
   try {
     return cors(Response.json(await listPayments(admin.graphql, parsePaymentParams(new URL(request.url).searchParams))));
   } catch (error) {
-    console.error("Payment History: Shopify read failed", error.message);
-    return cors(Response.json({ message: "Shopify could not be read just now. Press Refresh to try again." }, { status: 502 }));
+    // admin.graphql throws its own error with Shopify's messages in body.errors; show them so a refusal can be traced.
+    const reason = error.body?.errors?.graphQLErrors?.map((e) => e.message).join("; ") || error.message;
+    console.error("Payment History: Shopify read failed", reason);
+    return cors(Response.json({ message: `Shopify could not be read just now (${String(reason).slice(0, 300)}). Press Refresh to try again.` }, { status: 502 }));
   }
 };

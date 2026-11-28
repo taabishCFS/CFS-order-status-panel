@@ -1,5 +1,6 @@
 // Payment History (legacy "balance_paid", titled Payment/Refund): every payment and refund taken on the shop, newest first.
 // Read live from Shopify's shop-wide list of money movements (tenderTransactions), so nothing is stored here.
+// The customer name comes from the order's billing (or shipping) address: the app has no permission to read customers.
 export const PAGE_SIZE = 50;
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const CURSOR = /^[A-Za-z0-9+/=_-]{1,512}$/;
@@ -34,7 +35,7 @@ const QUERY = `#graphql
       nodes {
         id processedAt paymentMethod remoteReference test
         amount { amount currencyCode }
-        order { id name email customer { displayName } }
+        order { id name email billingAddress { name } shippingAddress { name } }
       }
       pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
     }
@@ -56,7 +57,7 @@ export function toPaymentRow(t) {
     currency: t.amount?.currencyCode ?? "GBP",
     payType: payTypeLabel(t.paymentMethod),
     email: t.order?.email ?? "",
-    customer: t.order?.customer?.displayName ?? "",
+    customer: t.order?.billingAddress?.name || t.order?.shippingAddress?.name || "",
     date: t.processedAt ?? null,
     test: Boolean(t.test),
   };

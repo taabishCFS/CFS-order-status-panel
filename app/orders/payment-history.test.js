@@ -11,7 +11,7 @@ describe("Payment History", () => {
     expect(paymentSearch({ from: "", to: "" })).toBe("");
   });
   it("turns a transaction into a row; a negative amount is a refund", () => {
-    const t = { id: "T1", processedAt: "2026-11-18T10:21:13Z", paymentMethod: "credit_card", remoteReference: "53433", test: true, amount: { amount: "-20.0", currencyCode: "GBP" }, order: { id: "gid://shopify/Order/1", name: "#1036", email: "a@b.co", customer: { displayName: "Stonage" } } };
+    const t = { id: "T1", processedAt: "2026-11-18T10:21:13Z", paymentMethod: "credit_card", remoteReference: "53433", test: true, amount: { amount: "-20.0", currencyCode: "GBP" }, order: { id: "gid://shopify/Order/1", name: "#1036", email: "a@b.co", billingAddress: null, shippingAddress: { name: "Stonage" } } };
     expect(toPaymentRow(t)).toEqual({ id: "T1", orderId: "gid://shopify/Order/1", orderName: "1036", reference: "53433", type: "Refund", amountMinor: -2000, currency: "GBP", payType: "Card", email: "a@b.co", customer: "Stonage", date: "2026-11-18T10:21:13Z", test: true });
     expect(toPaymentRow({ id: "T2", amount: { amount: "5", currencyCode: "GBP" }, paymentMethod: "bank_deposit", order: null })).toMatchObject({ type: "Payment", orderId: null, payType: "Bank deposit" });
   });
