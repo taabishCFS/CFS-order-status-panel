@@ -94,6 +94,7 @@ export function mapOrder(shop, o) {
     expectedDate: status.lines[l.id]?.expectedDate ?? null,
     deliveryOutcome: status.lines[l.id]?.delivery ?? null,
     stockedDate: status.lines[l.id]?.stockedDate ?? null,
+    cancelReason: status.lines[l.id]?.cancelReason ?? null,
     orderCreatedAt: createdAt,
   }));
   return { order, lines };

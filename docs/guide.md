@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 57 (28 November 2026)
+**Guide version:** 58 (28 November 2026)
 
 ## Before you start
 
@@ -46,6 +46,7 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 36 | Instock Balance Due (orders that still owe money while every item is in stock or on its way) | Ready, not yet tried |
 | 48 | Balance Pending (every order that still owes money, paid and owed amounts, two downloads) | Ready |
 | 49 | Payment History (every payment and refund taken, newest first, date filter) | Ready |
+| 50 | Returned Items (every cancelled item with its reason; mark what was done with the goods) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
@@ -134,6 +135,18 @@ Open **Payment History** on the Dashboard (Orders group). It lists **every payme
 - **Order hidden by Shopify**: Shopify lets the app see orders from the last 60 days only, so an older payment shows its amount and date but not its order, customer or email. To see them, the app needs Shopify's "read all orders" permission (ask the developer).
 
 **Not copied:** the old sort-by-column links, the tick boxes (they did nothing) and the Payer Status / Payment Status columns (Shopify only lists payments that went through, so every row is a completed payment or refund).
+
+### Returned Items
+Open **Returned Items** on the Dashboard (Orders group). It lists **every item set to Cancelled**, newest order first, like the old Returned Items page.
+
+- Each row shows the order date, order number (click it to open the order), the item, product code, quantity, the **Reason** typed in **Cancel reason** when the item was cancelled, its status, and the **Action** taken (with who set it and when).
+- To record what happened to the goods: tick the items, choose a **Return Action** (Return Back To Supplier, Damage Return, Clearance, Dispose or Free Stock) and press **Action**. Choosing again changes it. An item that is no longer Cancelled is skipped.
+- **Search** finds an order number; press **GO**. **Reset** clears it.
+- **Free Stock** here is only a note of what was done. To offer the item to other orders, add it on the **Stock** page as well.
+
+**Good to know:** the reason is read from orders as they change. An item cancelled before this page was added shows "Not given" until its order next changes, or until **Refresh order data** is pressed on the Orders page.
+
+**Not copied:** the sort-by-column links, and the download button (in the old system it called something that did not exist, so it never worked).
 
 ---
 
@@ -900,7 +913,8 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
-| 28 Nov 2026 | 57 | Date Lapsed matches the old Instock Date Lapsed: clearance and In Stock items left off, delivery date, booked and customer confirm columns (page and CSV). V12 Approval Status not copied (V12 finance no longer used) |
+| 28 Nov 2026 | 58 | Returned Items page: cancelled items with their cancel reason, and the action taken with the returned goods |
+| 28 Nov 2026 | 57 | Date Lapsed matches the old Instock Date Lapsed: clearance and In Stock items left off, delivery date, booked and customer confirm columns (page and CSV). V12 Approval Status not copied (V12 finance no longer used); tried live |
 | 28 Nov 2026 | 56 | Payment History page: every payment and refund, newest first, date filter; tried live and marked Ready |
 | 28 Nov 2026 | 55 | Balance Pending tried live and marked Ready; Export ticked now exports the ticked orders whatever Status is chosen |
 | 27 Nov 2026 | 54 | Balance Pending page: every order that still owes money, paid and owed amounts, status filter, search, Export ticked and Download All |

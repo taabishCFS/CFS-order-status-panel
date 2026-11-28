@@ -23,6 +23,7 @@ export const DASHBOARD_GROUPS: DashboardGroup[] = [
       { href: '/balance-pending', title: 'Balance Pending', description: 'Every order that still owes money: what was paid and what is owed. Download the ticked orders or every item.', icon: 'cash-dollar' },
       { href: '/payment-history', title: 'Payment History', description: 'Every payment and refund taken, newest first, read live from Shopify. Filter by date.', icon: 'receipt' },
       { href: '/instock-balance', title: 'Instock Balance Due', description: 'Orders that still owe money while every item is in stock or on its way. Download the ticked ones.', icon: 'cash-dollar' },
+      { href: '/returned-items', title: 'Returned Items', description: 'Every cancelled item with its reason. Mark what was done with the goods: back to supplier, damaged, clearance, dispose or free stock.', icon: 'return' },
       { href: '/refunds', title: 'Refund Orders List', description: 'Refund requests waiting to be paid, and the ones already refunded.', icon: 'receipt-refund' },
     ],
   },

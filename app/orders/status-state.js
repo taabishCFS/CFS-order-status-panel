@@ -31,6 +31,8 @@ export function readStatusState(value) {
       expectedDate: text(state.expected?.[id]?.date),
       delivery: delivery === "confirmed" || delivery === "declined" ? delivery : null,
       stockedDate: isoDay(state.supplierDelivered?.[id]?.date),
+      // The reason typed when the line was set to Cancelled (shown on Returned Items).
+      cancelReason: stamp?.statusId === 7 ? text(stamp?.extras?.cancelReason) : null,
     };
   }
   return { orderStatusId: int(state.order?.statusId), lines, unreadable: false };

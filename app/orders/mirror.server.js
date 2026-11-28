@@ -58,6 +58,7 @@ const lineColumns = (l, archived) => ({
   expectedDate: l.expectedDate,
   deliveryOutcome: l.deliveryOutcome,
   stockedDate: l.stockedDate,
+  cancelReason: l.cancelReason ?? null,
   orderCreatedAt: l.orderCreatedAt,
   orderArchived: archived,
 });

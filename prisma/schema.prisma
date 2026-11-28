@@ -90,6 +90,7 @@ model OrderLine {
   expectedDate    String?
   deliveryOutcome String?
   stockedDate     String? // YYYY-MM-DD the line last came into stock (status 4); kept when it moves on
+  cancelReason    String? // the reason typed when the line was set to Cancelled (status 7)
   orderCreatedAt  DateTime @default(now())
   orderArchived   Boolean  @default(false)
 
@@ -636,4 +637,16 @@ model MinervaPayment {
 
   @@unique([shop, lineId])
   @@index([shop, paidAt])
+}
+
+// Returned Items (legacy afterReturnAction): what was done with a cancelled line's goods once they came back.
+model LineReturnAction {
+  shop      String
+  lineId    String
+  orderId   String
+  action    String // ReturnBackToSupplier | DamageReturn | Clearance | Dispose | FreeStock
+  byName    String
+  updatedAt DateTime @updatedAt
+
+  @@id([shop, lineId])
 }
