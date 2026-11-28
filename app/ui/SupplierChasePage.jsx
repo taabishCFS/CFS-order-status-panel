@@ -141,6 +141,9 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
             <s-table-header listSlot="primary">Order</s-table-header>
             <s-table-header>Item</s-table-header>
             <s-table-header>Expected</s-table-header>
+            {kind === 'lapsed' && <s-table-header>Delivery</s-table-header>}
+            {kind === 'lapsed' && <s-table-header>Booked?</s-table-header>}
+            {kind === 'lapsed' && <s-table-header>Confirm / Notes</s-table-header>}
             {kind === 'chaseup' && <s-table-header>Update expected date</s-table-header>}
             {kind === 'chaseup' && <s-table-header>Last chaseup</s-table-header>}
             <s-table-header>Status</s-table-header>
@@ -162,6 +165,17 @@ export default function SupplierChasePage({ kind = 'chaseup' }) {
                   </s-stack>
                 </s-table-cell>
                 <s-table-cell><s-text tone={dateTone(r.expectedDate, todayIso())}>{dmy(r.expectedDate)}</s-text></s-table-cell>
+                {kind === 'lapsed' && <s-table-cell>{r.deliveryDate ? dmy(r.deliveryDate) : ''}</s-table-cell>}
+                {kind === 'lapsed' && <s-table-cell>{r.deliveryBooked ? <s-badge tone="success">Booked</s-badge> : ''}</s-table-cell>}
+                {kind === 'lapsed' && (
+                  <s-table-cell>
+                    <s-stack direction="block" gap="small-500">
+                      {r.deliveryOutcome === 'confirmed' && <s-badge tone="success">Confirmed</s-badge>}
+                      {r.deliveryOutcome === 'declined' && <s-badge tone="critical">Not confirmed</s-badge>}
+                      {r.confirmNote && <s-text color="subdued">{r.confirmNote}</s-text>}
+                    </s-stack>
+                  </s-table-cell>
+                )}
                 {kind === 'chaseup' && (
                   <s-table-cell>
                     <s-date-field label="New date" labelAccessibilityVisibility="exclusive" value={r.expectedDate ?? ''} disabled={busy !== null || undefined} onChange={(e) => saveDate(r, e.currentTarget.value)} />

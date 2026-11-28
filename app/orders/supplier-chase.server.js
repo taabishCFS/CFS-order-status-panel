@@ -25,6 +25,9 @@ export async function listChase(db, shop, params, now = new Date()) {
   const names = new Map(orders.map((o) => [o.orderId, o.name]));
   const chases = stored.length ? await db.lineChase.findMany({ where: { shop, lineId: { in: stored.map((l) => l.lineId) } } }) : [];
   const chased = new Map(chases.map((c) => [c.lineId, c.lastChasedAt]));
+  // Date Lapsed also shows each line's delivery: its booked date, whether it is booked (not just pre-booked) and the customer's answer.
+  const bookings = params.kind === "lapsed" && stored.length ? await db.deliveryBooking.findMany({ where: { shop, lineId: { in: stored.map((l) => l.lineId) } } }) : [];
+  const booking = new Map(bookings.map((b) => [b.lineId, b]));
   const rows = stored.map((l) => ({
     lineId: l.lineId,
     orderId: l.orderId,
@@ -38,6 +41,9 @@ export async function listChase(db, shop, params, now = new Date()) {
     expectedDate: l.expectedDate,
     deliveryOutcome: l.deliveryOutcome,
     lastChasedAt: chased.get(l.lineId)?.toISOString?.() ?? null,
+    deliveryDate: booking.get(l.lineId)?.date ?? null,
+    deliveryBooked: Boolean(booking.get(l.lineId)?.date && !booking.get(l.lineId)?.prebook),
+    confirmNote: booking.get(l.lineId)?.confirmNote ?? null,
   }));
   return { rows, summary, total: summary.lines, page, pageCount, capped: params.all && summary.lines > MAX_ALL };
 }
@@ -153,7 +159,8 @@ export async function queueSupplierEmails(db, { shop, request, actor, config, no
 const dmy = (iso) => (iso ? iso.split("-").reverse().join("/") : "");
 const ukDate = (d) => (d ? new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(d)) : "");
 const CHASE_HEADERS = ["Order No", "Brand", "Product Name", "Qty", "Order Date", "Expected Delivery Date", "Last Chaseup Date", "Order Status"];
-const LAPSED_HEADERS = ["Order No", "Brand", "Product Name", "Qty", "Order Date", "Expected Delivery Date", "Order Status"];
+const LAPSED_HEADERS = ["Order No", "Brand", "Product Name", "Qty", "Order Date", "Expected Delivery Date", "Delivery Date", "Delivery Booked", "Delivery Confirmed?", "Order Status"];
+const confirmText = (outcome) => (outcome === "confirmed" ? "Confirm" : outcome === "declined" ? "Not Confirm" : "");
 
 /** The CSV of the Supplier Chaseup or Date Lapsed list (every matching line, up to 5,000): { csv, count, capped }. */
 export async function buildChaseCsv(db, shop, params, now = new Date()) {
@@ -161,7 +168,9 @@ export async function buildChaseCsv(db, shop, params, now = new Date()) {
   const rows = list.rows.map((r) => {
     const status = statusLabels.get(r.lineStatusId) ?? "";
     const base = [r.orderName, r.brand, r.product, r.quantity, ukDate(r.orderCreatedAt), dmy(r.expectedDate)];
-    return params.kind === "lapsed" ? [...base, status] : [...base, ukDate(r.lastChasedAt), status];
+    return params.kind === "lapsed"
+      ? [...base, dmy(r.deliveryDate), r.deliveryBooked ? "Yes" : "", confirmText(r.deliveryOutcome), status]
+      : [...base, ukDate(r.lastChasedAt), status];
   });
   return { csv: buildCsv(params.kind === "lapsed" ? LAPSED_HEADERS : CHASE_HEADERS, rows), count: rows.length, capped: list.capped };
 }

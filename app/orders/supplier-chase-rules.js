@@ -63,6 +63,8 @@ export function buildChaseWhere(shop, p, now = new Date()) {
   const statuses = p.kind === "lapsed" ? LAPSED_STATUSES : CHASE_STATUSES;
   const and = [{ orderArchived: false }, { lineStatusId: { in: statuses } }, { expectedDate: { not: null } }, { expectedDate: { not: "" } }, { expectedDate: expectedWindow(p.kind, p, now) }];
   if (p.brand) and.push(p.brand === "Unmapped" ? { OR: [{ vendor: null }, { vendor: "" }] } : { vendor: p.brand });
+  // The old Date Lapsed page left out clearance items and items already sold as in stock (by their product name).
+  if (p.kind === "lapsed") and.push({ NOT: { title: { startsWith: "Clearance", mode: "insensitive" } } }, { NOT: { title: { contains: "In Stock", mode: "insensitive" } } });
   return { shop, AND: and };
 }
 

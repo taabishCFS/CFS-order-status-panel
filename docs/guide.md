@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 56 (28 November 2026)
+**Guide version:** 57 (28 November 2026)
 
 ## Before you start
 
@@ -624,7 +624,11 @@ Open it from the **Dashboard**. It lists lines that are Order in Progress, Delay
 - **Download CSV** gives the list as a spreadsheet.
 
 ### Date Lapsed
-Lines whose expected date is today or earlier and that are still Order in Progress, Delayed, Invoice Paid, Due In Stock or Service Issue. Filter by brand or expected date and download the CSV.
+Lines whose expected date is today or earlier and that are still Order in Progress, Delayed, Invoice Paid, Due In Stock or Service Issue. Filter by brand or expected date and download the CSV. This is the old **Instock Date Lapsed** page from the Order menu.
+
+- Clearance items (the name starts with "Clearance") and items whose name says "In Stock" are left off, as on the old page.
+- **Delivery** is the date the item is booked for, **Booked?** shows **Booked** once it has a firm (not pre-booked) date, and **Confirm / Notes** shows whether the customer **Confirmed** or answered **Not confirmed** on the confirm link, with any note they typed.
+- The CSV has the same delivery columns: Delivery Date, Delivery Booked and Delivery Confirmed?.
 
 Only staff with the **Process Order** permission can send these emails (see Permissions).
 
@@ -896,6 +900,7 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
+| 28 Nov 2026 | 57 | Date Lapsed matches the old Instock Date Lapsed: clearance and In Stock items left off, delivery date, booked and customer confirm columns (page and CSV). V12 Approval Status not copied (V12 finance no longer used) |
 | 28 Nov 2026 | 56 | Payment History page: every payment and refund, newest first, date filter; tried live and marked Ready |
 | 28 Nov 2026 | 55 | Balance Pending tried live and marked Ready; Export ticked now exports the ticked orders whatever Status is chosen |
 | 27 Nov 2026 | 54 | Balance Pending page: every order that still owes money, paid and owed amounts, status filter, search, Export ticked and Download All |

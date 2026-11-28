@@ -39,7 +39,12 @@ describe("reading requests", () => {
     const chase = buildChaseWhere(SHOP, { kind: "chaseup", brand: "Actona", from: null, to: null }, NOW);
     expect(chase.AND).toContainEqual({ lineStatusId: { in: [3, 10, 15, 16] } });
     expect(chase.AND).toContainEqual({ vendor: "Actona" });
-    expect(buildChaseWhere(SHOP, { kind: "lapsed", brand: null, from: null, to: null }, NOW).AND).toContainEqual({ lineStatusId: { in: [3, 10, 13, 57, 15] } });
+    const lapsed = buildChaseWhere(SHOP, { kind: "lapsed", brand: null, from: null, to: null }, NOW).AND;
+    expect(lapsed).toContainEqual({ lineStatusId: { in: [3, 10, 13, 57, 15] } });
+    // Clearance and "In Stock" items are left off Date Lapsed, as on the old page, but stay on Supplier Chaseup.
+    expect(lapsed).toContainEqual({ NOT: { title: { startsWith: "Clearance", mode: "insensitive" } } });
+    expect(lapsed).toContainEqual({ NOT: { title: { contains: "In Stock", mode: "insensitive" } } });
+    expect(chase.AND.some((c) => c.NOT)).toBe(false);
   });
   it("accepts one or a few email addresses and refuses anything else", () => {
     expect(cleanEmails(" A@x.com ; b@y.co.uk, a@x.com")).toBe("a@x.com, b@y.co.uk");
@@ -118,6 +123,17 @@ describe("listChase", () => {
     expect(r.rows[0]).toMatchObject({ orderName: "#1001", brand: "Welcome", lastChasedAt: "2026-11-29T09:00:00.000Z" });
     expect(r.rows[1]).toMatchObject({ brand: "Unmapped", lastChasedAt: null });
     expect(db.seen.where.AND).toContainEqual({ expectedDate: { equals: "2026-12-03" } });
+  });
+  it("Date Lapsed adds each line's delivery date, booked mark and customer note", async () => {
+    const lines = [
+      { lineId: L(1), orderId: O(1), vendor: "Welcome", title: "Bed", quantity: 1, lineStatusId: 3, expectedDate: "2026-11-20", deliveryOutcome: "confirmed", orderCreatedAt: new Date("2026-11-01") },
+      { lineId: L(2), orderId: O(1), vendor: "Welcome", title: "Chair", quantity: 1, lineStatusId: 3, expectedDate: "2026-11-20", deliveryOutcome: null, orderCreatedAt: new Date("2026-11-01") },
+    ];
+    const db = chaseDb({ lines, orders: [{ orderId: O(1), name: "#1001" }] });
+    db.deliveryBooking = { findMany: async () => [{ lineId: L(1), date: "2026-12-04", prebook: false, confirmNote: "Ring first" }, { lineId: L(2), date: "2026-12-05", prebook: true, confirmNote: null }] };
+    const r = await listChase(db, SHOP, { kind: "lapsed", brand: null, from: null, to: null, page: 1, all: false }, NOW);
+    expect(r.rows[0]).toMatchObject({ deliveryDate: "2026-12-04", deliveryBooked: true, confirmNote: "Ring first", deliveryOutcome: "confirmed" });
+    expect(r.rows[1]).toMatchObject({ deliveryDate: "2026-12-05", deliveryBooked: false, confirmNote: null });
   });
 });
 

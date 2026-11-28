@@ -21,6 +21,9 @@ export interface ChaseRow {
   expectedDate: string | null;
   deliveryOutcome: string | null;
   lastChasedAt: string | null;
+  deliveryDate?: string | null; // Date Lapsed only
+  deliveryBooked?: boolean;
+  confirmNote?: string | null;
 }
 export interface ChaseList {
   rows: ChaseRow[];
