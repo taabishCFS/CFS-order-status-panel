@@ -7,7 +7,7 @@ describe("Payment History", () => {
     expect(parsePaymentParams(new URLSearchParams("from=01/11/2026&to=2026-13-45&before=x y"))).toEqual({ from: "", to: "", after: "", before: "" });
   });
   it("searches whole days", () => {
-    expect(paymentSearch({ from: "2026-11-01", to: "2026-11-02" })).toBe("processed_at:>=2026-11-01T00:00:00Z processed_at:<=2026-11-02T23:59:59Z");
+    expect(paymentSearch({ from: "2026-11-01", to: "2026-11-30" })).toBe("processed_at:>=2026-11-01 processed_at:<2026-12-01");
     expect(paymentSearch({ from: "", to: "" })).toBe("");
   });
   it("turns a transaction into a row; a negative amount is a refund", () => {
@@ -22,7 +22,7 @@ describe("Payment History", () => {
       return { json: async () => ({ data: { tenderTransactions: { nodes: [], pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: "s", endCursor: "e" } } } }) };
     };
     expect(await listPayments(graphql, { from: "2026-11-01", to: "", after: "", before: "" })).toEqual({ rows: [], hasNext: true, hasPrevious: false, next: "e", previous: null, size: 50 });
-    expect(calls[0]).toEqual({ query: "processed_at:>=2026-11-01T00:00:00Z", first: 50, after: null });
+    expect(calls[0]).toEqual({ query: "processed_at:>=2026-11-01", first: 50, after: null });
     await listPayments(graphql, { from: "", to: "", after: "", before: "b" });
     expect(calls[1]).toEqual({ query: null, last: 50, before: "b" });
   });

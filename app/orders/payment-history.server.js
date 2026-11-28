@@ -21,11 +21,13 @@ export function parsePaymentParams(searchParams) {
   };
 }
 
-/** The Shopify search for the date range; both ends are whole days. */
+const dayAfter = (s) => new Date(Date.parse(`${s}T00:00:00Z`) + 86400000).toISOString().slice(0, 10);
+
+/** The Shopify search for the date range; both ends are whole days. Dates without a time are the shop's own days (UK time). */
 export function paymentSearch({ from, to }) {
   const terms = [];
-  if (from) terms.push(`processed_at:>=${from}T00:00:00Z`);
-  if (to) terms.push(`processed_at:<=${to}T23:59:59Z`);
+  if (from) terms.push(`processed_at:>=${from}`);
+  if (to) terms.push(`processed_at:<${dayAfter(to)}`);
   return terms.join(" ");
 }
 

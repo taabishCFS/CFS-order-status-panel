@@ -4,6 +4,7 @@ import { formatMoney } from './orderList';
 import { loadPayments } from './paymentHistory';
 
 const orderUrl = (gid) => `/orders/${gid.split('/').pop()}`;
+const money = (r) => (r.amountMinor < 0 ? `-${formatMoney(-r.amountMinor, r.currency)}` : formatMoney(r.amountMinor, r.currency));
 const when = (iso) => (iso ? new Date(iso).toLocaleString('en-GB', { timeZone: 'Europe/London', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '');
 
 // Payment History (old Order menu, "Payment/Refund"): every payment and refund on the shop, newest first, read live from Shopify.
@@ -84,7 +85,7 @@ export default function PaymentHistoryPage() {
             <s-table-body>
               {rows.map((r) => (
                 <s-table-row key={r.id}>
-                  <s-table-cell>{r.orderId ? <s-link href={orderUrl(r.orderId)} tone="critical">{r.orderName}</s-link> : r.orderName}</s-table-cell>
+                  <s-table-cell>{r.orderId ? <s-link href={orderUrl(r.orderId)} tone="critical">{r.orderName}</s-link> : <s-text tone="neutral" color="subdued">Order hidden by Shopify</s-text>}</s-table-cell>
                   <s-table-cell>{r.reference}</s-table-cell>
                   <s-table-cell>
                     <s-stack direction="inline" gap="small-200">
@@ -92,7 +93,7 @@ export default function PaymentHistoryPage() {
                       {r.test && <s-badge>Test</s-badge>}
                     </s-stack>
                   </s-table-cell>
-                  <s-table-cell>{r.type === 'Refund' ? <s-text tone="critical">{formatMoney(r.amountMinor, r.currency)}</s-text> : formatMoney(r.amountMinor, r.currency)}</s-table-cell>
+                  <s-table-cell>{r.type === 'Refund' ? <s-text tone="critical">{money(r)}</s-text> : money(r)}</s-table-cell>
                   <s-table-cell>{r.payType}</s-table-cell>
                   <s-table-cell>{r.customer.toUpperCase()}</s-table-cell>
                   <s-table-cell>{r.email}</s-table-cell>
