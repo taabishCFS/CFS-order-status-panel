@@ -91,6 +91,7 @@ model OrderLine {
   deliveryOutcome String?
   stockedDate     String? // YYYY-MM-DD the line last came into stock (status 4); kept when it moves on
   cancelReason    String? // the reason typed when the line was set to Cancelled (status 7)
+  completedDate   String? // YYYY-MM-DD (UK) the line was set to Completed (status 6)
   orderCreatedAt  DateTime @default(now())
   orderArchived   Boolean  @default(false)
 
@@ -649,4 +650,32 @@ model LineReturnAction {
   updatedAt DateTime @updatedAt
 
   @@id([shop, lineId])
+}
+
+// Feedback Calling (legacy orders.call_date / review_*): one order's review call after every item was Completed.
+model FeedbackCall {
+  shop          String
+  orderId       String
+  orderName     String
+  callDate      String? // YYYY-MM-DD
+  staff         String? // a caller name from FeedbackCaller
+  callStatus    String? // Completed | Pending
+  remark        String?
+  remark2       String?
+  rating        String?
+  ratingDate    String? // YYYY-MM-DD
+  updatedByName String?
+  updatedAt     DateTime @updatedAt
+
+  @@id([shop, orderId])
+  @@index([shop, staff])
+}
+
+// The people who make feedback calls (legacy: six names written into the page). Kept on the Feedback Calling page.
+model FeedbackCaller {
+  shop      String
+  name      String
+  createdAt DateTime @default(now())
+
+  @@id([shop, name])
 }

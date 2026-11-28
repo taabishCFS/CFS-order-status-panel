@@ -3,6 +3,7 @@ import { parseRescheduleParams } from "../orders/reschedule-orders.server";
 import { parseMinervaParams } from "../orders/minerva.server";
 import { parseOrderReportParams } from "../orders/order-reports.server";
 import { parseBalancePendingParams } from "../orders/balance-pending.server";
+import { parseFeedbackParams } from "../orders/feedback-calling.server";
 import { marketingQuery, parseMarketingParams } from "../orders/marketing-sales.server";
 import db from "../db.server";
 import { can } from "../staff/permissions.server";
@@ -92,6 +93,12 @@ export const loader = async ({ request }) => {
     query = new URLSearchParams({ ids: ids.join(","), ...(status ? { status: String(status) } : {}) }).toString();
   } else if (kind === "balance-pending-all") {
     query = "";
+  } else if (kind === "feedback-calling") {
+    const p = parseFeedbackParams(search);
+    const q = new URLSearchParams({ from: p.from, to: p.to });
+    if (p.q) q.set("q", p.q);
+    if (p.staff) q.set("staff", p.staff);
+    query = q.toString();
   } else if (kind === "maxpro-order" || kind === "maxpro-product") {
     const ids = [...new Set((search.get("ids") ?? "").split(",").filter((x) => /^\d{1,20}$/.test(x)))];
     if (ids.length === 0 || ids.length > MAX_EXPORT_ORDERS) return json({ error: "bad_request" }, 400);

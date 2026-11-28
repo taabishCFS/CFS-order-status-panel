@@ -5,6 +5,8 @@ const int = (v) => (Number.isInteger(v) ? v : null);
 const text = (v) => (typeof v === "string" ? v : null);
 const isObject = (v) => v && typeof v === "object" && !Array.isArray(v);
 const isoDay = (v) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null);
+// The UK calendar day of a timestamp, as YYYY-MM-DD; null when it is not a real time.
+const ukDay = (v) => (typeof v === "string" && !Number.isNaN(Date.parse(v)) ? new Date(v).toLocaleDateString("en-CA", { timeZone: "Europe/London" }) : null);
 
 export function readStatusState(value) {
   if (value == null) return empty(false);
@@ -33,6 +35,8 @@ export function readStatusState(value) {
       stockedDate: isoDay(state.supplierDelivered?.[id]?.date),
       // The reason typed when the line was set to Cancelled (shown on Returned Items).
       cancelReason: stamp?.statusId === 7 ? text(stamp?.extras?.cancelReason) : null,
+      // The day the line was set to Completed (Feedback Calling lists orders by it).
+      completedDate: stamp?.statusId === 6 ? ukDay(stamp?.at) : null,
     };
   }
   return { orderStatusId: int(state.order?.statusId), lines, unreadable: false };

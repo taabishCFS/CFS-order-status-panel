@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 58 (28 November 2026)
+**Guide version:** 59 (28 November 2026)
 
 ## Before you start
 
@@ -46,7 +46,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 36 | Instock Balance Due (orders that still owe money while every item is in stock or on its way) | Ready, not yet tried |
 | 48 | Balance Pending (every order that still owes money, paid and owed amounts, two downloads) | Ready |
 | 49 | Payment History (every payment and refund taken, newest first, date filter) | Ready |
-| 50 | Returned Items (every cancelled item with its reason; mark what was done with the goods) | Ready, not yet tried |
+| 50 | Returned Items (every cancelled item with its reason; mark what was done with the goods) | Ready |
+| 51 | Feedback Calling (completed orders to phone for a review: caller, call status, remarks, rating) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
@@ -147,6 +148,18 @@ Open **Returned Items** on the Dashboard (Orders group). It lists **every item s
 **Good to know:** the reason is read from orders as they change. An item cancelled before this page was added shows "Not given" until its order next changes, or until **Refresh order data** is pressed on the Orders page.
 
 **Not copied:** the sort-by-column links, and the download button (in the old system it called something that did not exist, so it never worked).
+
+### Feedback Calling
+Open **Feedback Calling** on the Dashboard (Orders group). It lists the orders whose **every item is Completed**, so you can phone the customer for a review, like the old Feedback Calling page.
+
+- It opens on orders completed **today**. Pick **Completed from** and **To** dates and press **Search** (one date alone means that day). **Order No. / Postcode** searches; **Staff** shows one caller's orders; **Reset** goes back to today.
+- The **Completed Date** is the day the order's last item was set to Completed. **Month** is that month and **Alloc.Date** the day after.
+- Fill in each order's **Calling Date**, **Staff**, **Call Status** (Completed or Pending), **Remark**, **Remark 2**, **Rating Recv** and **Rating Date** straight in the table. Each one saves by itself: dates and lists when you pick, text when you leave the box. Orders not yet called show **To call**.
+- **Share out unassigned** gives every order in the dates with no caller to the callers in turn, starting again with the first caller for each completed day (the old page did this whenever it was opened; now it only happens when you press the button).
+- **Callers** (top right) shows the list of people who make the calls: add or remove names there. It starts with the six names from the old page. Removing a caller does not change orders already given to them.
+- **Download CSV** gives the list as filtered, with the same columns.
+
+**Good to know:** the app keeps the completed day from now on. Orders completed before this page was added show **Not known** and appear whatever dates you pick (as on the old page) until the order next changes or **Refresh order data** is pressed on the Orders page.
 
 ---
 
@@ -913,7 +926,8 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
-| 28 Nov 2026 | 58 | Returned Items page: cancelled items with their cancel reason, and the action taken with the returned goods |
+| 28 Nov 2026 | 59 | Feedback Calling page: completed orders to phone for a review, callers list, share out, CSV |
+| 28 Nov 2026 | 58 | Returned Items page: cancelled items with their cancel reason, and the action taken with the returned goods; tried live and marked Ready |
 | 28 Nov 2026 | 57 | Date Lapsed matches the old Instock Date Lapsed: clearance and In Stock items left off, delivery date, booked and customer confirm columns (page and CSV). V12 Approval Status not copied (V12 finance no longer used); tried live |
 | 28 Nov 2026 | 56 | Payment History page: every payment and refund, newest first, date filter; tried live and marked Ready |
 | 28 Nov 2026 | 55 | Balance Pending tried live and marked Ready; Export ticked now exports the ticked orders whatever Status is chosen |

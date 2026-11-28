@@ -8,6 +8,7 @@ import { KINDS, outcomeCsv, parseOutcomeParams } from "../delivery/outcome-rules
 import { balanceRowsFor, instockBalanceCsv } from "../delivery/instock-balance.server";
 import { balancePendingAllCsv, balancePendingCsv, balancePendingFileName, balancePendingRowsFor, parseBalancePendingParams } from "../orders/balance-pending.server";
 import { maxproRowsFor } from "../delivery/maxpro.server";
+import { feedbackCsv, parseFeedbackParams } from "../orders/feedback-calling.server";
 import { orderWiseCsv, productWiseCsv } from "../delivery/maxpro-rules";
 import { bookedCsv, bookedFileName, driverSheetCsv, pickListCsv, sheetFileName } from "../delivery/delivery-csv";
 import { payCsv, payRowsFor } from "../orders/pay-supplier.server";
@@ -104,6 +105,12 @@ export const loader = async ({ request }) => {
     const graphql = (await unauthenticated.admin(link.shop)).admin.graphql;
     const out = await balancePendingAllCsv(db, graphql, link.shop);
     if (out.count === 0) return refuse(404, "Nothing to export: the orders that owe money have no items to list (Completed, Cancelled, Deleted, Order Failed, Payment Not Confirmed, Awaiting V12 Approval and Awaiting Payment items are left out).");
+    return file(out.csv, out.fileName);
+  }
+  if (link.kind === "delivery-feedback-calling") {
+    const p = parseFeedbackParams(query);
+    const out = await feedbackCsv(db, link.shop, p);
+    if (out.count === 0) return refuse(404, "Nothing to export: no completed orders match these dates and filters.");
     return file(out.csv, out.fileName);
   }
   if (link.kind === "delivery-maxpro-order" || link.kind === "delivery-maxpro-product") {
