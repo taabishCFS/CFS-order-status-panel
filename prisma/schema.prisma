@@ -679,3 +679,38 @@ model FeedbackCaller {
 
   @@id([shop, name])
 }
+
+// Service Issue Report (legacy service_issue_report): a staff-kept log of service issues. Every field is typed by staff.
+model ServiceIssue {
+  id              Int      @id @default(autoincrement())
+  shop            String
+  raisedDate      String? // YYYY-MM-DD
+  expectedDate    String? // YYYY-MM-DD
+  orderNo         String?
+  brand           String?
+  item            String?
+  code            String?
+  remark          String?
+  qty             Int?
+  process         String?
+  chargeable      String? // Chargeable | Non Chargeable
+  amount          String?
+  supplierOffered String?
+  status          String? // Open | Closed
+  rma             String?
+  mdTd            String? // MD | TD
+  cost            String?
+  price           String?
+  discount        String?
+  finalPrice      String?
+  van             String?
+  containerNo     String?
+  takenBy         String?
+  photos          Json     @default("[]") // [{ id: Shopify file gid, url }], up to 5
+  updatedByName   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([shop, raisedDate])
+  @@index([shop, code])
+}

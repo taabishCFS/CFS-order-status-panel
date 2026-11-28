@@ -2,7 +2,7 @@
 
 This guide shows you, step by step, how to use the new order screens in Shopify. They do the same job as the Orders section of the old CFS admin.
 
-**Guide version:** 59 (28 November 2026)
+**Guide version:** 60 (28 November 2026)
 
 ## Before you start
 
@@ -47,7 +47,8 @@ This guide shows you, step by step, how to use the new order screens in Shopify.
 | 48 | Balance Pending (every order that still owes money, paid and owed amounts, two downloads) | Ready |
 | 49 | Payment History (every payment and refund taken, newest first, date filter) | Ready |
 | 50 | Returned Items (every cancelled item with its reason; mark what was done with the goods) | Ready |
-| 51 | Feedback Calling (completed orders to phone for a review: caller, call status, remarks, rating) | Ready, not yet tried |
+| 51 | Feedback Calling (completed orders to phone for a review: caller, call status, remarks, rating) | Ready |
+| 52 | Service Issue Report (staff log of service issues with photos; replaces the old Report, Images and By Vendor pages) | Ready, not yet tried |
 | 37 | Pay To Supplier and Supplier Paid (check costs, add invoice numbers, mark lines paid or unpaid) | Ready, not yet tried |
 | 38 | Supplier Payments (your own list of items to pay, filled with Add To Accounts on an order) | Ready |
 | 39 | Proforma Payment Report and Credit Payment Report (items to pay suppliers for, with the invoice amount with and without VAT) | Ready |
@@ -160,6 +161,20 @@ Open **Feedback Calling** on the Dashboard (Orders group). It lists the orders w
 - **Download CSV** gives the list as filtered, with the same columns.
 
 **Good to know:** the app keeps the completed day from now on. Orders completed before this page was added show **Not known** and appear whatever dates you pick (as on the old page) until the order next changes or **Refresh order data** is pressed on the Orders page.
+
+### Service Issue Report
+Open **Service Issue Report** on the Dashboard (Orders group). It is the log of service issues that staff keep by hand, like the old Service Issue Report page. The old **Service Issue Report Images** and **Service Issue Report By Vendor** pages are part of this one page now.
+
+- **Add New** (top right) opens a form with every field. **Item** is needed. Status starts **Open**, Date SO Raised starts today and Name starts as you. Final Price is worked out as Price minus Discount.
+- Every column in the table can be changed straight in the table: dates and lists save when you pick, text when you leave the box. Changing **Price** or **Discount** works the **Final Price** out again.
+- **Chargeable?** is Chargeable or Non Chargeable; **Status** is Open or Closed; **MD/TD** is MD or TD. Money boxes take numbers only (a £ sign or commas are fine).
+- Filters: **Search** (order no, item, brand or code), **Raised from / To** dates with **GO**, and the **Brand**, **Vendor**, **User** and **Status** lists. **Reset** clears them.
+- **Vendor** is the supplier recorded for the item's **Code** in the container stock (as the old By Vendor page did). Issues whose code is not in the container stock show "-".
+- When the Order No. is one of the shop's orders, an **Order** link under the ID opens it.
+- **Photos (n)** opens that issue's photos at the top of the page: add up to 5 photos (20 MB each, JPG, PNG, GIF, WEBP or HEIC), open one full size, or **Remove** it. Photos are kept in the store's Files (Shopify admin, Content, Files); removing one here deletes it there too. A new photo can show **Processing...** for a moment until Shopify has it ready.
+- **Download CSV** gives the list as filtered, with every column, the vendor and the photo links.
+
+**Not copied:** the sort-by-column links and the tick boxes (the old page did nothing with them). Issues cannot be deleted (the old page could not either).
 
 ---
 
@@ -926,7 +941,8 @@ These will be added to this guide as soon as they are built:
 | 26 Nov 2026 | 38 | Supplier Payments page and the Add To Accounts button on an order: tick items, add them to your own list, then mark Paid, Not Paid or Delete (take off the list) |
 | 26 Nov 2026 | 39 | Proforma Payment Report and Credit Payment Report pages: brand and date filters, invoice amount and invoice + VAT, download of ticked items; Supplier Payments tried and marked Ready |
 | 26 Nov 2026 | 40 | Dashboard grouped like the old menus (new Accounts group). Reschedule on an order now asks Delivery attempted before?; Yes adds a reschedule charge. New Reschedule Delivery Orders page |
-| 28 Nov 2026 | 59 | Feedback Calling page: completed orders to phone for a review, callers list, share out, CSV |
+| 28 Nov 2026 | 60 | Service Issue Report page: the service issue log with editing in the table, Add New, brand/vendor/user/status filters, photos and CSV |
+| 28 Nov 2026 | 59 | Feedback Calling page: completed orders to phone for a review, callers list, share out, CSV. Tried live: share out, saving each field, callers, CSV and the completed-date filter all work; table boxes widened |
 | 28 Nov 2026 | 58 | Returned Items page: cancelled items with their cancel reason, and the action taken with the returned goods; tried live and marked Ready |
 | 28 Nov 2026 | 57 | Date Lapsed matches the old Instock Date Lapsed: clearance and In Stock items left off, delivery date, booked and customer confirm columns (page and CSV). V12 Approval Status not copied (V12 finance no longer used); tried live |
 | 28 Nov 2026 | 56 | Payment History page: every payment and refund, newest first, date filter; tried live and marked Ready |
